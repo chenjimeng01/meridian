@@ -207,6 +207,8 @@ export function buildResults(input: BuildResultsInput): Results {
     usParams: readParams("us/2026.json"),
     ukParams: readParams("uk/2026-27.json"),
     pficRules: readParams("shared/pfic-rules.json"),
+    situsRules: readParams("shared/situs-rules.json"),
+    currencyOfLifeRules: readParams("shared/currency-of-life.json"),
     wrapperMatrix: readParams("shared/wrapper-matrix.json"),
     asof,
     toBase: (money, at) => convert(money, base, at, fx).exact,

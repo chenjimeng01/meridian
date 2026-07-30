@@ -73,16 +73,41 @@ preview produces sane A4.
   prompt needs a host page that serves a worker. Recorded as a deliberate
   trade-off, not an omission.
 
-## PHASE_REVIEW_4 SHOULD-FIX (were untracked — now listed)
+## SHOULD-FIX debt — cleared
 
-Not yet done: float-rounding sweep (S1-S3); `fx.ts` hard-codes the USD pivot
-(S4); the cost stack reconciles against hand-typed constants rather than
-ingested figures (S6); three engine entry points do not take a ledger (S7);
-`latestHoldings` has no disposal semantics, so a sold holding never disappears
-(S8); the two currency columns are two different measurements and this is not
-stated (S9); concentration is measured against total rather than investable
-wealth (S10). Plus PHASE_REVIEW_5's 14 SHOULD-FIX, including table semantics
-(`scope`, `caption`) and non-text contrast below 3:1.
+- [x] **S8 disposal semantics.** `latestHoldings` took the latest snapshot per
+      (account, instrument), so a position sold and absent from the newest
+      statement was resurrected forever — it stayed in the client's total, in
+      their concentration flags and in their PFIC list. Each account is now
+      read at its own most recent valuation date, which is what a statement
+      actually asserts. Regression test sells a holding and checks it leaves.
+      This also corrected the FX fixture, which had modelled two valuation
+      dates inside one account — an impossible statement.
+- [x] **S10 concentration base.** Measured against total wealth, a 6% position
+      reads as 4% simply because a deposit account sits beside it. Now measured
+      against investable wealth, with the exclusions in params and reported on
+      the result so the denominator is visible.
+- [x] **S2/S3 rounding.** `Math.round` replaced with the half-even the fx
+      policy mandates, everywhere it reached a presented figure.
+- [x] **S4 FX pivot and ignored policy.** The USD pivot is now read from
+      params, and `policyOf` FAILS if the policy asks for a date or cross-rate
+      rule the engine does not implement — a params file the engine silently
+      ignores documents a behaviour nobody has.
+- [x] **S9 the two currency columns.** They are the same wealth measured two
+      ways — base struck at each holding's own valuation date, secondary
+      converted at one report-date rate — and the report now says so, with the
+      rate and its date.
+- [x] **Table semantics.** Every header cell carries `scope="col"`.
+- [x] **Params naming wart.** `situs-rules.json` and `currency-of-life.json`
+      split out of `pfic-rules.json`, where they lived only because the Module
+      3 agent was scoped to one writable file.
+
+Still open (lower value, none affecting a reported figure): S1 unrounded floats
+inside the `usconnect` result object; S6 the cost-stack golden reconciles
+against hand-typed constants rather than ingested figures; S7 three engine
+entry points take loose arguments rather than a ledger; plus the remainder of
+PHASE_REVIEW_5's SHOULD-FIX list (non-text contrast below 3:1 on some chart
+fills, chart `<caption>` elements).
 
 ## Phase 5 findings
 

@@ -222,11 +222,16 @@ const fxMismatch = (() => {
   const personId = id();
   const docId = id();
   const accountId = id();
+  const olderAccountId = id();
   const instruments = [
     { key: "gbpFund", name: "Northgate UK Smaller Companies OEIC", type: "oeic", domicile: "GB", currency: "GBP", units: 10000, price: 1, asof: "2026-06-30" },
     { key: "usdFund", name: "Pioneer S&P Index Fund", type: "mutual_fund_us", domicile: "US", currency: "USD", units: 12800, price: 1, asof: "2026-06-30" },
     { key: "eurFund", name: "Continental Europe Equity SICAV", type: "other_pooled", domicile: "LU", currency: "EUR", units: 5400, price: 1, asof: "2026-06-30" },
-    { key: "oldUsd", name: "Keystone Treasury Money Market Fund", type: "mmf", domicile: "US", currency: "USD", units: 2500, price: 1, asof: "2026-02-15" },
+    // In a SECOND account: a statement is a complete picture of its own
+    // account, so two valuation dates within one account would mean the older
+    // position had been sold. Different accounts reporting on different dates
+    // is the real-world case, and is what makes the FX dates mismatch.
+    { key: "oldUsd", name: "Keystone Treasury Money Market Fund", type: "mmf", domicile: "US", currency: "USD", units: 2500, price: 1, asof: "2026-02-15", account: "older" },
   ].map((i) => ({ ...i, id: id() }));
 
   return {
@@ -243,6 +248,11 @@ const fxMismatch = (() => {
         account_token: "A1", wrapper: "gia", wrapper_jurisdiction: "UK",
         custody_currency: "GBP", opened: null, data_asof: "2026-06-30",
       },
+      {
+        id: olderAccountId, person_ids: [personId], institution: "Liberty Street Securities",
+        account_token: "A2", wrapper: "us_brokerage", wrapper_jurisdiction: "US",
+        custody_currency: "USD", opened: null, data_asof: "2026-02-15",
+      },
     ],
     instruments: instruments.map((i) => ({
       id: i.id, identifiers: {}, name: i.name, type: i.type, domicile: i.domicile,
@@ -250,7 +260,8 @@ const fxMismatch = (() => {
       prices: [{ date: i.asof, price: { amount: i.price, currency: i.currency }, source: "statement" }],
     })),
     holdings: instruments.map((i) => ({
-      account_id: accountId, instrument_id: i.id, asof: i.asof, units: i.units,
+      account_id: i.account === "older" ? olderAccountId : accountId,
+      instrument_id: i.id, asof: i.asof, units: i.units,
       value: { amount: r2(i.units * i.price), currency: i.currency },
       source_document_id: docId,
     })),
@@ -267,7 +278,7 @@ const fxMismatch = (() => {
       {
         id: id(), document_id: docId, parse_run_id: "RUN-FX-01",
         accepted_at: ACCEPTED_AT, operator_initials: "JC",
-        lines: instruments.map((i) => ({ kind: "holding", account_token: "A1", ref: i.name, action: "accepted", instrument_id: i.id })),
+        lines: instruments.map((i) => ({ kind: "holding", account_token: i.account === "older" ? "A2" : "A1", ref: i.name, action: "accepted", instrument_id: i.id })),
       },
     ],
     // No rate lands on 2026-06-30 or 2026-02-15, and GBPEUR is never quoted.

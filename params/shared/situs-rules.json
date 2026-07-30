@@ -1,0 +1,235 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "situs-rules",
+  "effective": {
+    "from": "2026-01-01",
+    "to": "2099-12-31"
+  },
+  "comment": "SPEC §7.3 situs cascade. Split out of pfic-rules.json, where it lived only because of a scoping constraint during the build.",
+  "situs": {
+    "comment": "SPEC §7.3. Ordered cascade, first match wins, evaluated per holding (instrument + the account that holds it). Situs follows the asset, not the custodian.",
+    "label": {
+      "value": "Exposure sketch — not advice",
+      "source": "SPEC §7.3 requires the whole section to carry this label",
+      "status": "published"
+    },
+    "attribution": {
+      "value": "equal_split_across_account_owners",
+      "source": "Meridian v0 modelling assumption: a holding in a jointly owned account is attributed equally to each named owner; beneficial ownership is not recorded in the ledger",
+      "status": "published"
+    },
+    "treaty_credit": {
+      "value": "Modelling assumption: the UK/US estate and gift tax treaty (1979) is assumed to be available, giving primary taxing rights by situs and domicile with credit relief for the other country's tax, and extending a prorated unified credit to a non-US-domiciled decedent. No treaty credit is computed here — the two columns are gross exposure, before any treaty relief.",
+      "source": "UK/US Estate, Gift and Generation-Skipping Tax Convention 1979, Arts. 5-9 and 11",
+      "status": "published"
+    },
+    "asset_classes": {
+      "comment": "Every class a situs rule may assign. Classes carrying us_params_ref must appear in that list in params/us/2026.json — the module asserts it at run time.",
+      "us_incorporated_stock": {
+        "situs": "us",
+        "us_params_ref": "situs.us_situs_asset_classes",
+        "sources": [
+          "IRC s2104(a); Treas. Reg. 20.2104-1(a)(5): stock of a US corporation is US-situs wherever the certificate or custody sits, including via ADR"
+        ]
+      },
+      "us_real_property": {
+        "situs": "us",
+        "us_params_ref": "situs.us_situs_asset_classes",
+        "sources": [
+          "IRC s2104; Treas. Reg. 20.2104-1(a)(1)"
+        ]
+      },
+      "us_situs_debt_non_portfolio": {
+        "situs": "us",
+        "us_params_ref": "situs.us_situs_asset_classes",
+        "sources": [
+          "IRC s2104(c)",
+          "IRC s2105(b)(3) portfolio-interest debt is excluded, but the exclusion cannot be verified from a statement — the conservative reading is applied"
+        ]
+      },
+      "us_retirement_plan_interest": {
+        "situs": "us",
+        "sources": [
+          "IRC s2104; the interest in a US qualified plan or IRA is treated as US-situs property, and the plan's own holdings are not looked through",
+          "UK/US DTA 2001 Arts. 17-18 (income treatment, not situs)"
+        ]
+      },
+      "non_us_incorporated_stock": {
+        "situs": "non_us",
+        "us_params_ref": "situs.non_us_situs_asset_classes",
+        "sources": [
+          "IRC s2104(a) by implication: only US-corporation stock is US-situs; shares in non-US corporations, OEICs, unit trusts and non-US funds are outside US situs"
+        ]
+      },
+      "us_bank_deposits_non_business": {
+        "situs": "non_us",
+        "us_params_ref": "situs.non_us_situs_asset_classes",
+        "sources": [
+          "IRC s2105(b)(1): deposits with a US bank not effectively connected with a US business are not US-situs",
+          "Non-US bank deposits are outside US situs entirely"
+        ]
+      },
+      "non_us_real_property": {
+        "situs": "non_us",
+        "sources": [
+          "IRC s2104(a): only real property situated in the US is US-situs"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "id": "us_retirement_plan",
+        "when": {
+          "wrapper_in": [
+            "401k",
+            "ira_trad",
+            "ira_roth",
+            "529"
+          ]
+        },
+        "asset_class": "us_retirement_plan_interest",
+        "explanation": "Held inside a US retirement or education plan. The estate asset is the interest in the US plan itself, which is US-situs; the plan's underlying holdings are not looked through."
+      },
+      {
+        "id": "metadata_unconfirmed",
+        "when": {
+          "metadata_confirmed": false
+        },
+        "asset_class": null,
+        "explanation": "Instrument type and domicile were inferred at ingestion and not operator-confirmed. Situs cannot be assigned from unverified metadata; the value is shown separately rather than dropped into either column."
+      },
+      {
+        "id": "us_corporation_security",
+        "when": {
+          "domicile_in": [
+            "US"
+          ],
+          "type_in": [
+            "equity",
+            "investment_trust",
+            "oeic",
+            "ucits_etf",
+            "us_etf",
+            "mutual_fund_us",
+            "mmf",
+            "other_pooled",
+            "private_equity"
+          ]
+        },
+        "asset_class": "us_incorporated_stock",
+        "explanation": "Stock of a US-incorporated issuer or fund. US-situs regardless of where it is held or in which currency it is quoted."
+      },
+      {
+        "id": "us_debt",
+        "when": {
+          "domicile_in": [
+            "US"
+          ],
+          "type_in": [
+            "bond"
+          ]
+        },
+        "asset_class": "us_situs_debt_non_portfolio",
+        "explanation": "Debt of a US obligor. The portfolio-interest exclusion may take it out of US situs, but qualification cannot be established from a statement, so the conservative (in-scope) reading is applied."
+      },
+      {
+        "id": "us_real_property",
+        "when": {
+          "domicile_in": [
+            "US"
+          ],
+          "type_in": [
+            "property"
+          ]
+        },
+        "asset_class": "us_real_property",
+        "explanation": "Real property situated in the United States."
+      },
+      {
+        "id": "cash_deposit",
+        "when": {
+          "type_in": [
+            "cash"
+          ]
+        },
+        "asset_class": "us_bank_deposits_non_business",
+        "explanation": "Cash deposit. Non-US deposits are outside US situs; deposits with a US bank not connected with a US trade or business are excluded by s2105(b)(1)."
+      },
+      {
+        "id": "non_us_security",
+        "when": {
+          "domicile_present": true,
+          "domicile_not": [
+            "US"
+          ],
+          "type_in": [
+            "equity",
+            "bond",
+            "investment_trust",
+            "oeic",
+            "ucits_etf",
+            "us_etf",
+            "mutual_fund_us",
+            "mmf",
+            "other_pooled",
+            "private_equity"
+          ]
+        },
+        "asset_class": "non_us_incorporated_stock",
+        "explanation": "Security or pooled vehicle of a non-US issuer. Outside US estate tax situs, though within UK IHT scope where the owner is UK long-term resident."
+      },
+      {
+        "id": "non_us_real_property",
+        "when": {
+          "domicile_present": true,
+          "domicile_not": [
+            "US"
+          ],
+          "type_in": [
+            "property"
+          ]
+        },
+        "asset_class": "non_us_real_property",
+        "explanation": "Real property situated outside the United States."
+      },
+      {
+        "id": "unmatched_fallback",
+        "when": {},
+        "asset_class": null,
+        "explanation": "No situs rule matched — typically a confirmed record with no domicile recorded. Reported separately rather than assigned to a column."
+      }
+    ],
+    "uk_iht_scope": {
+      "comment": "SPEC §7.3: post-2025 UK IHT scope is residence-based (params/uk/2026-27.json iht.long_term_residence_rule).",
+      "long_term_resident_flags": {
+        "value": [
+          "ltr_flag"
+        ],
+        "source": "FA 2025 residence-based IHT regime: a long-term UK resident (UK-resident in 10 of the previous 20 tax years) is in scope on worldwide assets. The ledger records the operator's conclusion as uk_domicile_status; residence history is not held, so the 10-of-20 test is not recomputed here.",
+        "status": "published"
+      },
+      "worldwide_note": {
+        "value": "Long-term UK resident: worldwide assets are within the scope of UK inheritance tax at death.",
+        "source": "IHTA 1984 s6 as amended by FA 2025; params/uk/2026-27.json iht.long_term_residence_rule",
+        "status": "published"
+      },
+      "uk_situs_note": {
+        "value": "Not recorded as a long-term UK resident: UK inheritance tax is assumed to reach UK-situs assets only. Residence history is not held in the ledger, so the 10-of-20 test cannot be evaluated by this system, and the post-departure tail provisions are not modelled.",
+        "source": "IHTA 1984 s6 as amended by FA 2025; Meridian v0 scope note",
+        "status": "published"
+      }
+    },
+    "us_estate_scope": {
+      "worldwide_note": {
+        "value": "US citizen or domiciliary: the worldwide estate is within the scope of US estate tax, and the situs split below is presentational only — it does not narrow the taxable estate.",
+        "source": "IRC s2031; Treas. Reg. 20.0-1(b)",
+        "status": "published"
+      },
+      "us_situs_only_note": {
+        "value": "Not a US person: US estate tax reaches US-situs assets only, against a unified credit equivalent to a much smaller exemption than a US person receives, subject to any treaty relief.",
+        "source": "IRC ss2101-2107; params/us/2026.json estate_gift.nonresident_alien_exemption_equivalent",
+        "status": "published"
+      }
+    }
+  }
+}

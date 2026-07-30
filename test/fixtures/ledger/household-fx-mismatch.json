@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1",
   "household": {
-    "id": "01MERFXMM00000000000000008",
+    "id": "01MERFXMM00000000000000009",
     "base_currency": "GBP",
     "secondary_currency": "USD",
     "persons": [
@@ -28,11 +28,24 @@
       "custody_currency": "GBP",
       "opened": null,
       "data_asof": "2026-06-30"
+    },
+    {
+      "id": "01MERFXMM00000000000000004",
+      "person_ids": [
+        "01MERFXMM00000000000000001"
+      ],
+      "institution": "Liberty Street Securities",
+      "account_token": "A2",
+      "wrapper": "us_brokerage",
+      "wrapper_jurisdiction": "US",
+      "custody_currency": "USD",
+      "opened": null,
+      "data_asof": "2026-02-15"
     }
   ],
   "instruments": [
     {
-      "id": "01MERFXMM00000000000000004",
+      "id": "01MERFXMM00000000000000005",
       "identifiers": {},
       "name": "Northgate UK Smaller Companies OEIC",
       "type": "oeic",
@@ -51,7 +64,7 @@
       ]
     },
     {
-      "id": "01MERFXMM00000000000000005",
+      "id": "01MERFXMM00000000000000006",
       "identifiers": {},
       "name": "Pioneer S&P Index Fund",
       "type": "mutual_fund_us",
@@ -70,7 +83,7 @@
       ]
     },
     {
-      "id": "01MERFXMM00000000000000006",
+      "id": "01MERFXMM00000000000000007",
       "identifiers": {},
       "name": "Continental Europe Equity SICAV",
       "type": "other_pooled",
@@ -89,7 +102,7 @@
       ]
     },
     {
-      "id": "01MERFXMM00000000000000007",
+      "id": "01MERFXMM00000000000000008",
       "identifiers": {},
       "name": "Keystone Treasury Money Market Fund",
       "type": "mmf",
@@ -111,7 +124,7 @@
   "holdings": [
     {
       "account_id": "01MERFXMM00000000000000003",
-      "instrument_id": "01MERFXMM00000000000000004",
+      "instrument_id": "01MERFXMM00000000000000005",
       "asof": "2026-06-30",
       "units": 10000,
       "value": {
@@ -122,7 +135,7 @@
     },
     {
       "account_id": "01MERFXMM00000000000000003",
-      "instrument_id": "01MERFXMM00000000000000005",
+      "instrument_id": "01MERFXMM00000000000000006",
       "asof": "2026-06-30",
       "units": 12800,
       "value": {
@@ -133,7 +146,7 @@
     },
     {
       "account_id": "01MERFXMM00000000000000003",
-      "instrument_id": "01MERFXMM00000000000000006",
+      "instrument_id": "01MERFXMM00000000000000007",
       "asof": "2026-06-30",
       "units": 5400,
       "value": {
@@ -143,8 +156,8 @@
       "source_document_id": "01MERFXMM00000000000000002"
     },
     {
-      "account_id": "01MERFXMM00000000000000003",
-      "instrument_id": "01MERFXMM00000000000000007",
+      "account_id": "01MERFXMM00000000000000004",
+      "instrument_id": "01MERFXMM00000000000000008",
       "asof": "2026-02-15",
       "units": 2500,
       "value": {
@@ -175,7 +188,7 @@
   ],
   "acceptances": [
     {
-      "id": "01MERFXMM00000000000000009",
+      "id": "01MERFXMM00000000000000010",
       "document_id": "01MERFXMM00000000000000002",
       "parse_run_id": "RUN-FX-01",
       "accepted_at": "2026-07-30T12:00:00Z",
@@ -186,28 +199,28 @@
           "account_token": "A1",
           "ref": "Northgate UK Smaller Companies OEIC",
           "action": "accepted",
-          "instrument_id": "01MERFXMM00000000000000004"
+          "instrument_id": "01MERFXMM00000000000000005"
         },
         {
           "kind": "holding",
           "account_token": "A1",
           "ref": "Pioneer S&P Index Fund",
           "action": "accepted",
-          "instrument_id": "01MERFXMM00000000000000005"
+          "instrument_id": "01MERFXMM00000000000000006"
         },
         {
           "kind": "holding",
           "account_token": "A1",
           "ref": "Continental Europe Equity SICAV",
           "action": "accepted",
-          "instrument_id": "01MERFXMM00000000000000006"
+          "instrument_id": "01MERFXMM00000000000000007"
         },
         {
           "kind": "holding",
-          "account_token": "A1",
+          "account_token": "A2",
           "ref": "Keystone Treasury Money Market Fund",
           "action": "accepted",
-          "instrument_id": "01MERFXMM00000000000000007"
+          "instrument_id": "01MERFXMM00000000000000008"
         }
       ]
     }

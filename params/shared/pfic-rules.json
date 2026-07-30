@@ -1,53 +1,95 @@
 {
   "jurisdiction": "SHARED",
   "name": "pfic-rules",
-  "effective": { "from": "2026-01-01", "to": "2099-12-31" },
+  "effective": {
+    "from": "2026-01-01",
+    "to": "2099-12-31"
+  },
   "cascade": {
     "comment": "Ordered rule cascade for SPEC §7.1. Evaluated top to bottom; first match wins. Edge cases live here, never in engine code.",
     "rules": [
       {
         "id": "metadata_unconfirmed",
-        "when": { "metadata_confirmed": false },
+        "when": {
+          "metadata_confirmed": false
+        },
         "outcome": "needs_classification",
         "severity": "INFO",
         "explanation": "Instrument type and domicile were inferred during ingestion and not confirmed by an operator. PFIC status cannot be determined from unverified metadata; a misclassification here would silently downgrade a critical flag.",
-        "sources": ["Meridian design decision (PHASE_REVIEW_2 S7): the cascade may only run on operator-confirmed metadata"]
+        "sources": [
+          "Meridian design decision (PHASE_REVIEW_2 S7): the cascade may only run on operator-confirmed metadata"
+        ]
       },
       {
         "id": "us_registered_fund",
-        "when": { "us_registered": true },
+        "when": {
+          "us_registered": true
+        },
         "outcome": "not_pfic",
         "severity": "OK",
         "explanation": "US-registered ('40 Act) fund. A domestic corporation is outside the PFIC definition.",
-        "sources": ["IRC s1297(a) (foreign corporation requirement)", "Investment Company Act 1940"]
+        "sources": [
+          "IRC s1297(a) (foreign corporation requirement)",
+          "Investment Company Act 1940"
+        ]
       },
       {
         "id": "direct_security_or_cash",
-        "when": { "type_in": ["equity", "bond", "cash", "property"] },
+        "when": {
+          "type_in": [
+            "equity",
+            "bond",
+            "cash",
+            "property"
+          ]
+        },
         "outcome": "not_pfic",
         "severity": "OK",
         "explanation": "Directly held security, cash or real property — not an interest in a pooled foreign corporation.",
-        "sources": ["IRC s1297(a)"]
+        "sources": [
+          "IRC s1297(a)"
+        ]
       },
       {
         "id": "non_us_pooled_vehicle",
         "when": {
-          "type_in": ["oeic", "ucits_etf", "investment_trust", "other_pooled", "mmf", "us_etf", "mutual_fund_us"],
-          "domicile_not": ["US"]
+          "type_in": [
+            "oeic",
+            "ucits_etf",
+            "investment_trust",
+            "other_pooled",
+            "mmf",
+            "us_etf",
+            "mutual_fund_us"
+          ],
+          "domicile_not": [
+            "US"
+          ]
         },
         "outcome": "pfic",
         "severity": "CRITICAL",
         "explanation": "Non-US domiciled pooled vehicle held by a US person. Default treatment is the punitive excess-distribution regime: gains and 'excess' distributions are allocated across the holding period, taxed at the highest ordinary rate for prior years, plus an interest charge. QEF and mark-to-market elections exist but QEF requires a PFIC Annual Information Statement that most UK funds do not produce.",
         "filing_implication": "Form 8621 required per PFIC per year (subject to the de minimis reporting exception).",
-        "sources": ["IRC s1291 (excess distribution regime)", "IRC s1293 (QEF)", "IRC s1296 (mark-to-market)", "IRC s1298(f) (annual reporting)"]
+        "sources": [
+          "IRC s1291 (excess distribution regime)",
+          "IRC s1293 (QEF)",
+          "IRC s1296 (mark-to-market)",
+          "IRC s1298(f) (annual reporting)"
+        ]
       },
       {
         "id": "ambiguous_pooled",
-        "when": { "type_in": ["private_equity"] },
+        "when": {
+          "type_in": [
+            "private_equity"
+          ]
+        },
         "outcome": "needs_classification",
         "severity": "WARN",
         "explanation": "Pooled vehicle whose income and asset mix determines PFIC status under the 75%/50% tests; look-through data is not available to this system.",
-        "sources": ["IRC s1297(a) income and asset tests"]
+        "sources": [
+          "IRC s1297(a) income and asset tests"
+        ]
       },
       {
         "id": "unmatched_fallback",
@@ -55,7 +97,9 @@
         "outcome": "needs_classification",
         "severity": "WARN",
         "explanation": "No cascade rule matched this instrument — typically a confirmed record with a missing or unrecognised domicile. The conservative reading is to refer it to the operator rather than let it fall out of the PFIC population.",
-        "sources": ["Meridian design decision: the cascade is total; an unmatched instrument is never treated as not-PFIC"]
+        "sources": [
+          "Meridian design decision: the cascade is total; an unmatched instrument is never treated as not-PFIC"
+        ]
       }
     ]
   },
@@ -63,10 +107,18 @@
     "comment": "SPEC §7.1: a PFIC inside a treaty-recognised pension is a WARN with wrapper context, not a CRITICAL. The PFIC determination itself does not change — only the severity presented.",
     "rules": [
       {
-        "wrappers": ["sipp", "ira_trad", "ira_roth", "401k"],
+        "wrappers": [
+          "sipp",
+          "ira_trad",
+          "ira_roth",
+          "401k"
+        ],
         "severity": "WARN",
         "explanation": "Held inside a treaty-recognised pension wrapper. The UK/US treaty's pension articles are generally read as deferring tax on growth within the scheme, which is the usual basis for not applying PFIC reporting to holdings inside it. This is a treaty position, not a statutory exemption, and it depends on the scheme qualifying.",
-        "sources": ["UK/US DTA 2001 Arts. 17-18", "IRC s1298(f) reporting relief is not automatic — position depends on scheme qualification"]
+        "sources": [
+          "UK/US DTA 2001 Arts. 17-18",
+          "IRC s1298(f) reporting relief is not automatic — position depends on scheme qualification"
+        ]
       }
     ]
   },
@@ -96,171 +148,10 @@
   },
   "summary": {
     "investable_wealth_excluded_types": {
-      "value": ["property"],
-      "source": "SPEC §7.1 expresses PFIC exposure as a share of investable wealth; directly held real property is not investable wealth",
-      "status": "published"
-    }
-  },
-  "situs": {
-    "comment": "SPEC §7.3. Ordered cascade, first match wins, evaluated per holding (instrument + the account that holds it). Situs follows the asset, not the custodian.",
-    "label": {
-      "value": "Exposure sketch — not advice",
-      "source": "SPEC §7.3 requires the whole section to carry this label",
-      "status": "published"
-    },
-    "attribution": {
-      "value": "equal_split_across_account_owners",
-      "source": "Meridian v0 modelling assumption: a holding in a jointly owned account is attributed equally to each named owner; beneficial ownership is not recorded in the ledger",
-      "status": "published"
-    },
-    "treaty_credit": {
-      "value": "Modelling assumption: the UK/US estate and gift tax treaty (1979) is assumed to be available, giving primary taxing rights by situs and domicile with credit relief for the other country's tax, and extending a prorated unified credit to a non-US-domiciled decedent. No treaty credit is computed here — the two columns are gross exposure, before any treaty relief.",
-      "source": "UK/US Estate, Gift and Generation-Skipping Tax Convention 1979, Arts. 5-9 and 11",
-      "status": "published"
-    },
-    "asset_classes": {
-      "comment": "Every class a situs rule may assign. Classes carrying us_params_ref must appear in that list in params/us/2026.json — the module asserts it at run time.",
-      "us_incorporated_stock": {
-        "situs": "us",
-        "us_params_ref": "situs.us_situs_asset_classes",
-        "sources": ["IRC s2104(a); Treas. Reg. 20.2104-1(a)(5): stock of a US corporation is US-situs wherever the certificate or custody sits, including via ADR"]
-      },
-      "us_real_property": {
-        "situs": "us",
-        "us_params_ref": "situs.us_situs_asset_classes",
-        "sources": ["IRC s2104; Treas. Reg. 20.2104-1(a)(1)"]
-      },
-      "us_situs_debt_non_portfolio": {
-        "situs": "us",
-        "us_params_ref": "situs.us_situs_asset_classes",
-        "sources": ["IRC s2104(c)", "IRC s2105(b)(3) portfolio-interest debt is excluded, but the exclusion cannot be verified from a statement — the conservative reading is applied"]
-      },
-      "us_retirement_plan_interest": {
-        "situs": "us",
-        "sources": ["IRC s2104; the interest in a US qualified plan or IRA is treated as US-situs property, and the plan's own holdings are not looked through", "UK/US DTA 2001 Arts. 17-18 (income treatment, not situs)"]
-      },
-      "non_us_incorporated_stock": {
-        "situs": "non_us",
-        "us_params_ref": "situs.non_us_situs_asset_classes",
-        "sources": ["IRC s2104(a) by implication: only US-corporation stock is US-situs; shares in non-US corporations, OEICs, unit trusts and non-US funds are outside US situs"]
-      },
-      "us_bank_deposits_non_business": {
-        "situs": "non_us",
-        "us_params_ref": "situs.non_us_situs_asset_classes",
-        "sources": ["IRC s2105(b)(1): deposits with a US bank not effectively connected with a US business are not US-situs", "Non-US bank deposits are outside US situs entirely"]
-      },
-      "non_us_real_property": {
-        "situs": "non_us",
-        "sources": ["IRC s2104(a): only real property situated in the US is US-situs"]
-      }
-    },
-    "rules": [
-      {
-        "id": "us_retirement_plan",
-        "when": { "wrapper_in": ["401k", "ira_trad", "ira_roth", "529"] },
-        "asset_class": "us_retirement_plan_interest",
-        "explanation": "Held inside a US retirement or education plan. The estate asset is the interest in the US plan itself, which is US-situs; the plan's underlying holdings are not looked through."
-      },
-      {
-        "id": "metadata_unconfirmed",
-        "when": { "metadata_confirmed": false },
-        "asset_class": null,
-        "explanation": "Instrument type and domicile were inferred at ingestion and not operator-confirmed. Situs cannot be assigned from unverified metadata; the value is shown separately rather than dropped into either column."
-      },
-      {
-        "id": "us_corporation_security",
-        "when": { "domicile_in": ["US"], "type_in": ["equity", "investment_trust", "oeic", "ucits_etf", "us_etf", "mutual_fund_us", "mmf", "other_pooled", "private_equity"] },
-        "asset_class": "us_incorporated_stock",
-        "explanation": "Stock of a US-incorporated issuer or fund. US-situs regardless of where it is held or in which currency it is quoted."
-      },
-      {
-        "id": "us_debt",
-        "when": { "domicile_in": ["US"], "type_in": ["bond"] },
-        "asset_class": "us_situs_debt_non_portfolio",
-        "explanation": "Debt of a US obligor. The portfolio-interest exclusion may take it out of US situs, but qualification cannot be established from a statement, so the conservative (in-scope) reading is applied."
-      },
-      {
-        "id": "us_real_property",
-        "when": { "domicile_in": ["US"], "type_in": ["property"] },
-        "asset_class": "us_real_property",
-        "explanation": "Real property situated in the United States."
-      },
-      {
-        "id": "cash_deposit",
-        "when": { "type_in": ["cash"] },
-        "asset_class": "us_bank_deposits_non_business",
-        "explanation": "Cash deposit. Non-US deposits are outside US situs; deposits with a US bank not connected with a US trade or business are excluded by s2105(b)(1)."
-      },
-      {
-        "id": "non_us_security",
-        "when": { "domicile_present": true, "domicile_not": ["US"], "type_in": ["equity", "bond", "investment_trust", "oeic", "ucits_etf", "us_etf", "mutual_fund_us", "mmf", "other_pooled", "private_equity"] },
-        "asset_class": "non_us_incorporated_stock",
-        "explanation": "Security or pooled vehicle of a non-US issuer. Outside US estate tax situs, though within UK IHT scope where the owner is UK long-term resident."
-      },
-      {
-        "id": "non_us_real_property",
-        "when": { "domicile_present": true, "domicile_not": ["US"], "type_in": ["property"] },
-        "asset_class": "non_us_real_property",
-        "explanation": "Real property situated outside the United States."
-      },
-      {
-        "id": "unmatched_fallback",
-        "when": {},
-        "asset_class": null,
-        "explanation": "No situs rule matched — typically a confirmed record with no domicile recorded. Reported separately rather than assigned to a column."
-      }
-    ],
-    "uk_iht_scope": {
-      "comment": "SPEC §7.3: post-2025 UK IHT scope is residence-based (params/uk/2026-27.json iht.long_term_residence_rule).",
-      "long_term_resident_flags": {
-        "value": ["ltr_flag"],
-        "source": "FA 2025 residence-based IHT regime: a long-term UK resident (UK-resident in 10 of the previous 20 tax years) is in scope on worldwide assets. The ledger records the operator's conclusion as uk_domicile_status; residence history is not held, so the 10-of-20 test is not recomputed here.",
-        "status": "published"
-      },
-      "worldwide_note": {
-        "value": "Long-term UK resident: worldwide assets are within the scope of UK inheritance tax at death.",
-        "source": "IHTA 1984 s6 as amended by FA 2025; params/uk/2026-27.json iht.long_term_residence_rule",
-        "status": "published"
-      },
-      "uk_situs_note": {
-        "value": "Not recorded as a long-term UK resident: UK inheritance tax is assumed to reach UK-situs assets only. Residence history is not held in the ledger, so the 10-of-20 test cannot be evaluated by this system, and the post-departure tail provisions are not modelled.",
-        "source": "IHTA 1984 s6 as amended by FA 2025; Meridian v0 scope note",
-        "status": "published"
-      }
-    },
-    "us_estate_scope": {
-      "worldwide_note": {
-        "value": "US citizen or domiciliary: the worldwide estate is within the scope of US estate tax, and the situs split below is presentational only — it does not narrow the taxable estate.",
-        "source": "IRC s2031; Treas. Reg. 20.0-1(b)",
-        "status": "published"
-      },
-      "us_situs_only_note": {
-        "value": "Not a US person: US estate tax reaches US-situs assets only, against a unified credit equivalent to a much smaller exemption than a US person receives, subject to any treaty relief.",
-        "source": "IRC ss2101-2107; params/us/2026.json estate_gift.nonresident_alien_exemption_equivalent",
-        "status": "published"
-      }
-    }
-  },
-  "currency_of_life": {
-    "comment": "SPEC §7.4. Compares the person's portfolio currency exposure with the operator-set spending currency mix.",
-    "method": {
-      "value": "Mismatch score is the total variation distance between the two currency distributions: half the sum of the absolute differences in share, per currency. 0.00 means the portfolio's currency split matches the spending split exactly; 1.00 means no overlap at all.",
-      "source": "SPEC §7.4 requires a mismatch score; total variation distance is the standard bounded distance between two distributions and is symmetric and scale-free",
-      "status": "published"
-    },
-    "look_through": {
-      "value": false,
-      "source": "Meridian v0 modelling assumption: currency exposure is taken from the quotation/valuation currency of each holding. Funds are not looked through to their underlying currency exposure, because the ledger holds no constituent data — a GBP-quoted global equity fund therefore counts as GBP exposure and the score understates true mismatch",
-      "status": "published"
-    },
-    "bands": {
       "value": [
-        { "band": "aligned", "up_to": 0.1 },
-        { "band": "mild", "up_to": 0.25 },
-        { "band": "material", "up_to": 0.5 },
-        { "band": "severe", "up_to": null }
+        "property"
       ],
-      "source": "Meridian v0 presentation bands for the §7.4 mismatch score; presentational only, no tax consequence",
+      "source": "SPEC §7.1 expresses PFIC exposure as a share of investable wealth; directly held real property is not investable wealth",
       "status": "published"
     }
   }

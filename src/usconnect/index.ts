@@ -33,6 +33,10 @@ export interface UsConnectInput {
   ukParams: unknown;
   /** Parsed params/shared/pfic-rules.json */
   pficRules: unknown;
+  /** SPEC §7.3 situs cascade (params/shared/situs-rules.json). */
+  situsRules?: unknown;
+  /** SPEC §7.4 configuration (params/shared/currency-of-life.json). */
+  currencyOfLifeRules?: unknown;
   /** Parsed params/shared/wrapper-matrix.json */
   wrapperMatrix: unknown;
   /** ISO date the analysis is stated as at. Never read from the clock. */
@@ -48,7 +52,13 @@ export function analyseUsConnect(input: UsConnectInput): UsConnectResult | null 
   const usPersons = persons.filter((p) => p.usPerson);
   if (usPersons.length === 0) return null;
 
-  const rules = readSharedRules(input.pficRules);
+  // The §7 rules live in three properly-named params files; the reader takes
+  // one document, so they are composed here rather than in every caller.
+  const rules = readSharedRules({
+    ...(input.pficRules as Record<string, unknown>),
+    ...((input.situsRules as Record<string, unknown>) ?? {}),
+    ...((input.currencyOfLifeRules as Record<string, unknown>) ?? {}),
+  });
   const us = readUsParams(input.usParams);
   const uk = readUkParams(input.ukParams);
   const matrix = readWrapperMatrix(input.wrapperMatrix);

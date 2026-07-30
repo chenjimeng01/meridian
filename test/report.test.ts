@@ -169,6 +169,24 @@ test("dual currency is the signature: every headline is a stacked pair (§8)", (
   assert.match(usukHtml, /font-variant-numeric:\s*tabular-nums/);
 });
 
+test("the report states what the second currency column actually means (§8)", () => {
+  // The base column is struck at each holding's own date; the second is that
+  // total converted at one report-date rate. A reader who assumes both were
+  // struck on the same day will misread any currency move between them.
+  assert.match(usukHtml, /struck in GBP at each holding's own valuation date/);
+  assert.match(usukHtml, /GBPUSD 1\.2800 as at 30 June 2026/);
+  assert.match(usukHtml, /same wealth measured two ways, not two independent valuations/);
+});
+
+test("tables carry header scope for screen readers (§8)", () => {
+  // (?=[\s>]) so <thead> is not mistaken for a header cell.
+  const headers = usukHtml.match(/<th(?=[\s>])[^>]*>/g) ?? [];
+  assert.ok(headers.length > 10);
+  for (const header of headers) {
+    assert.match(header, /scope="col"/, `a header cell has no scope: ${header}`);
+  }
+});
+
 test("sections appear in the order §8 specifies", () => {
   const order = ["What you have", "What it costs", "How it has done", "What you are exposed to", "What should worry you", "Where every figure came from"];
   let cursor = -1;

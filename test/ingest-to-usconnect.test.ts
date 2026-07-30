@@ -57,6 +57,8 @@ function analyse(ledger: any) {
     usParams: readJson("params/us/2026.json"),
     ukParams: readJson("params/uk/2026-27.json"),
     pficRules: readJson("params/shared/pfic-rules.json"),
+    situsRules: readJson("params/shared/situs-rules.json"),
+    currencyOfLifeRules: readJson("params/shared/currency-of-life.json"),
     wrapperMatrix: readJson("params/shared/wrapper-matrix.json"),
     asof: "2026-06-30",
     toBase: (m, asof) => convert(m, "GBP", asof, { rates: ledger.fx_rates, policy: fxPolicy }).exact,

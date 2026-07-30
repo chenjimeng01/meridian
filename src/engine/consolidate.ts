@@ -52,16 +52,29 @@ const LIQUIDITY_LABELS: Record<string, string> = {
   illiquid: "No reliable market",
 };
 
-/** Latest accepted snapshot per (account, instrument) at or before `asof`. */
+/**
+ * The holdings that still exist, as at `asof`.
+ *
+ * A statement is a complete picture of its account on its date, so a position
+ * that appears on an older statement and NOT on the newest one has been sold.
+ * Taking the latest snapshot per (account, instrument) instead — as this did —
+ * resurrects every disposed position forever: sell a holding and it stays in
+ * the client's total, in their concentration flags, and in their PFIC list.
+ *
+ * Each account is therefore read at its own most recent valuation date. That
+ * date can differ between accounts (one platform reports quarterly, another
+ * annually), which is exactly why the report shows freshness per account.
+ */
 export function latestHoldings(ledger: Ledger, asof: string): any[] {
-  const newest = new Map<string, any>();
+  const latestDateByAccount = new Map<string, string>();
   for (const holding of ledger.holdings) {
     if (holding.asof > asof) continue;
-    const key = `${holding.account_id}|${holding.instrument_id}`;
-    const existing = newest.get(key);
-    if (!existing || holding.asof > existing.asof) newest.set(key, holding);
+    const current = latestDateByAccount.get(holding.account_id);
+    if (!current || holding.asof > current) latestDateByAccount.set(holding.account_id, holding.asof);
   }
-  return [...newest.values()];
+  return ledger.holdings.filter(
+    (holding) => holding.asof === latestDateByAccount.get(holding.account_id)
+  );
 }
 
 export function consolidate(input: ConsolidateInput): ConsolidationResult {

@@ -1,0 +1,44 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "currency-of-life",
+  "effective": {
+    "from": "2026-01-01",
+    "to": "2099-12-31"
+  },
+  "comment": "SPEC §7.4 currency-of-life configuration.",
+  "currency_of_life": {
+    "comment": "SPEC §7.4. Compares the person's portfolio currency exposure with the operator-set spending currency mix.",
+    "method": {
+      "value": "Mismatch score is the total variation distance between the two currency distributions: half the sum of the absolute differences in share, per currency. 0.00 means the portfolio's currency split matches the spending split exactly; 1.00 means no overlap at all.",
+      "source": "SPEC §7.4 requires a mismatch score; total variation distance is the standard bounded distance between two distributions and is symmetric and scale-free",
+      "status": "published"
+    },
+    "look_through": {
+      "value": false,
+      "source": "Meridian v0 modelling assumption: currency exposure is taken from the quotation/valuation currency of each holding. Funds are not looked through to their underlying currency exposure, because the ledger holds no constituent data — a GBP-quoted global equity fund therefore counts as GBP exposure and the score understates true mismatch",
+      "status": "published"
+    },
+    "bands": {
+      "value": [
+        {
+          "band": "aligned",
+          "up_to": 0.1
+        },
+        {
+          "band": "mild",
+          "up_to": 0.25
+        },
+        {
+          "band": "material",
+          "up_to": 0.5
+        },
+        {
+          "band": "severe",
+          "up_to": null
+        }
+      ],
+      "source": "Meridian v0 presentation bands for the §7.4 mismatch score; presentational only, no tax consequence",
+      "status": "published"
+    }
+  }
+}

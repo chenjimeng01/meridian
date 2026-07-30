@@ -26,6 +26,23 @@ const SECTIONS = {
   appendix: "Where every figure came from",
 } as const;
 
+/**
+ * The two columns are not the same measurement, and saying so matters. Each
+ * base figure is struck at its own holding's valuation date; the second
+ * currency is that base figure converted at one rate as at the report date. A
+ * reader who assumes both were struck on the same day will misread any
+ * currency move between the two.
+ */
+function currencyBasisNote(results: Results): string {
+  const rate = results.meta.secondary_rate;
+  if (!rate || !results.meta.secondary_currency) return "";
+  return (
+    `<p class="asof small">Figures are struck in ${esc(results.meta.base_currency)} at each holding's own valuation date, ` +
+    `then shown in ${esc(results.meta.secondary_currency)} at ${esc(rate.pair)} ${rate.rate.toFixed(4)} as at ${esc(longDate(rate.date))}. ` +
+    `The two columns are the same wealth measured two ways, not two independent valuations.</p>`
+  );
+}
+
 /** The stacked GBP/USD pair — the product's signature element. */
 function pair(value: DualMoney): string {
   if (!value.secondary) {
@@ -89,7 +106,7 @@ function sliceTable(slices: Slice[], heading: string, limit = 100): string {
     .join("");
   return (
     `<div class="scroll" role="region" aria-label="${esc(heading)}" tabindex="0">` +
-    `<table><thead><tr><th>${esc(heading)}</th><th class="r">Share</th><th class="r">Value</th></tr></thead>` +
+    `<table><thead><tr><th scope="col">${esc(heading)}</th><th scope="col" class="r">Share</th><th scope="col" class="r">Value</th></tr></thead>` +
     `<tbody>${rows}</tbody></table></div>`
   );
 }
@@ -116,7 +133,7 @@ ${pair(consolidation.total)}
 ${commentary(options.narrative?.wealth)}
 <h3>By account, and how fresh each figure is</h3>
 <div class="scroll" role="region" aria-label="Accounts" tabindex="0">
-<table><thead><tr><th>Account</th><th>Valued</th><th>Age</th><th class="r">Value</th></tr></thead>
+<table><thead><tr><th scope="col">Account</th><th scope="col">Valued</th><th scope="col">Age</th><th scope="col" class="r">Value</th></tr></thead>
 <tbody>${freshnessRows}</tbody></table></div>
 <h3>By wrapper</h3>
 ${barChart(
@@ -165,7 +182,7 @@ ${dragChart({
 <p class="small muted">Before costs ${esc(money(compoundingDrag.grossTerminal, 0))} · after costs ${esc(money(compoundingDrag.netTerminal, 0))} · the difference is ${esc(money(compoundingDrag.drag, 0))}. Assumes ${esc(compoundingDrag.assumption)}.</p>
 <h3>Every charge, and the document it came from</h3>
 <div class="scroll" role="region" aria-label="Charges" tabindex="0">
-<table><thead><tr><th>Charge</th><th>Category</th><th class="r">Amount</th><th class="col-detail">Source</th></tr></thead>
+<table><thead><tr><th scope="col">Charge</th><th scope="col">Category</th><th scope="col" class="r">Amount</th><th scope="col" class="col-detail">Source</th></tr></thead>
 <tbody>${lines || `<tr><td colspan="4" class="muted">No charges disclosed for this period.</td></tr>`}</tbody></table></div>
 </section>`;
 }
@@ -187,7 +204,7 @@ function performanceSection(results: Results, options: RenderOptions): string {
   const benchmark = performance.benchmark
     ? `<h3>Against your benchmark</h3>
 <div class="scroll" role="region" aria-label="Benchmark comparison" tabindex="0">
-<table><thead><tr><th></th><th class="r">Nominal</th><th class="r">After inflation</th></tr></thead>
+<table><thead><tr><th scope="col"><span class="visually-hidden">Measure</span></th><th scope="col" class="r">Nominal</th><th scope="col" class="r">After inflation</th></tr></thead>
 <tbody>
 <tr><td>Your portfolio</td><td class="r num">${esc(percent(performance.benchmark.portfolio.nominal))}</td><td class="r num">${esc(percent(performance.benchmark.portfolio.real))}</td></tr>
 <tr><td>Benchmark</td><td class="r num">${esc(percent(performance.benchmark.benchmark.nominal))}</td><td class="r num">${esc(percent(performance.benchmark.benchmark.real))}</td></tr>
@@ -208,7 +225,7 @@ ${
 }
 ${commentary(options.narrative?.performance)}
 ${benchmark}
-${accountRows ? `<h3>By account</h3><div class="scroll" role="region" aria-label="Performance by account" tabindex="0"><table><thead><tr><th>Account</th><th>Return</th><th>Method</th></tr></thead><tbody>${accountRows}</tbody></table></div>` : ""}
+${accountRows ? `<h3>By account</h3><div class="scroll" role="region" aria-label="Performance by account" tabindex="0"><table><thead><tr><th scope="col">Account</th><th scope="col">Return</th><th scope="col">Method</th></tr></thead><tbody>${accountRows}</tbody></table></div>` : ""}
 </section>`;
 }
 
@@ -239,14 +256,14 @@ ${
   flags
     ? `<h3>Positions above 5% of total wealth</h3>
 <div class="scroll" role="region" aria-label="Concentration flags" tabindex="0">
-<table><thead><tr><th>Position</th><th class="r">Share</th><th class="r">Value</th></tr></thead><tbody>${flags}</tbody></table></div>`
+<table><thead><tr><th scope="col">Position</th><th scope="col" class="r">Share</th><th scope="col" class="r">Value</th></tr></thead><tbody>${flags}</tbody></table></div>`
     : `<p class="muted">No single position exceeds 5% of total wealth.</p>`
 }
 <h3>Currency exposure</h3>
 ${sliceTable(consolidation.byCurrency, "Currency")}
 <h3>Wrapped versus unwrapped</h3>
 <div class="scroll" role="region" aria-label="Wrapped versus unwrapped" tabindex="0">
-<table><thead><tr><th>Jurisdiction</th><th class="r">Sheltered</th><th class="r">Exposed</th></tr></thead><tbody>
+<table><thead><tr><th scope="col">Jurisdiction</th><th scope="col" class="r">Sheltered</th><th scope="col" class="r">Exposed</th></tr></thead><tbody>
 ${Object.entries(risk.wrappedRatioByJurisdiction)
   .map(
     ([jurisdiction, split]) =>
@@ -304,7 +321,7 @@ ${
   pficRows
     ? `<h3>Passive foreign investment companies</h3>
 <div class="scroll" role="region" aria-label="PFIC holdings" tabindex="0">
-<table><thead><tr><th>Holding</th><th>Severity</th><th class="r">Value</th></tr></thead><tbody>${pficRows}</tbody></table></div>
+<table><thead><tr><th scope="col">Holding</th><th scope="col">Severity</th><th scope="col" class="r">Value</th></tr></thead><tbody>${pficRows}</tbody></table></div>
 <p class="small muted">${esc(usConnect.pfic?.filingImplication ?? "Form 8621 may be required for each PFIC holding, for each year it is held.")}</p>`
     : ""
 }
@@ -312,7 +329,7 @@ ${
   wrapperRows
     ? `<h3>How your wrappers are treated</h3>
 <div class="scroll" role="region" aria-label="Wrapper treatment" tabindex="0">
-<table><thead><tr><th>Wrapper</th><th>Status</th><th>Why</th></tr></thead><tbody>${wrapperRows}</tbody></table></div>`
+<table><thead><tr><th scope="col">Wrapper</th><th scope="col">Status</th><th scope="col">Why</th></tr></thead><tbody>${wrapperRows}</tbody></table></div>`
     : ""
 }
 ${currencyOfLifeBlock(usConnect)}
@@ -320,7 +337,7 @@ ${
   situsRows
     ? `<h3>Estate exposure sketch — not advice</h3>
 <div class="scroll" role="region" aria-label="Situs exposure" tabindex="0">
-<table><thead><tr><th>Person</th><th class="r">US situs</th><th class="r">Non-US situs</th><th class="r">Unclassified</th></tr></thead><tbody>${situsRows}</tbody></table></div>
+<table><thead><tr><th scope="col">Person</th><th scope="col" class="r">US situs</th><th scope="col" class="r">Non-US situs</th><th scope="col" class="r">Unclassified</th></tr></thead><tbody>${situsRows}</tbody></table></div>
 <p class="small muted">${esc(usConnect.situs?.treatyCredit?.note ?? "")}</p>`
     : ""
 }
@@ -377,7 +394,7 @@ function appendixSection(results: Results, options: RenderOptions): string {
 <h2>Data appendix</h2>
 <p class="small muted">Every figure in this report comes from one of the documents below. Nothing was estimated or filled in.</p>
 <div class="scroll" role="region" aria-label="Source documents" tabindex="0">
-<table><thead><tr><th>Document</th><th>Type</th><th class="col-detail">Period</th><th>Parsed</th><th class="col-detail">Fingerprint</th></tr></thead>
+<table><thead><tr><th scope="col">Document</th><th scope="col">Type</th><th scope="col" class="col-detail">Period</th><th scope="col">Parsed</th><th scope="col" class="col-detail">Fingerprint</th></tr></thead>
 <tbody>${rows}</tbody></table></div>
 ${
   results.appendix.instrumentsNeedingConfirmation.length
@@ -479,7 +496,7 @@ function deckSlides(results: Results): string {
     slide(
       SECTIONS.exposure,
       `<h2>Five largest positions</h2><div class="scroll" role="region" aria-label="Largest positions" tabindex="0">` +
-        `<table><thead><tr><th>Position</th><th class="r">Share</th><th class="r">Value</th></tr></thead><tbody>${topPositions}</tbody></table></div>`
+        `<table><thead><tr><th scope="col">Position</th><th scope="col" class="r">Share</th><th scope="col" class="r">Value</th></tr></thead><tbody>${topPositions}</tbody></table></div>`
     ),
     usConnect
       ? slide(
@@ -488,7 +505,7 @@ function deckSlides(results: Results): string {
             `<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to address.</p>` +
             (criticalRows
               ? `<div class="scroll" role="region" aria-label="Critical holdings" tabindex="0">` +
-                `<table><thead><tr><th>Holding</th><th class="r">Value</th></tr></thead><tbody>${criticalRows}</tbody></table></div>`
+                `<table><thead><tr><th scope="col">Holding</th><th scope="col" class="r">Value</th></tr></thead><tbody>${criticalRows}</tbody></table></div>`
               : "")
         )
       : "",
@@ -534,6 +551,7 @@ ${manifestLink(title)}
     ${toggle}
   </div>
   <p class="asof">Two currencies, one truth. Prepared ${esc(longDate(results.meta.generated_at.slice(0, 10)))}.</p>
+  ${currencyBasisNote(results)}
 </header>
 ${
   deck

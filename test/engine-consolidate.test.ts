@@ -9,6 +9,7 @@ import type { Ledger } from "../src/ingest/types.ts";
 const assetClasses = readJson("params/shared/asset-classes.json");
 const fxPolicy = readJson("params/shared/fx-policy.json");
 const ASOF = "2026-06-30";
+const roundTo = (value: number, dp: number) => Number(value.toFixed(dp));
 
 function load(name: string) {
   const ledger = readJson(`test/fixtures/ledger/${name}.json`) as Ledger;
@@ -226,6 +227,64 @@ test("a missing secondary rate degrades the second column without sinking the re
   for (const slice of result.byInstrument) {
     assert.equal(slice.value.secondary, undefined);
   }
+});
+
+// PHASE_REVIEW_4 S8: a statement is a complete picture of its account on its
+// date, so a position missing from the newest one has been sold. Taking the
+// latest snapshot per (account, instrument) resurrected every disposed
+// position forever — it stayed in the total, the concentration flags and the
+// PFIC list.
+test("a position absent from the newest statement is treated as sold (§6.1)", () => {
+  const ledger = structuredClone(readJson("test/fixtures/ledger/household-usuk-acceptance.json")) as any;
+  const account = ledger.accounts[0];
+  const sold = ledger.instruments.find((i: any) => i.name.startsWith("Thames"))!;
+
+  // Back-date the whole account to an earlier statement, then add a NEWER
+  // statement that omits the Thames holding: the client sold it.
+  for (const holding of ledger.holdings.filter((h: any) => h.account_id === account.id)) {
+    holding.asof = "2026-03-31";
+  }
+  for (const holding of ledger.holdings.filter((h: any) => h.account_id === account.id && h.instrument_id !== sold.id)) {
+    ledger.holdings.push({ ...holding, asof: "2026-06-30" });
+  }
+
+  const result = consolidate({
+    ledger,
+    assetClasses,
+    fx: { rates: ledger.fx_rates, policy: fxPolicy },
+    asof: ASOF,
+  });
+
+  assert.equal(
+    result.byInstrument.some((slice) => slice.label.startsWith("Thames")),
+    false,
+    "a sold holding must leave the consolidation, not linger forever"
+  );
+  // And the total falls by exactly the disposed position.
+  assert.equal(result.total.base.amount, roundTo(TOTAL_GBP - 11358, 2));
+});
+
+test("concentration is measured against investable wealth, not total (§6.4)", () => {
+  const { ledger, result } = load("household-usuk-acceptance");
+  const risk = assessRisk({ consolidation: result, ledger: ledger as any, assetClasses, asof: ASOF });
+
+  assert.ok(risk.investableWealth.amount < result.total.base.amount, "cash is excluded from the base");
+  assert.deepEqual(risk.investableWealth.excludedTypes, ["cash", "property"]);
+
+  // Each flagged share must be of investable wealth — measuring against total
+  // understates every position by however much cash happens to sit beside it.
+  for (const flag of risk.singleIssuerFlags) {
+    assert.ok(
+      Math.abs(flag.share - flag.amount / risk.investableWealth.amount) < 1e-6,
+      `${flag.label} share is measured against the wrong base`
+    );
+    assert.ok(flag.share > flag.amount / result.total.base.amount, "the investable share must exceed the total share");
+  }
+  assert.equal(
+    risk.singleIssuerFlags.some((flag) => flag.label.startsWith("Cash")),
+    false,
+    "cash is not a concentrated position"
+  );
 });
 
 test("the UK-only household consolidates without a secondary currency", () => {

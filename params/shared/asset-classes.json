@@ -49,6 +49,13 @@
     "property": false,
     "private_holding": false
   },
+  "investable_wealth": {
+    "excluded_types": {
+      "value": ["cash", "property"],
+      "source": "SPEC §6.4 concentration is a risk measure about invested capital; a current account is not a concentrated position, and measuring against total wealth understates every real concentration",
+      "status": "published"
+    }
+  },
   "concentration": {
     "single_issuer_flag_threshold": {
       "value": 0.05,

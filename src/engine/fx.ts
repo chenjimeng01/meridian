@@ -46,6 +46,8 @@ interface FxPolicyDoc {
     nearest_rate_max_staleness_days: { value: number };
     refuse_conversion_beyond_days: { value: number };
     cross_rate_rule: { value: string };
+    cross_rate_pivot: { value: string };
+    date_mismatch_rule: { value: string };
     rounding: { value: { rate_decimal_places: number; amount_decimal_places: number; method: string } };
   };
 }
@@ -96,8 +98,27 @@ export function findRate(
   return best;
 }
 
+const IMPLEMENTED_DATE_RULE = "use_rate_on_or_before_valuation_date";
+const IMPLEMENTED_CROSS_RULE = "triangulate_via_pivot_when_direct_pair_absent";
+
+/**
+ * Reads the policy AND checks the code still implements what it says. A params
+ * file the engine silently ignores is worse than no params file: it documents
+ * a behaviour nobody has.
+ */
 function policyOf(raw: unknown): FxPolicyDoc["policy"] {
-  return (raw as FxPolicyDoc).policy;
+  const policy = (raw as FxPolicyDoc).policy;
+  if (policy.date_mismatch_rule?.value !== IMPLEMENTED_DATE_RULE) {
+    throw new Error(
+      `fx: policy asks for date rule "${policy.date_mismatch_rule?.value}" but this engine implements "${IMPLEMENTED_DATE_RULE}"`
+    );
+  }
+  if (policy.cross_rate_rule?.value !== IMPLEMENTED_CROSS_RULE) {
+    throw new Error(
+      `fx: policy asks for cross-rate rule "${policy.cross_rate_rule?.value}" but this engine implements "${IMPLEMENTED_CROSS_RULE}"`
+    );
+  }
+  return policy;
 }
 
 function stalenessWarning(asof: string, rateDate: string, maxClean: number): string[] {
@@ -136,8 +157,8 @@ export function convert(money: Money, target: string, asof: string, ctx: FxConte
     };
   }
 
-  // No direct pair: triangulate through USD, per the cross-rate policy.
-  const pivot = "USD";
+  // No direct pair: triangulate through the policy's pivot currency.
+  const pivot = policy.cross_rate_pivot.value;
   if (money.currency !== pivot && target !== pivot) {
     const legA = findRate(money.currency, pivot, asof, ctx.rates);
     const legB = findRate(target, pivot, asof, ctx.rates);

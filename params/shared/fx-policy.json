@@ -26,8 +26,13 @@
       "status": "published"
     },
     "cross_rate_rule": {
-      "value": "triangulate_via_usd_when_direct_pair_absent",
+      "value": "triangulate_via_pivot_when_direct_pair_absent",
       "source": "Meridian design decision",
+      "status": "published"
+    },
+    "cross_rate_pivot": {
+      "value": "USD",
+      "source": "Meridian design decision: USD is the most widely quoted leg, so triangulating through it needs the fewest observations",
       "status": "published"
     },
     "rounding": {

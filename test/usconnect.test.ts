@@ -19,6 +19,8 @@ import type { Ledger } from "../src/ingest/types.ts";
 const usParams = readJson("params/us/2026.json");
 const ukParams = readJson("params/uk/2026-27.json");
 const pficRules = readJson("params/shared/pfic-rules.json");
+const situsRules = readJson("params/shared/situs-rules.json");
+const currencyOfLifeRules = readJson("params/shared/currency-of-life.json");
 const wrapperMatrix = readJson("params/shared/wrapper-matrix.json");
 
 const ASOF = "2026-06-30";
@@ -45,6 +47,8 @@ function analyse(ledger: Ledger, currencyOfLife?: Record<string, Record<string, 
     usParams,
     ukParams,
     pficRules,
+    situsRules,
+    currencyOfLifeRules,
     wrapperMatrix,
     asof: ASOF,
     toBase,
