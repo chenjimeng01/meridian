@@ -1,0 +1,3 @@
+#!/bin/sh
+# SPEC §9 rail. Installed by "npm run prepare" (git config core.hooksPath .githooks).
+exec node scripts/precommit-scan.mjs

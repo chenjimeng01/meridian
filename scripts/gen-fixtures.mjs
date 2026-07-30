@@ -332,7 +332,13 @@ function renderExpected(doc) {
 // ---------------------------------------------------------------------------
 // Write statements + expected, collecting sha256 for the ledger's documents[]
 // ---------------------------------------------------------------------------
+// Fixed timestamps: this fixture household represents one operator session.
+const PARSED_AT = "2026-07-30T11:00:00Z";
+const ACCEPTED_AT = "2026-07-30T12:00:00Z";
+const OPERATOR = "JC";
+
 const documents = [];
+const acceptances = [];
 const holdings = [];
 const transactions = [];
 const pricePoints = new Map(); // instrumentKey -> [{date, price, source}]
@@ -347,6 +353,7 @@ for (const doc of DOCS) {
   writeFileSync(expPath, JSON.stringify(renderExpected(doc), null, 2) + "\n");
 
   const docId = nextUlid();
+  const runId = `RUN-${String(documents.length + 1).padStart(2, "0")}`;
   documents.push({
     id: docId,
     filename: `${doc.dir}/${doc.file}.txt`,
@@ -354,8 +361,11 @@ for (const doc of DOCS) {
     institution: doc.institution,
     doc_type: doc.doc_type,
     period: doc.period,
-    parse_run_ids: [],
+    parsed_at: PARSED_AT,
+    accepted_at: ACCEPTED_AT,
+    parse_run_ids: [runId],
   });
+  const acceptanceLines = [];
 
   for (const acct of doc.accounts) {
     const a = ACCOUNTS[acct.key];
@@ -372,6 +382,7 @@ for (const doc of DOCS) {
       });
       if (!pricePoints.has(key)) pricePoints.set(key, []);
       pricePoints.get(key).push({ date: doc.period.to, price: { amount: price, currency: cur }, source: "statement" });
+      acceptanceLines.push({ kind: "holding", account_token: a.token, ref: inst.name, action: "accepted", instrument_id: inst.id });
     }
     if (acct.cash != null && doc.doc_type !== "mifid_costs") {
       const cashInst = doc.statement_currency === "USD" ? INSTRUMENTS.cashUsd : INSTRUMENTS.cashGbp;
@@ -383,6 +394,10 @@ for (const doc of DOCS) {
         value: { amount: acct.cash, currency: doc.statement_currency },
         source_document_id: docId,
       });
+      acceptanceLines.push({ kind: "cash", account_token: a.token, ref: cashInst.name, action: "accepted" });
+    }
+    for (const f of acct.fees ?? []) {
+      acceptanceLines.push({ kind: "fee", account_token: a.token, ref: f.label, action: "accepted" });
     }
     for (const m of acct.movements ?? []) {
       transactions.push({
@@ -395,8 +410,18 @@ for (const doc of DOCS) {
         net: { amount: m.amount, currency: doc.statement_currency },
         source_document_id: docId,
       });
+      acceptanceLines.push({ kind: "movement", account_token: a.token, ref: `${m.date} ${m.type}`, action: "accepted" });
     }
   }
+
+  acceptances.push({
+    id: nextUlid(),
+    document_id: docId,
+    parse_run_id: runId,
+    accepted_at: ACCEPTED_AT,
+    operator_initials: OPERATOR,
+    lines: acceptanceLines,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -456,6 +481,7 @@ const ledger = {
   holdings,
   transactions,
   documents,
+  acceptances,
   fx_rates: [
     { date: "2025-12-31", pair: "GBPUSD", rate: 1.27, source: "statement:harcourt-private-bank/consolidated-2025-12" },
     { date: "2026-03-31", pair: "GBPUSD", rate: 1.29, source: "statement:harcourt-private-bank/consolidated-2026-03" },

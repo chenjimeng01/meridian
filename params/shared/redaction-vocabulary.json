@@ -1,0 +1,43 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "redaction-vocabulary",
+  "effective": { "from": "2026-01-01", "to": "2099-12-31" },
+  "policy": {
+    "unknown_proper_noun_detection": {
+      "value": "flag_capitalised_runs_with_no_vocabulary_token",
+      "source": "Meridian design decision implementing SPEC §5.2 'local regex + NER pass' deterministically: a run of two or more capitalised tokens containing no financial/institutional/geographic/temporal vocabulary token is treated as an unrecognised personal name and hard-fails before egress",
+      "status": "published",
+      "notes": "Deterministic substitute for a trained NER model in v0 (SPEC §2.1 forbids model output in the core). It fails loudly and forces the operator to extend the vault or this vocabulary; it does not silently redact. KNOWN LIMITATION: a bare single-token surname on its own is not detected unless preceded by an honorific — logged in PROGRESS.md for human review."
+    },
+    "min_run_length": {
+      "value": 2,
+      "source": "Meridian design decision: single capitalised tokens are pervasive in statement layouts (Cash, Balance, Holding, TOTAL) and flagging them would make the gate unusable",
+      "status": "published"
+    }
+  },
+  "safe_tokens": {
+    "comment": "A capitalised run is SAFE if ANY of its tokens appears here. Case-insensitive. Extend rather than weaken the detector.",
+    "corporate_and_legal": [
+      "PLC", "LTD", "LIMITED", "LLP", "INC", "CORP", "CORPORATION", "COMPANY", "CO", "GROUP", "HOLDINGS", "NV", "SA", "AG", "SE", "TRUSTEES", "TRUSTEE", "NOMINEES", "PARTNERS", "PARTNERSHIP"
+    ],
+    "financial_institutions": [
+      "BANK", "BANKING", "PRIVATE", "WEALTH", "SECURITIES", "BROKERAGE", "PLATFORM", "CUSTODY", "CUSTODIAN", "ASSET", "ASSETS", "MANAGEMENT", "INVESTMENTS", "INVESTMENT", "CAPITAL", "ADVISERS", "ADVISORS", "FINANCIAL", "SERVICES", "TREASURY"
+    ],
+    "instrument_and_product": [
+      "FUND", "FUNDS", "ETF", "UCITS", "OEIC", "SICAV", "ICVC", "TRUST", "INDEX", "EQUITY", "EQUITIES", "BOND", "BONDS", "GILT", "GILTS", "STOCK", "STOCKS", "SHARES", "SHARE", "ORDINARY", "PREFERENCE", "COMMON", "CLASS", "ACC", "INC.", "ACCUMULATION", "DISTRIBUTION", "INCOME", "GROWTH", "GLOBAL", "INTERNATIONAL", "EMERGING", "MARKET", "MARKETS", "MONEY", "CASH", "DEPOSIT", "RESERVE", "PORTFOLIO", "DISCRETIONARY", "MANAGED", "SLEEVE", "MANDATE", "REIT", "INFRASTRUCTURE", "UTILITIES", "TECH", "TECHNOLOGY", "RAIL", "PHARMA", "ENERGY", "MINING", "RETAIL", "CONSUMER", "INDUSTRIAL", "HEALTHCARE"
+    ],
+    "wrappers_and_schemes": [
+      "ISA", "SIPP", "GIA", "PENSION", "PENSIONS", "SCHEME", "ACCOUNT", "ACCOUNTS", "PERSONAL", "SELF-INVESTED", "STAKEHOLDER", "IRA", "ROTH", "BROKERAGE", "INDIVIDUAL", "JOINT", "GENERAL", "SAVINGS", "CURRENT", "BOND"
+    ],
+    "statement_vocabulary": [
+      "VALUATION", "STATEMENT", "STATEMENTS", "PERIOD", "TOTAL", "TOTALS", "SUBTOTAL", "BALANCE", "HOLDING", "HOLDINGS", "UNITS", "PRICE", "VALUE", "COST", "COSTS", "CHARGE", "CHARGES", "FEE", "FEES", "ACTIVITY", "ISIN", "SEDOL", "CUSIP", "TICKER", "SYMBOL", "TRANSACTION", "TRANSACTIONS", "SUMMARY", "DISCLOSURE", "ANNUAL", "QUARTERLY", "MONTHLY", "EXCHANGE", "RATE", "RATES", "CURRENCY", "DIVIDEND", "INTEREST", "CONTRIBUTION", "CONTRIBUTIONS", "WITHDRAWAL", "TRANSFER", "PURCHASE", "SALE", "BOUGHT", "SOLD", "OPENING", "CLOSING", "SYNTHETIC", "FIXTURE", "FICTIONAL", "NOTICE", "MIFID", "II", "EX-POST", "PAGE", "REPORT", "REFERENCE", "DATE", "DESCRIPTION", "ADMINISTRATION", "EMPLOYER", "MEMBER", "RELIEF", "TAX", "GROSS", "NET", "YEAR", "REINVESTED", "SCHEME"
+    ],
+    "temporal": [
+      "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER", "JAN", "FEB", "MAR", "APR", "JUN", "JUL", "AUG", "SEP", "SEPT", "OCT", "NOV", "DEC", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY", "Q1", "Q2", "Q3", "Q4"
+    ],
+    "geographic": [
+      "UK", "US", "USA", "GB", "EU", "UNITED", "KINGDOM", "STATES", "LONDON", "NEW", "YORK", "EUROPE", "EUROPEAN", "AMERICA", "AMERICAN", "BRITAIN", "BRITISH", "ENGLAND", "SCOTLAND", "WALES", "IRELAND", "IRISH", "LUXEMBOURG", "JERSEY", "GUERNSEY", "ASIA", "PACIFIC", "JAPAN", "CHINA", "INDIA", "GERMANY", "FRANCE", "SWITZERLAND", "NORTH", "SOUTH", "EAST", "WEST", "STERLING", "DOLLAR", "EURO", "GBP", "USD", "EUR", "CHF", "JPY"
+    ],
+    "redaction_placeholders": ["[ADDRESS]", "[POSTCODE]", "[NI]", "[SSN]", "[REDACTED]"]
+  }
+}

@@ -1,10 +1,20 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ROOT, readJson } from "./helpers.ts";
-import { createVault, redactStatement, assertRedacted, RedactionError } from "../src/ingest/redact.ts";
+import {
+  createVault,
+  redactStatement,
+  assertRedacted,
+  findUnknownProperNouns,
+  saveVault,
+  loadVault,
+  RedactionError,
+} from "../src/ingest/redact.ts";
 import { extractWithClaude } from "../src/ingest/extract-llm.ts";
+import { INGEST_ORDER } from "../src/ingest/order.ts";
 
 const config = readJson("test/fixtures/household-config.json") as any;
 const statement = (rel: string) => readFileSync(join(ROOT, "test/fixtures/statements", rel), "utf8");
@@ -128,6 +138,70 @@ test("invalid extraction output triggers exactly one retry with validation error
   const retryText = JSON.stringify(bodies[1]);
   assert.ok(/schema_version|required/.test(retryText), "retry must carry the validation errors");
   assert.equal(audits.length, 2, "both calls audited");
+});
+
+// --- M3: a name the operator never listed must still block egress ---------
+
+test("an unlisted personal name is detected and blocks the call (§5.2 NER pass)", async () => {
+  const vault = createVault(config, "fixture-salt");
+  // A third party the vault knows nothing about — an executor, adviser, joint
+  // holder. Redaction cannot substitute it; the gate must refuse to transmit.
+  const text = "Statement for P1\nJoint holder: Marguerite Ashdown\nTOTAL (GBP) £1,000.00";
+  assert.throws(() => assertRedacted(text, vault), (err: unknown) => {
+    assert.ok(err instanceof RedactionError);
+    assert.match(err.message, /unrecognised proper noun "Marguerite Ashdown"/);
+    return true;
+  });
+
+  const calls: unknown[] = [];
+  await assert.rejects(
+    extractWithClaude(text, {
+      vault,
+      apiKey: "test-key",
+      fetchFn: (async (...a: unknown[]) => {
+        calls.push(a);
+        throw new Error("unreachable");
+      }) as typeof fetch,
+      appendAudit: () => {},
+      now: FIXED_NOW,
+    }),
+    RedactionError
+  );
+  assert.equal(calls.length, 0, "an unrecognised name must never reach the network");
+});
+
+test("legitimate institution and instrument vocabulary does not trip the detector", () => {
+  const vault = createVault(config, "fixture-salt");
+  // Every redacted fixture statement must pass cleanly, or the gate is unusable.
+  for (const rel of INGEST_ORDER) {
+    const red = redactStatement(statement(rel), vault);
+    assert.deepEqual(findUnknownProperNouns(red), [], `${rel}: false positive`);
+  }
+});
+
+test("the detector's known limitation is a bare single-token surname", () => {
+  // Documented in PROGRESS.md and params/shared/redaction-vocabulary.json:
+  // single capitalised tokens are pervasive in statement layouts, so a lone
+  // surname is NOT detected. This test pins the limitation so it cannot be
+  // silently assumed away.
+  assert.deepEqual(findUnknownProperNouns("Ashdown"), []);
+  assert.deepEqual(findUnknownProperNouns("Dr Ashdown"), ["Dr Ashdown"]);
+});
+
+test("vault writes are owner-only and reload identically (§5.2, §9)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "meridian-vault-"));
+  try {
+    const path = join(dir, "vault.local.json");
+    const vault = createVault(config, "fixture-salt");
+    redactStatement(statement("alderbrook-platform/valuation-2025-12.txt"), vault);
+
+    writeFileSync(path, "{}", { mode: 0o644 }); // pre-existing loose permissions
+    saveVault(path, vault);
+    assert.equal(statSync(path).mode & 0o777, 0o600, "vault must be owner-read/write only");
+    assert.deepEqual(loadVault(path), vault);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("offline mode refuses all egress", async () => {

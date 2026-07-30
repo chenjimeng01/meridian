@@ -71,9 +71,51 @@ export interface ParseRun {
   id: string;
   filename: string;
   sha256: string;
+  /** When this parse run executed; injected, never read from the clock in src/. */
+  created_at: string;
   redactedText: string;
   output: ParseOutput;
   matches: MatchResult[];
+}
+
+/** One operator decision on one extracted line (SPEC §5.6). */
+export interface LineDecision {
+  action: "accept" | "reject";
+  /** Operator corrections to the extracted figures; presence records the line as "edited". */
+  edits?: { units?: number; value?: Money; book_cost?: Money; amount?: Money; date?: string };
+  /** Confirms one of the fuzzy candidates proposed for this holding (SPEC §5.4). */
+  instrumentId?: string;
+  note?: string;
+}
+
+export interface LineRef {
+  kind: "holding" | "cash" | "fee" | "movement";
+  accountToken: string;
+  index: number;
+  /** Human-readable label for the acceptance log. */
+  ref: string;
+  match?: MatchResult;
+  holding?: ParseHolding;
+  fee?: ParseFee;
+  movement?: ParseMovement;
+  cash?: Money;
+}
+
+export interface AcceptOptions {
+  /** ISO timestamp of the acceptance session; injected at the CLI boundary. */
+  acceptedAt: string;
+  operatorInitials: string;
+  /** Per-line operator decision. Omitted means accept every line unchanged. */
+  decide?: (line: LineRef) => LineDecision;
+}
+
+export interface AcceptanceLine {
+  kind: string;
+  account_token: string;
+  ref: string;
+  action: "accepted" | "edited" | "rejected";
+  instrument_id?: string;
+  note?: string;
 }
 
 export type IdFactory = () => string;
@@ -91,5 +133,6 @@ export interface Ledger {
   holdings: any[];
   transactions: any[];
   documents: any[];
+  acceptances: any[];
   fx_rates: any[];
 }

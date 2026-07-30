@@ -21,6 +21,8 @@ export interface ParseRunInput {
   ledger: Ledger;
   vault: Vault;
   ids: IdFactory;
+  /** ISO timestamp of this run; injected at the CLI boundary (SPEC §2, §6). */
+  createdAt: string;
   extract?: (redactedText: string) => ParseOutput;
 }
 
@@ -38,6 +40,7 @@ export function executeParseRun(input: ParseRunInput): ParseRun {
     id: input.ids(),
     filename: input.filename,
     sha256,
+    created_at: input.createdAt,
     redactedText,
     output,
     matches: matchInstruments(output, input.ledger),

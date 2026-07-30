@@ -1,8 +1,9 @@
 # PROGRESS
 
-**Current phase:** 2 — Ingestion pipeline (SPEC §5)
-**Status:** in progress
-**Last completed step:** Phase 1 gate closed (PHASE_REVIEW_1.md, 0 MUST-FIX)
+**Current phase:** 2 complete — Phase 3 (engine + US-connected) may open
+**Status:** `npm test` green (54/54), lint + typecheck clean; PHASE_REVIEW_2
+MUST-FIX items all resolved
+**Last completed step:** 2.10 MUST-FIX resolution
 
 ## Phase 2 step plan
 
@@ -32,7 +33,34 @@ test proves the redaction assertion blocks an unredacted network call;
       to the Phase 1 fixture ledger (per-account totals, asof, fx)
 - [x] 2.8 Mobile review diff HTML (390-first, redacted-only, confidence chips,
       prior-vs-proposed diff, <200KB)
-- [ ] 2.9 Phase gate: tests green (45/45) + structural review → PHASE_REVIEW_2.md
+- [x] 2.9 Phase gate: PHASE_REVIEW_2.md (Opus reviewer) — 3 MUST-FIX, 10 SHOULD-FIX, 9 NOTE
+- [x] 2.10 MUST-FIX resolution (54/54 green):
+      - M1 accept flow now takes per-line accept/edit/reject decisions; only
+        accepted lines enter the ledger; every decision written to the new
+        `acceptances[]` log with an injected timestamp; documents carry
+        `parsed_at`/`accepted_at` for the §8 appendix
+      - M2 `acceptRun` consumes the operator's match decision — a confirmed
+        fuzzy candidate merges into that instrument instead of duplicating it,
+        and the confirmation is recorded in the acceptance log
+      - M3 deterministic unknown-proper-noun detector added to `assertRedacted`
+        (capitalised runs with no vocabulary token), vocabulary in
+        `params/shared/redaction-vocabulary.json`; verified zero false
+        positives across all 15 redacted fixtures
+      - Pulled forward: S1 tracked `.githooks/` + `prepare` script, S2 account
+        pattern with `test/fixtures/**` allowlist, S3 vault chmod + tests,
+        S6 `needs_review` narrowed to unresolvable instruments, S10 test glob,
+        and `gen:golden` now requires `--force`
+
+## Phase 3 entry tasks (remaining PHASE_REVIEW_2 SHOULD-FIX)
+
+- [ ] S4 exercise the <0.9 confidence review branch with a synthetic run
+- [ ] S5 confidence on cash balances and statement FX observations
+- [ ] S7 **blocking for §7.1**: do not treat ingest-inferred `type`/`domicile`
+      as authoritative in the PFIC cascade — gate on operator-confirmed
+      metadata and route unconfirmed instruments to `needs_classification`
+- [ ] S9 replace `any[]` in the `Ledger` type with §4-mirroring types
+- [ ] Deferred to Phase 4 (CLI boundary): S8 write parked runs to
+      `parse-runs/failed/` and review HTML to `data/{household}/parse-runs/`
 
 ## Phase 1 step plan
 
@@ -55,6 +83,19 @@ test proves the redaction assertion blocks an unredacted network call;
 (none)
 
 ## Notes / ambiguities logged for human review
+
+- **Redaction detector limitation (v0):** the unknown-proper-noun gate flags
+  runs of two or more capitalised tokens. A bare single-token surname on its
+  own line ("Ashdown") is NOT detected unless preceded by an honorific —
+  single capitalised tokens are pervasive in statement layouts, so flagging
+  them would make the gate unusable. Pinned by a test so it cannot be assumed
+  away. Revisit if a real statement layout puts surnames on their own line.
+- **Model tiering changed:** Fable 5 usage was exhausted mid-build, so
+  `.claude/agents/deep-technical.md` now specifies `model: opus`, exactly as
+  SPEC §12.1's availability note directs. PHASE_REVIEW_1 was written by the
+  main loop rather than the Opus reviewer (spend limit at the time) and is
+  therefore weaker evidence than PHASE_REVIEW_2, which the Opus reviewer wrote
+  properly — a re-run of the Phase 1 review is still worth doing.
 
 - US 2026 params: several 2026 inflation adjustments not yet published at build
   time; entries marked `"status": "projected"` with basis stated. Refresh when

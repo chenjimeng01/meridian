@@ -4,7 +4,7 @@
   "title": "Meridian canonical wealth ledger",
   "description": "The canonical, human-readable wealth ledger. All monetary amounts are {amount, currency}; all dates ISO 8601; all IDs ULIDs. Nothing enters the ledger without a source_document_id or an explicit manual source with operator initials (SPEC §4).",
   "type": "object",
-  "required": ["schema_version", "household", "accounts", "instruments", "holdings", "transactions", "documents", "fx_rates"],
+  "required": ["schema_version", "household", "accounts", "instruments", "holdings", "transactions", "documents", "acceptances", "fx_rates"],
   "additionalProperties": false,
   "properties": {
     "schema_version": { "const": "0.1" },
@@ -220,7 +220,50 @@
               "to": { "$ref": "#/$defs/isoDate" }
             }
           },
+          "parsed_at": {
+            "$ref": "#/$defs/isoDateTime",
+            "description": "When the accepted parse run executed. Rendered as the parse date in the §8 data appendix."
+          },
+          "accepted_at": {
+            "$ref": "#/$defs/isoDateTime",
+            "description": "When the operator accepted lines from this document into the ledger."
+          },
           "parse_run_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "acceptances": {
+      "type": "array",
+      "description": "Per-line operator decision log (SPEC §5.6): every acceptance, edit and rejection, with a timestamp. Append-only; this log is the audit trail behind every figure in the ledger.",
+      "items": {
+        "type": "object",
+        "required": ["id", "document_id", "parse_run_id", "accepted_at", "operator_initials", "lines"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/ulid" },
+          "document_id": { "$ref": "#/$defs/ulid" },
+          "parse_run_id": { "type": "string", "minLength": 1 },
+          "accepted_at": { "$ref": "#/$defs/isoDateTime" },
+          "operator_initials": { "type": "string", "minLength": 2, "maxLength": 4 },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "account_token", "ref", "action"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": { "type": "string", "enum": ["holding", "cash", "fee", "movement", "account"] },
+                "account_token": { "type": "string", "pattern": "^A[0-9]+$" },
+                "ref": { "type": "string", "minLength": 1 },
+                "action": { "type": "string", "enum": ["accepted", "edited", "rejected"] },
+                "instrument_id": {
+                  "$ref": "#/$defs/ulid",
+                  "description": "Set when the operator confirmed a proposed fuzzy match to an existing instrument (SPEC §5.4)."
+                },
+                "note": { "type": "string" }
+              }
+            }
+          }
         }
       }
     },
@@ -249,6 +292,11 @@
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "description": "ISO 8601 calendar date."
+    },
+    "isoDateTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "ISO 8601 UTC timestamp. Always injected at the CLI boundary — src/ never reads the clock."
     },
     "currency": {
       "type": "string",

@@ -58,7 +58,7 @@
       "data_asof": "2026-06-30"
     },
     {
-      "id": "01MER1D1AN0000000000000018",
+      "id": "01MER1D1AN0000000000000021",
       "person_ids": [
         "01MER1D1AN0000000000000002"
       ],
@@ -71,7 +71,7 @@
       "data_asof": "2026-04-05"
     },
     {
-      "id": "01MER1D1AN0000000000000025",
+      "id": "01MER1D1AN0000000000000031",
       "person_ids": [
         "01MER1D1AN0000000000000002"
       ],
@@ -84,7 +84,7 @@
       "data_asof": "2026-06-30"
     },
     {
-      "id": "01MER1D1AN0000000000000036",
+      "id": "01MER1D1AN0000000000000045",
       "person_ids": [
         "01MER1D1AN0000000000000002",
         "01MER1D1AN0000000000000003"
@@ -98,7 +98,7 @@
       "data_asof": "2026-06-30"
     },
     {
-      "id": "01MER1D1AN0000000000000039",
+      "id": "01MER1D1AN0000000000000048",
       "person_ids": [
         "01MER1D1AN0000000000000002",
         "01MER1D1AN0000000000000003"
@@ -122,7 +122,6 @@
       "type": "oeic",
       "domicile": "GB",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2025-12-31",
@@ -207,7 +206,6 @@
       "type": "ucits_etf",
       "domicile": "IE",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2025-12-31",
@@ -292,7 +290,6 @@
       "type": "equity",
       "domicile": "GB",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2025-12-31",
@@ -329,7 +326,7 @@
       "prices": []
     },
     {
-      "id": "01MER1D1AN0000000000000026",
+      "id": "01MER1D1AN0000000000000032",
       "identifiers": {
         "isin": "US0000SYN047"
       },
@@ -337,7 +334,6 @@
       "type": "equity",
       "domicile": "US",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2026-04-30",
@@ -390,7 +386,7 @@
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000027",
+      "id": "01MER1D1AN0000000000000033",
       "identifiers": {
         "isin": "US0000SYN062"
       },
@@ -398,7 +394,6 @@
       "type": "equity",
       "domicile": "US",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2026-04-30",
@@ -427,7 +422,7 @@
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000028",
+      "id": "01MER1D1AN0000000000000034",
       "identifiers": {
         "isin": "US0000SYN070"
       },
@@ -435,7 +430,6 @@
       "type": "mmf",
       "domicile": "US",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2026-04-30",
@@ -464,7 +458,7 @@
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000029",
+      "id": "01MER1D1AN0000000000000035",
       "identifiers": {},
       "name": "Cash (USD)",
       "type": "cash",
@@ -472,7 +466,7 @@
       "prices": []
     },
     {
-      "id": "01MER1D1AN0000000000000037",
+      "id": "01MER1D1AN0000000000000046",
       "identifiers": {
         "isin": "US0000SYN039"
       },
@@ -480,7 +474,6 @@
       "type": "mutual_fund_us",
       "domicile": "US",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2025-12-31",
@@ -509,7 +502,7 @@
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000038",
+      "id": "01MER1D1AN0000000000000047",
       "identifiers": {
         "isin": "GB00SYNGLT08"
       },
@@ -517,7 +510,6 @@
       "type": "bond",
       "domicile": "GB",
       "pfic_status": "not_assessed",
-      "needs_review": true,
       "prices": [
         {
           "date": "2025-12-31",
@@ -633,7 +625,7 @@
         "amount": 27456.25,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -644,7 +636,7 @@
         "amount": 28732.5,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -655,7 +647,7 @@
         "amount": 11790,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -666,7 +658,7 @@
         "amount": 1210.11,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -677,7 +669,7 @@
         "amount": 40864,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -688,7 +680,7 @@
         "amount": 17572,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -699,7 +691,7 @@
         "amount": 95.4,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000013"
+      "source_document_id": "01MER1D1AN0000000000000014"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -710,7 +702,7 @@
         "amount": 27762.5,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -721,7 +713,7 @@
         "amount": 29259,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -732,7 +724,7 @@
         "amount": 11358,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000006",
@@ -743,7 +735,7 @@
         "amount": 1215.8,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -754,7 +746,7 @@
         "amount": 41612.8,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -765,7 +757,7 @@
         "amount": 17768,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
       "account_id": "01MER1D1AN0000000000000011",
@@ -776,10 +768,10 @@
         "amount": 101.12,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000015"
+      "source_document_id": "01MER1D1AN0000000000000017"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000008",
       "asof": "2024-04-05",
       "units": 900,
@@ -787,10 +779,10 @@
         "amount": 49680,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000007",
       "asof": "2024-04-05",
       "units": 15000,
@@ -798,10 +790,10 @@
         "amount": 29775,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2024-04-05",
       "units": 2150,
@@ -809,10 +801,10 @@
         "amount": 2150,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000008",
       "asof": "2025-04-05",
       "units": 1050,
@@ -820,10 +812,10 @@
         "amount": 62370,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000007",
       "asof": "2025-04-05",
       "units": 16500,
@@ -831,10 +823,10 @@
         "amount": 34171.5,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2025-04-05",
       "units": 1890,
@@ -842,10 +834,10 @@
         "amount": 1890,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000008",
       "asof": "2026-04-05",
       "units": 1150,
@@ -853,10 +845,10 @@
         "amount": 73485,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000007",
       "asof": "2026-04-05",
       "units": 17200,
@@ -864,10 +856,10 @@
         "amount": 37857.2,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2026-04-05",
       "units": 2305,
@@ -875,175 +867,175 @@
         "amount": 2305,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2026-04-30",
       "units": 85,
       "value": {
         "amount": 17204,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000024"
+      "source_document_id": "01MER1D1AN0000000000000030"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000027",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000033",
       "asof": "2026-04-30",
       "units": 55,
       "value": {
         "amount": 5296.5,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000024"
+      "source_document_id": "01MER1D1AN0000000000000030"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000028",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000034",
       "asof": "2026-04-30",
       "units": 12400,
       "value": {
         "amount": 12400,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000024"
+      "source_document_id": "01MER1D1AN0000000000000030"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000029",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000035",
       "asof": "2026-04-30",
       "units": 152.4,
       "value": {
         "amount": 152.4,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000024"
+      "source_document_id": "01MER1D1AN0000000000000030"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2026-05-31",
       "units": 85,
       "value": {
         "amount": 17689.35,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000031"
+      "source_document_id": "01MER1D1AN0000000000000038"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000027",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000033",
       "asof": "2026-05-31",
       "units": 60,
       "value": {
         "amount": 5871,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000031"
+      "source_document_id": "01MER1D1AN0000000000000038"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000028",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000034",
       "asof": "2026-05-31",
       "units": 12410,
       "value": {
         "amount": 12410,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000031"
+      "source_document_id": "01MER1D1AN0000000000000038"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000029",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000035",
       "asof": "2026-05-31",
       "units": 152.4,
       "value": {
         "amount": 152.4,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000031"
+      "source_document_id": "01MER1D1AN0000000000000038"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2026-06-30",
       "units": 85,
       "value": {
         "amount": 18394,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000033"
+      "source_document_id": "01MER1D1AN0000000000000041"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000027",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000033",
       "asof": "2026-06-30",
       "units": 60,
       "value": {
         "amount": 5880,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000033"
+      "source_document_id": "01MER1D1AN0000000000000041"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000028",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000034",
       "asof": "2026-06-30",
       "units": 12451.15,
       "value": {
         "amount": 12451.15,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000033"
+      "source_document_id": "01MER1D1AN0000000000000041"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
-      "instrument_id": "01MER1D1AN0000000000000029",
+      "account_id": "01MER1D1AN0000000000000031",
+      "instrument_id": "01MER1D1AN0000000000000035",
       "asof": "2026-06-30",
       "units": 152.4,
       "value": {
         "amount": 152.4,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000033"
+      "source_document_id": "01MER1D1AN0000000000000041"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000037",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000046",
       "asof": "2025-12-31",
       "units": 300,
       "value": {
         "amount": 43560,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000035"
+      "source_document_id": "01MER1D1AN0000000000000044"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2025-12-31",
       "units": 120,
       "value": {
         "amount": 25266,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000035"
+      "source_document_id": "01MER1D1AN0000000000000044"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000038",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000047",
       "asof": "2025-12-31",
       "units": 30000,
       "value": {
         "amount": 29460,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000035"
+      "source_document_id": "01MER1D1AN0000000000000044"
     },
     {
-      "account_id": "01MER1D1AN0000000000000039",
+      "account_id": "01MER1D1AN0000000000000048",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2025-12-31",
       "units": 85000,
@@ -1051,43 +1043,43 @@
         "amount": 85000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000035"
+      "source_document_id": "01MER1D1AN0000000000000044"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000037",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000046",
       "asof": "2026-03-31",
       "units": 300,
       "value": {
         "amount": 44670,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000041"
+      "source_document_id": "01MER1D1AN0000000000000051"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2026-03-31",
       "units": 120,
       "value": {
         "amount": 24612,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000041"
+      "source_document_id": "01MER1D1AN0000000000000051"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000038",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000047",
       "asof": "2026-03-31",
       "units": 30000,
       "value": {
         "amount": 29625,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000041"
+      "source_document_id": "01MER1D1AN0000000000000051"
     },
     {
-      "account_id": "01MER1D1AN0000000000000039",
+      "account_id": "01MER1D1AN0000000000000048",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2026-03-31",
       "units": 85150,
@@ -1095,43 +1087,43 @@
         "amount": 85150,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000041"
+      "source_document_id": "01MER1D1AN0000000000000051"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000037",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000046",
       "asof": "2026-06-30",
       "units": 300,
       "value": {
         "amount": 45705,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000043"
+      "source_document_id": "01MER1D1AN0000000000000054"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000026",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000032",
       "asof": "2026-06-30",
       "units": 120,
       "value": {
         "amount": 25968,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000043"
+      "source_document_id": "01MER1D1AN0000000000000054"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
-      "instrument_id": "01MER1D1AN0000000000000038",
+      "account_id": "01MER1D1AN0000000000000045",
+      "instrument_id": "01MER1D1AN0000000000000047",
       "asof": "2026-06-30",
       "units": 30000,
       "value": {
         "amount": 29730,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000043"
+      "source_document_id": "01MER1D1AN0000000000000054"
     },
     {
-      "account_id": "01MER1D1AN0000000000000039",
+      "account_id": "01MER1D1AN0000000000000048",
       "instrument_id": "01MER1D1AN0000000000000010",
       "asof": "2026-06-30",
       "units": 85300,
@@ -1139,12 +1131,12 @@
         "amount": 85300,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000043"
+      "source_document_id": "01MER1D1AN0000000000000054"
     }
   ],
   "transactions": [
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2024-04-05",
       "type": "fee",
       "instrument_id": null,
@@ -1156,10 +1148,10 @@
         "amount": 250,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2024-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1171,10 +1163,10 @@
         "amount": 12000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2024-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1186,10 +1178,10 @@
         "amount": 8000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000017"
+      "source_document_id": "01MER1D1AN0000000000000020"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2025-04-05",
       "type": "fee",
       "instrument_id": null,
@@ -1201,10 +1193,10 @@
         "amount": 255,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2025-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1216,10 +1208,10 @@
         "amount": 12000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2025-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1231,10 +1223,10 @@
         "amount": 8000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000020"
+      "source_document_id": "01MER1D1AN0000000000000024"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2026-04-05",
       "type": "fee",
       "instrument_id": null,
@@ -1246,10 +1238,10 @@
         "amount": 260,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2026-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1261,10 +1253,10 @@
         "amount": 12000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000018",
+      "account_id": "01MER1D1AN0000000000000021",
       "date": "2026-04-05",
       "type": "contribution",
       "instrument_id": null,
@@ -1276,10 +1268,10 @@
         "amount": 10000,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000022"
+      "source_document_id": "01MER1D1AN0000000000000027"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
+      "account_id": "01MER1D1AN0000000000000031",
       "date": "2026-04-15",
       "type": "dividend",
       "instrument_id": null,
@@ -1291,10 +1283,10 @@
         "amount": 34.2,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000024"
+      "source_document_id": "01MER1D1AN0000000000000030"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
+      "account_id": "01MER1D1AN0000000000000031",
       "date": "2026-05-08",
       "type": "buy",
       "instrument_id": null,
@@ -1306,10 +1298,10 @@
         "amount": 485.5,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000031"
+      "source_document_id": "01MER1D1AN0000000000000038"
     },
     {
-      "account_id": "01MER1D1AN0000000000000025",
+      "account_id": "01MER1D1AN0000000000000031",
       "date": "2026-06-30",
       "type": "interest",
       "instrument_id": null,
@@ -1321,10 +1313,10 @@
         "amount": 41.15,
         "currency": "USD"
       },
-      "source_document_id": "01MER1D1AN0000000000000033"
+      "source_document_id": "01MER1D1AN0000000000000041"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1336,10 +1328,10 @@
         "amount": 750,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000045"
+      "source_document_id": "01MER1D1AN0000000000000057"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1351,10 +1343,10 @@
         "amount": 180,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000045"
+      "source_document_id": "01MER1D1AN0000000000000057"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1366,10 +1358,10 @@
         "amount": 95,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000045"
+      "source_document_id": "01MER1D1AN0000000000000057"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1381,10 +1373,10 @@
         "amount": 40,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000045"
+      "source_document_id": "01MER1D1AN0000000000000057"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1396,10 +1388,10 @@
         "amount": 15,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000045"
+      "source_document_id": "01MER1D1AN0000000000000057"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1411,10 +1403,10 @@
         "amount": 785,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000047"
+      "source_document_id": "01MER1D1AN0000000000000060"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1426,10 +1418,10 @@
         "amount": 190,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000047"
+      "source_document_id": "01MER1D1AN0000000000000060"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1441,10 +1433,10 @@
         "amount": 110,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000047"
+      "source_document_id": "01MER1D1AN0000000000000060"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1456,10 +1448,10 @@
         "amount": 45,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000047"
+      "source_document_id": "01MER1D1AN0000000000000060"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1471,10 +1463,10 @@
         "amount": 820,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000049"
+      "source_document_id": "01MER1D1AN0000000000000063"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1486,10 +1478,10 @@
         "amount": 198,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000049"
+      "source_document_id": "01MER1D1AN0000000000000063"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1501,10 +1493,10 @@
         "amount": 88,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000049"
+      "source_document_id": "01MER1D1AN0000000000000063"
     },
     {
-      "account_id": "01MER1D1AN0000000000000036",
+      "account_id": "01MER1D1AN0000000000000045",
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
@@ -1516,7 +1508,7 @@
         "amount": 52,
         "currency": "GBP"
       },
-      "source_document_id": "01MER1D1AN0000000000000049"
+      "source_document_id": "01MER1D1AN0000000000000063"
     }
   ],
   "documents": [
@@ -1530,12 +1522,14 @@
         "from": "2025-10-01",
         "to": "2025-12-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
         "01MER1D1AN0000000000000004"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000013",
+      "id": "01MER1D1AN0000000000000014",
       "filename": "alderbrook-platform/valuation-2026-03.txt",
       "sha256": "4bed8b416741f035aa5ae0f2091a734154d3c9dfa4c009ab557fe1cab73c6cb3",
       "institution": "Alderbrook Platform",
@@ -1544,12 +1538,14 @@
         "from": "2026-01-01",
         "to": "2026-03-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000012"
+        "01MER1D1AN0000000000000013"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000015",
+      "id": "01MER1D1AN0000000000000017",
       "filename": "alderbrook-platform/valuation-2026-06.txt",
       "sha256": "c503be8a66cfb633fb19e772b8b4ec4ebf179438eb15721ccb2b98767155097e",
       "institution": "Alderbrook Platform",
@@ -1558,12 +1554,14 @@
         "from": "2026-04-01",
         "to": "2026-06-30"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000014"
+        "01MER1D1AN0000000000000016"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000017",
+      "id": "01MER1D1AN0000000000000020",
       "filename": "beacon-sipp-trustees/annual-2024.txt",
       "sha256": "16cbe282b351f6cd826cc78dba419084557d1d6e3c591e54e75a39c7b861a471",
       "institution": "Beacon SIPP Trustees",
@@ -1572,12 +1570,14 @@
         "from": "2023-04-06",
         "to": "2024-04-05"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000016"
+        "01MER1D1AN0000000000000019"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000020",
+      "id": "01MER1D1AN0000000000000024",
       "filename": "beacon-sipp-trustees/annual-2025.txt",
       "sha256": "2954b234f7f94e5add2431ed072d962a951bb10c1533468e8af4c86c3dfed926",
       "institution": "Beacon SIPP Trustees",
@@ -1586,12 +1586,14 @@
         "from": "2024-04-06",
         "to": "2025-04-05"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000019"
+        "01MER1D1AN0000000000000023"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000022",
+      "id": "01MER1D1AN0000000000000027",
       "filename": "beacon-sipp-trustees/annual-2026.txt",
       "sha256": "dd147803ced102cbacc12e3211364c4c0cc8d43199394c228b656c52f33eb0ed",
       "institution": "Beacon SIPP Trustees",
@@ -1600,12 +1602,14 @@
         "from": "2025-04-06",
         "to": "2026-04-05"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000021"
+        "01MER1D1AN0000000000000026"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000024",
+      "id": "01MER1D1AN0000000000000030",
       "filename": "liberty-street-securities/statement-2026-04.txt",
       "sha256": "dec6d1fddffaf35871128802c166f519359f7c1151624633e7012d219eff647b",
       "institution": "Liberty Street Securities",
@@ -1614,12 +1618,14 @@
         "from": "2026-04-01",
         "to": "2026-04-30"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000023"
+        "01MER1D1AN0000000000000029"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000031",
+      "id": "01MER1D1AN0000000000000038",
       "filename": "liberty-street-securities/statement-2026-05.txt",
       "sha256": "b53bcc862605c1d9e595b83a135c88a1dbf810d62c5fa0889ffda350eaea4d06",
       "institution": "Liberty Street Securities",
@@ -1628,12 +1634,14 @@
         "from": "2026-05-01",
         "to": "2026-05-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000030"
+        "01MER1D1AN0000000000000037"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000033",
+      "id": "01MER1D1AN0000000000000041",
       "filename": "liberty-street-securities/statement-2026-06.txt",
       "sha256": "c753190ab1df9dde572f3ea2e4d915fc0c8979c1fa95852641c18a0a9b6450aa",
       "institution": "Liberty Street Securities",
@@ -1642,12 +1650,14 @@
         "from": "2026-06-01",
         "to": "2026-06-30"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000032"
+        "01MER1D1AN0000000000000040"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000035",
+      "id": "01MER1D1AN0000000000000044",
       "filename": "harcourt-private-bank/consolidated-2025-12.txt",
       "sha256": "802b4205a389a7137b80df3cabc354fb63501e2baa7f37a31e071e882a4540b0",
       "institution": "Harcourt Private Bank",
@@ -1656,12 +1666,14 @@
         "from": "2025-10-01",
         "to": "2025-12-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000034"
+        "01MER1D1AN0000000000000043"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000041",
+      "id": "01MER1D1AN0000000000000051",
       "filename": "harcourt-private-bank/consolidated-2026-03.txt",
       "sha256": "dfa0be6f60044d4ec810826455d28f9973a9f7a64c957ad167dc2a17cb2de5df",
       "institution": "Harcourt Private Bank",
@@ -1670,12 +1682,14 @@
         "from": "2026-01-01",
         "to": "2026-03-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000040"
+        "01MER1D1AN0000000000000050"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000043",
+      "id": "01MER1D1AN0000000000000054",
       "filename": "harcourt-private-bank/consolidated-2026-06.txt",
       "sha256": "0b5313c9a22cc5eac7ba446a94aae86affb441c6261c7114695906175236546c",
       "institution": "Harcourt Private Bank",
@@ -1684,12 +1698,14 @@
         "from": "2026-04-01",
         "to": "2026-06-30"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000042"
+        "01MER1D1AN0000000000000053"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000045",
+      "id": "01MER1D1AN0000000000000057",
       "filename": "sterling-park-wealth/mifid-costs-2023.txt",
       "sha256": "4b23f66f07cffd6b47f1cebc484aa4c52d0030d33aa345c3f6abfefbe3b41568",
       "institution": "Sterling Park Wealth",
@@ -1698,12 +1714,14 @@
         "from": "2023-01-01",
         "to": "2023-12-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000044"
+        "01MER1D1AN0000000000000056"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000047",
+      "id": "01MER1D1AN0000000000000060",
       "filename": "sterling-park-wealth/mifid-costs-2024.txt",
       "sha256": "05c083e66943523a8dd13bbbdf6fd6c6e6f42f2055b46a765610b683ffe69449",
       "institution": "Sterling Park Wealth",
@@ -1712,12 +1730,14 @@
         "from": "2024-01-01",
         "to": "2024-12-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000046"
+        "01MER1D1AN0000000000000059"
       ]
     },
     {
-      "id": "01MER1D1AN0000000000000049",
+      "id": "01MER1D1AN0000000000000063",
       "filename": "sterling-park-wealth/mifid-costs-2025.txt",
       "sha256": "b3a6c34df403b734f22676329a3245eb81465bcf27bf27aa01a7b17467fae61d",
       "institution": "Sterling Park Wealth",
@@ -1726,8 +1746,696 @@
         "from": "2025-01-01",
         "to": "2025-12-31"
       },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
       "parse_run_ids": [
-        "01MER1D1AN0000000000000048"
+        "01MER1D1AN0000000000000062"
+      ]
+    }
+  ],
+  "acceptances": [
+    {
+      "id": "01MER1D1AN0000000000000012",
+      "document_id": "01MER1D1AN0000000000000005",
+      "parse_run_id": "01MER1D1AN0000000000000004",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "account",
+          "account_token": "A1",
+          "ref": "gia at Alderbrook Platform",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Thames Utilities PLC Ordinary 25p",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000009"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A1",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "account",
+          "account_token": "A2",
+          "ref": "isa at Alderbrook Platform",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A2",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000015",
+      "document_id": "01MER1D1AN0000000000000014",
+      "parse_run_id": "01MER1D1AN0000000000000013",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Thames Utilities PLC Ordinary 25p",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000009"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A1",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A2",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000018",
+      "document_id": "01MER1D1AN0000000000000017",
+      "parse_run_id": "01MER1D1AN0000000000000016",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Thames Utilities PLC Ordinary 25p",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000009"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A1",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A2",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000022",
+      "document_id": "01MER1D1AN0000000000000020",
+      "parse_run_id": "01MER1D1AN0000000000000019",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "account",
+          "account_token": "A3",
+          "ref": "sipp at Beacon SIPP Trustees",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A3",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A3",
+          "ref": "Annual scheme administration fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2024-04-05 contribution",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2024-04-05 contribution",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000025",
+      "document_id": "01MER1D1AN0000000000000024",
+      "parse_run_id": "01MER1D1AN0000000000000023",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A3",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A3",
+          "ref": "Annual scheme administration fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2025-04-05 contribution",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2025-04-05 contribution",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000028",
+      "document_id": "01MER1D1AN0000000000000027",
+      "parse_run_id": "01MER1D1AN0000000000000026",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000007"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A3",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A3",
+          "ref": "Annual scheme administration fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2026-04-05 contribution",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A3",
+          "ref": "2026-04-05 contribution",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000036",
+      "document_id": "01MER1D1AN0000000000000030",
+      "parse_run_id": "01MER1D1AN0000000000000029",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "account",
+          "account_token": "A4",
+          "ref": "us_brokerage at Liberty Street Securities",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Continental Rail Corp Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000033"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Keystone Treasury Money Market Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000034"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A4",
+          "ref": "Cash (USD)",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A4",
+          "ref": "2026-04-15 dividend",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000039",
+      "document_id": "01MER1D1AN0000000000000038",
+      "parse_run_id": "01MER1D1AN0000000000000037",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Continental Rail Corp Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000033"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Keystone Treasury Money Market Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000034"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A4",
+          "ref": "Cash (USD)",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A4",
+          "ref": "2026-05-08 buy",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000042",
+      "document_id": "01MER1D1AN0000000000000041",
+      "parse_run_id": "01MER1D1AN0000000000000040",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Continental Rail Corp Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000033"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Keystone Treasury Money Market Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000034"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A4",
+          "ref": "Cash (USD)",
+          "action": "accepted"
+        },
+        {
+          "kind": "movement",
+          "account_token": "A4",
+          "ref": "2026-06-30 interest",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000049",
+      "document_id": "01MER1D1AN0000000000000044",
+      "parse_run_id": "01MER1D1AN0000000000000043",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "account",
+          "account_token": "A5",
+          "ref": "gia at Harcourt Private Bank",
+          "action": "accepted"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Pioneer S&P Index Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000046"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "UK Treasury Gilt 4.25% 2032",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000047"
+        },
+        {
+          "kind": "account",
+          "account_token": "A6",
+          "ref": "bank_savings at Harcourt Private Bank",
+          "action": "accepted"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A6",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000052",
+      "document_id": "01MER1D1AN0000000000000051",
+      "parse_run_id": "01MER1D1AN0000000000000050",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Pioneer S&P Index Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000046"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "UK Treasury Gilt 4.25% 2032",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000047"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A6",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000055",
+      "document_id": "01MER1D1AN0000000000000054",
+      "parse_run_id": "01MER1D1AN0000000000000053",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Pioneer S&P Index Fund",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000046"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000032"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A5",
+          "ref": "UK Treasury Gilt 4.25% 2032",
+          "action": "accepted",
+          "instrument_id": "01MER1D1AN0000000000000047"
+        },
+        {
+          "kind": "cash",
+          "account_token": "A6",
+          "ref": "Cash (GBP)",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000058",
+      "document_id": "01MER1D1AN0000000000000057",
+      "parse_run_id": "01MER1D1AN0000000000000056",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Discretionary management fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Underlying fund ongoing charges",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Transaction costs",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Foreign exchange spreads",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Incidental costs",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000061",
+      "document_id": "01MER1D1AN0000000000000060",
+      "parse_run_id": "01MER1D1AN0000000000000059",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Discretionary management fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Underlying fund ongoing charges",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Transaction costs",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Foreign exchange spreads",
+          "action": "accepted"
+        }
+      ]
+    },
+    {
+      "id": "01MER1D1AN0000000000000064",
+      "document_id": "01MER1D1AN0000000000000063",
+      "parse_run_id": "01MER1D1AN0000000000000062",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Discretionary management fee",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Underlying fund ongoing charges",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Transaction costs",
+          "action": "accepted"
+        },
+        {
+          "kind": "fee",
+          "account_token": "A5",
+          "ref": "Foreign exchange spreads",
+          "action": "accepted"
+        }
       ]
     }
   ],

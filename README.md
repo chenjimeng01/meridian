@@ -32,9 +32,14 @@ review) and are not met.
 ## Running
 
 ```sh
-npm install
+npm install     # also installs the §9 pre-commit rail via the prepare script
 npm test
 ```
+
+`npm install` runs `prepare`, which points git at the tracked `.githooks/`
+directory. That hook refuses any commit containing personal-data patterns or a
+value recorded in a local vault — run it manually with `npm run scan`. If you
+clone without installing, set it yourself: `git config core.hooksPath .githooks`.
 
 Node 20+ required. No database, no build step for report output: the ledger is
 human-readable JSON on disk and reports are self-contained single-file HTML.
