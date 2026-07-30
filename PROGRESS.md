@@ -1,6 +1,6 @@
 # PROGRESS
 
-**Current phase:** 6 — Hardening (SPEC §10)
+**Current phase:** 6 complete — v0 feature-complete; web UI in progress
 **Status:** 178/178 green, lint + typecheck clean; demo script runs both
 households start-to-finish — awaiting phase-gate review
 **Last completed step:** 6.2 global --offline
@@ -25,7 +25,13 @@ start-to-finish.
 - [x] 6.4 README covers the demo, the real-document workflow and manual entry;
       PRE_LAUNCH.md has been in place since Phase 1.
 - [x] 6.5 Demo script runs both households start-to-finish (the §10 gate).
-- [ ] 6.6 Phase gate review → PHASE_REVIEW_6.md
+- [x] 6.6 Phase gate review → PHASE_REVIEW_6.md (main loop, at the operator's
+      instruction — the ONE gate not independently reviewed; see the caveat at
+      the top of that file). Found and fixed: run ids reached the filesystem
+      unvalidated, so `../` in an id could escape the household directory.
+      4 SHOULD-FIX recorded.
+
+**v0 is feature-complete against SPEC §10.**
 
 ## Phase 5 step plan
 

@@ -15,7 +15,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Ajv2020 } from "ajv/dist/2020.js";
-import { openStore } from "./store.ts";
+import { assertSafeId, openStore } from "./store.ts";
 import { ledgerIds } from "./ids.ts";
 import { matchInstruments } from "../ingest/match.ts";
 import { redactStatement } from "../ingest/redact.ts";
@@ -78,6 +78,7 @@ export interface ManualResult {
 }
 
 export function cmdManual(options: ManualOptions): ManualResult {
+  assertSafeId(options.runId, "run id");
   const store = openStore(options.dataRoot, options.householdId);
   const parked = store.loadParkedRun(options.runId);
   const vault = store.loadVault();

@@ -61,7 +61,21 @@ export function stripIdentifiers(config: HouseholdConfig & { addresses?: string[
   };
 }
 
+const SAFE_ID = /^[A-Za-z0-9_-]{1,64}$/;
+
+/**
+ * Ids become path segments. A run id of "../../etc" would otherwise let a
+ * mistyped or hostile argument read and write outside the household.
+ */
+export function assertSafeId(id: string, what: string): string {
+  if (!SAFE_ID.test(id)) {
+    throw new Error(`${what} "${id}" is not a valid id — expected letters, digits, hyphen or underscore`);
+  }
+  return id;
+}
+
 export function householdDir(dataRoot: string, householdId: string): string {
+  assertSafeId(householdId, "household id");
   return join(dataRoot, householdId);
 }
 
@@ -145,7 +159,7 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
       return target;
     },
     parkRun: (runId, files) => {
-      const target = write("failed", runId, files);
+      const target = write("failed", assertSafeId(runId, "run id"), files);
       // The parked source is the RAW, unredacted document — same sensitivity as
       // documents/, so the same mode.
       for (const name of Object.keys(files)) chmodSync(join(target, name), 0o600);
@@ -186,7 +200,7 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
         .sort();
     },
     loadParkedRun: (runId) => {
-      const target = join(dir, "parse-runs", "failed", runId);
+      const target = join(dir, "parse-runs", "failed", assertSafeId(runId, "run id"));
       if (!existsSync(join(target, "source.txt"))) {
         throw new Error(`no parked run ${runId} for household ${householdId}`);
       }
@@ -196,7 +210,7 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
       };
     },
     loadRun: (runId) => {
-      const target = join(dir, "parse-runs", runId);
+      const target = join(dir, "parse-runs", assertSafeId(runId, "run id"));
       if (!existsSync(join(target, "run.json"))) {
         throw new Error(`no parse run ${runId} for household ${householdId}`);
       }
