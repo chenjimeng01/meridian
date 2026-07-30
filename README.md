@@ -61,6 +61,19 @@ meridian review <run-id> --household <id> --accept-all \
 meridian report --household <id> --asof 2026-06-30 --html
 ```
 
+If a statement is in a layout the parser does not recognise it is parked
+rather than dropped, and you enter it by hand:
+
+```sh
+meridian manual <parked-run-id> --household <id>                  # writes a template
+meridian manual <parked-run-id> --household <id> --input filled.json
+```
+
+Manual entry rejoins the ordinary review flow — it is a different way to
+produce the extraction, not a way to bypass acceptance. Add `--offline` to any
+command to refuse all network egress; parsing then relies on the deterministic
+extractor and manual entry.
+
 Copy `test/fixtures/household-config.json` as a starting point. Confirming each
 instrument's type, domicile and '40 Act registration is what unlocks the
 US/UK tax analysis — until an operator confirms them, every holding is

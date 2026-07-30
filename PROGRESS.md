@@ -1,9 +1,31 @@
 # PROGRESS
 
-**Current phase:** 5 — Mobile-first client report (SPEC §8)
-**Status:** acceptance criteria met except Lighthouse (see below); 165/165
-green, lint + typecheck clean — awaiting phase-gate structural review
-**Last completed step:** 5.6 verified in a real browser
+**Current phase:** 6 — Hardening (SPEC §10)
+**Status:** 178/178 green, lint + typecheck clean; demo script runs both
+households start-to-finish — awaiting phase-gate review
+**Last completed step:** 6.2 global --offline
+
+## Phase 6 step plan
+
+Gate (§10): full regression green; demo script runs both households
+start-to-finish.
+
+- [x] 6.1 Manual entry (`meridian manual`): a parked document gets a redacted
+      template pre-filled only with what can be read without guessing, and a
+      filled-in entry rejoins the ORDINARY review and accept flow — a different
+      way to produce the extraction, not a way to bypass acceptance. The figure
+      stays traceable to the original document's bytes.
+- [x] 6.2 `--offline` is now a property of the run rather than of one
+      subcommand, and `report --narrate` refuses under it instead of silently
+      skipping. A test drives a full report offline, reaching it through manual
+      entry alone — §9's "parsing then requires manual entry mode" is now true
+      rather than a dead end.
+- [x] 6.3 Second (UK-only) fixture household — built by `scripts/demo.sh`,
+      verified to contain no US section and no alert red at all.
+- [x] 6.4 README covers the demo, the real-document workflow and manual entry;
+      PRE_LAUNCH.md has been in place since Phase 1.
+- [x] 6.5 Demo script runs both households start-to-finish (the §10 gate).
+- [ ] 6.6 Phase gate review → PHASE_REVIEW_6.md
 
 ## Phase 5 step plan
 

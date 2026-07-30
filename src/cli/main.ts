@@ -10,6 +10,7 @@
 //
 // This file is the only place the real clock is read.
 import { cmdHouseholds, cmdIngest, cmdIngestLive, cmdReport, cmdReview, generateNarrative } from "./commands.ts";
+import { cmdManual } from "./manual.ts";
 
 const DEFAULT_DATA_ROOT = "./data";
 
@@ -39,11 +40,13 @@ const USAGE = `meridian — cross-border wealth intelligence (v0, local-first)
   households list                        list households under the data root
   ingest <file> --household <id>         parse a statement into a review file
   review <run-id> --household <id>       accept/reject a parse run's lines
+  manual <run-id> --household <id>       enter a parked document by hand
   report --household <id> --asof <date>  compute results, and --html the report
 
 Common flags:
   --data-root <dir>        where household data lives (default ${DEFAULT_DATA_ROOT})
-  --offline                refuse all network egress (ingest)
+  --offline                refuse ALL network egress, for every command
+  --input <file>           a filled-in parse output (manual)
   --accept-all             accept every line of a run (review)
   --reaccept               reverse a prior acceptance and apply the run again
   --decisions <file>       per-line decisions JSON (review)
@@ -71,6 +74,9 @@ async function main(argv: string[]): Promise<number> {
   }
 
   const dataRoot = typeof flags["data-root"] === "string" ? flags["data-root"] : DEFAULT_DATA_ROOT;
+  // §9: --offline "disables all egress". It is a property of the run, not of
+  // one subcommand, so it is checked here for every path that could transmit.
+  const offlineMode = flags.offline === true;
   // The single point at which wall-clock time enters the system.
   // Full millisecond precision: truncating to whole seconds widens every
   // id-collision window a thousandfold for no benefit.
@@ -103,13 +109,36 @@ async function main(argv: string[]): Promise<number> {
       if (!file) throw new Error("ingest: expected a file path");
       const householdId = requireFlag(flags, "household");
       const apiKey = typeof flags["api-key"] === "string" ? flags["api-key"] : undefined;
-      const offline = flags.offline === true || !apiKey;
+      const offline = offlineMode || !apiKey;
       const result = offline
         ? cmdIngest({ dataRoot, householdId, file, offline: true, now })
         : await cmdIngestLive({ dataRoot, householdId, file, apiKey: apiKey!, now });
       console.log(`Parsed ${file} as run ${result.runId} (${result.extractor}, ${result.accountsFound} account(s)).`);
       console.log(`Review it: ${result.reviewPath}`);
       console.log(`Then: meridian review ${result.runId} --household ${householdId} --accept-all`);
+      return 0;
+    }
+
+    case "manual": {
+      const runId = positional[1];
+      if (!runId) throw new Error("manual: expected the parked run id");
+      const result = cmdManual({
+        dataRoot,
+        householdId: requireFlag(flags, "household"),
+        runId,
+        ...(typeof flags.input === "string" ? { inputPath: flags.input } : {}),
+        ...(typeof flags.operator === "string" ? { operatorInitials: flags.operator } : {}),
+        now,
+      });
+      if (result.template) {
+        console.log(`Wrote a template for ${result.accountsFound} account(s): ${result.reviewPath}`);
+        console.log("Fill it in from the document, then:");
+        console.log(`  meridian manual ${runId} --household <id> --input <that file>`);
+      } else {
+        console.log(`Entered manually as run ${result.runId} (${result.accountsFound} account(s)).`);
+        console.log(`Review it: ${result.reviewPath}`);
+        console.log(`Then: meridian review ${result.runId} --household <id> --accept-all`);
+      }
       return 0;
     }
 
@@ -151,6 +180,9 @@ async function main(argv: string[]): Promise<number> {
       // describes numbers the engine already produced (SPEC §2.1, §8).
       let narrative;
       if (flags.narrate) {
+        if (offlineMode) {
+          throw new Error("report --narrate cannot run with --offline: generating commentary requires an API call");
+        }
         const apiKey = typeof flags["api-key"] === "string" ? flags["api-key"] : process.env.ANTHROPIC_API_KEY;
         if (!apiKey) throw new Error("report --narrate: pass --api-key or set ANTHROPIC_API_KEY");
         const draft = cmdReport({ dataRoot, householdId, asof, now, ...(benchmarkWeights ? { benchmarkWeights } : {}) });

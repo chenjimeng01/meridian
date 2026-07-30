@@ -30,6 +30,8 @@ export interface HouseholdStore {
   parkRun(runId: string, files: Record<string, string>): string;
   listRuns(): string[];
   listAllRunIds(): string[];
+  listParkedRuns(): string[];
+  loadParkedRun(runId: string): { source: string; error: string };
   loadRun(runId: string): { output: ParseOutput; meta: RunMeta };
   saveReport(name: string, contents: string): string;
 }
@@ -174,6 +176,24 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
         }
       }
       return ids.sort();
+    },
+    listParkedRuns: () => {
+      const failedDir = join(dir, "parse-runs", "failed");
+      if (!existsSync(failedDir)) return [];
+      return readdirSync(failedDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .sort();
+    },
+    loadParkedRun: (runId) => {
+      const target = join(dir, "parse-runs", "failed", runId);
+      if (!existsSync(join(target, "source.txt"))) {
+        throw new Error(`no parked run ${runId} for household ${householdId}`);
+      }
+      return {
+        source: readFileSync(join(target, "source.txt"), "utf8"),
+        error: existsSync(join(target, "error.txt")) ? readFileSync(join(target, "error.txt"), "utf8") : "",
+      };
     },
     loadRun: (runId) => {
       const target = join(dir, "parse-runs", runId);
