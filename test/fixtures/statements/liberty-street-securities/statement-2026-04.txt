@@ -1,0 +1,30 @@
+========================================================================
+LIBERTY STREET SECURITIES
+========================================================================
+
+VALUATION STATEMENT
+Period: 2026-04-01 to 2026-04-30
+Statement currency: USD
+
+ELEANOR VANCE
+14 LARKSPUR MEWS, LONDON, UNITED KINGDOM
+
+------------------------------------------------------------------------
+Individual Brokerage   Account no: 774-20991
+------------------------------------------------------------------------
+Holding                                     Units        Price       Value
+Amalgamated Tech Inc Common Stock               85     202.4000 $17,204.00
+  ISIN: US0000SYN047
+Continental Rail Corp Common Stock              55      96.3000 $5,296.50
+  ISIN: US0000SYN062
+Keystone Treasury Money Market Fund          12400       1.0000 $12,400.00
+  ISIN: US0000SYN070
+Cash balance                                                 $152.40
+TOTAL (USD)                                               $35,052.90
+
+Activity during the period:
+  2026-04-15  DIVIDEND      $34.20  AMTK cash dividend
+
+========================================================================
+SYNTHETIC FIXTURE — fictional institution, client and holdings (see NOTICE).
+========================================================================

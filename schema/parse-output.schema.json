@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridian.local/schema/parse-output.schema.json",
+  "title": "Meridian parse-run output",
+  "description": "Strict shape the LLM extraction step must return for a single redacted document (SPEC §5.3). Validated with ajv; invalid output triggers one retry with validation errors appended, then parks in parse-runs/failed/. Every extracted figure carries a confidence score in [0,1].",
+  "type": "object",
+  "required": ["schema_version", "source", "accounts", "overall_confidence"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "source": {
+      "type": "object",
+      "required": ["institution", "doc_type", "period", "statement_currency"],
+      "additionalProperties": false,
+      "properties": {
+        "institution": { "type": "string", "minLength": 1 },
+        "doc_type": {
+          "type": "string",
+          "enum": ["valuation", "transactions", "mifid_costs", "contract_note", "tax_voucher"]
+        },
+        "period": {
+          "type": "object",
+          "required": ["from", "to"],
+          "additionalProperties": false,
+          "properties": {
+            "from": { "$ref": "#/$defs/isoDate" },
+            "to": { "$ref": "#/$defs/isoDate" }
+          }
+        },
+        "statement_currency": { "$ref": "#/$defs/currency" }
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["account_token", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "account_token": {
+            "type": "string",
+            "pattern": "^A[0-9]+$",
+            "description": "Redaction token — raw account numbers must never appear in parse output."
+          },
+          "wrapper_hint": {
+            "type": "string",
+            "enum": ["gia", "isa", "sipp", "uk_bond_onshore", "uk_bond_offshore", "us_brokerage", "ira_trad", "ira_roth", "401k", "529", "bank_current", "bank_savings", "property", "private_holding", "unknown"]
+          },
+          "currency": { "$ref": "#/$defs/currency" },
+          "confidence": { "$ref": "#/$defs/confidence" },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "units", "value", "confidence"],
+              "additionalProperties": false,
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "identifiers": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "isin": { "type": "string", "pattern": "^[A-Z]{2}[A-Z0-9]{9}[0-9]$" },
+                    "sedol": { "type": "string", "pattern": "^[B-DF-HJ-NP-TV-Z0-9]{6}[0-9]$" },
+                    "ticker": { "type": "string", "minLength": 1, "maxLength": 12 },
+                    "cusip": { "type": "string", "pattern": "^[A-Z0-9]{9}$" }
+                  }
+                },
+                "units": { "type": "number" },
+                "price": { "$ref": "#/$defs/money" },
+                "value": { "$ref": "#/$defs/money" },
+                "book_cost": { "$ref": "#/$defs/money" },
+                "confidence": { "$ref": "#/$defs/confidence" }
+              }
+            }
+          },
+          "cash_balance": { "$ref": "#/$defs/money" },
+          "fees": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "category", "amount", "confidence"],
+              "additionalProperties": false,
+              "properties": {
+                "label": { "type": "string", "minLength": 1 },
+                "category": {
+                  "type": "string",
+                  "enum": ["platform", "fund_ocf", "advice", "transaction", "fx_spread", "incidental", "other"]
+                },
+                "amount": { "$ref": "#/$defs/money" },
+                "rate_bps": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Fee expressed in basis points where the document states a rate."
+                },
+                "period": {
+                  "type": "object",
+                  "required": ["from", "to"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "from": { "$ref": "#/$defs/isoDate" },
+                    "to": { "$ref": "#/$defs/isoDate" }
+                  }
+                },
+                "confidence": { "$ref": "#/$defs/confidence" }
+              }
+            }
+          },
+          "movements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["date", "type", "amount", "confidence"],
+              "additionalProperties": false,
+              "properties": {
+                "date": { "$ref": "#/$defs/isoDate" },
+                "type": {
+                  "type": "string",
+                  "enum": ["buy", "sell", "dividend", "interest", "fee", "contribution", "withdrawal", "transfer_in", "transfer_out", "fx"]
+                },
+                "description": { "type": "string" },
+                "units": { "type": "number" },
+                "amount": { "$ref": "#/$defs/money" },
+                "confidence": { "$ref": "#/$defs/confidence" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "overall_confidence": { "$ref": "#/$defs/confidence" },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Extractor-noted ambiguities (unreadable rows, totals that do not reconcile, unknown identifiers)."
+    }
+  },
+  "$defs": {
+    "isoDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "money": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "additionalProperties": false,
+      "properties": {
+        "amount": { "type": "number" },
+        "currency": { "$ref": "#/$defs/currency" }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  }
+}

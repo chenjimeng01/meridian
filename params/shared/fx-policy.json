@@ -1,0 +1,39 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "fx-policy",
+  "effective": { "from": "2026-01-01", "to": "2099-12-31" },
+  "policy": {
+    "source_order": {
+      "value": ["statement_embedded", "ledger_fx_rates", "manual_entry"],
+      "source": "Meridian design decision (SPEC §2.3, §4): local-first, no live feeds in v0",
+      "status": "published",
+      "notes": "1) Use a rate printed on the source document where present; 2) else nearest ledger fx_rates entry; 3) else operator manual entry. No network FX lookups in v0."
+    },
+    "nearest_rate_max_staleness_days": {
+      "value": 7,
+      "source": "Meridian design decision: consolidation refuses silently-stale FX",
+      "status": "published",
+      "notes": "If the nearest ledger rate to the valuation date is older than this, the figure renders with an explicit staleness warning; beyond 31 days the conversion is refused and requires manual entry."
+    },
+    "refuse_conversion_beyond_days": {
+      "value": 31,
+      "source": "Meridian design decision",
+      "status": "published"
+    },
+    "date_mismatch_rule": {
+      "value": "use_rate_on_or_before_valuation_date",
+      "source": "Meridian design decision: never use a rate later than the valuation date, so a valuation is reproducible from data available on that date",
+      "status": "published"
+    },
+    "cross_rate_rule": {
+      "value": "triangulate_via_usd_when_direct_pair_absent",
+      "source": "Meridian design decision",
+      "status": "published"
+    },
+    "rounding": {
+      "value": { "rate_decimal_places": 6, "amount_decimal_places": 2, "method": "half_even" },
+      "source": "Meridian design decision: banker's rounding on presentation only; engine keeps full precision internally",
+      "status": "published"
+    }
+  }
+}

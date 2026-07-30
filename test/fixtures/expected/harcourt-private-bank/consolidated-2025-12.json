@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Harcourt Private Bank",
+    "doc_type": "valuation",
+    "period": {
+      "from": "2025-10-01",
+      "to": "2025-12-31"
+    },
+    "statement_currency": "GBP"
+  },
+  "accounts": [
+    {
+      "account_token": "A5",
+      "wrapper_hint": "gia",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Pioneer S&P Index Fund",
+          "identifiers": {
+            "isin": "US0000SYN039",
+            "ticker": "PIOSX"
+          },
+          "units": 300,
+          "price": {
+            "amount": 145.2,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 43560,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Amalgamated Tech Inc Common Stock",
+          "identifiers": {
+            "isin": "US0000SYN047",
+            "ticker": "AMTK",
+            "cusip": "SYN000104"
+          },
+          "units": 120,
+          "price": {
+            "amount": 210.55,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 25266,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "UK Treasury Gilt 4.25% 2032",
+          "identifiers": {
+            "isin": "GB00SYNGLT08"
+          },
+          "units": 30000,
+          "price": {
+            "amount": 0.982,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 29460,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "account_token": "A6",
+      "wrapper_hint": "bank_savings",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "cash_balance": {
+        "amount": 85000,
+        "currency": "GBP"
+      }
+    }
+  ],
+  "overall_confidence": 0.97
+}

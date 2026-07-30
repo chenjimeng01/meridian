@@ -1,0 +1,149 @@
+{
+  "jurisdiction": "UK",
+  "tax_year": "2026-27",
+  "effective": { "from": "2026-04-06", "to": "2027-04-05" },
+  "currency": "GBP",
+  "params": {
+    "income_tax": {
+      "personal_allowance": {
+        "value": 12570,
+        "source": "ITA 2007 s35; thresholds frozen to April 2028 (Autumn Statement 2022, confirmed subsequent fiscal events)",
+        "status": "published"
+      },
+      "personal_allowance_taper_threshold": {
+        "value": 100000,
+        "source": "ITA 2007 s35(2); £1 reduction per £2 of adjusted net income above threshold",
+        "status": "published"
+      },
+      "bands_rest_of_uk": {
+        "value": [
+          { "name": "basic", "rate": 0.2, "up_to": 37700 },
+          { "name": "higher", "rate": 0.4, "up_to": 125140 },
+          { "name": "additional", "rate": 0.45, "up_to": null }
+        ],
+        "source": "ITA 2007 s10; bands frozen to April 2028",
+        "status": "published",
+        "notes": "Bands are amounts of taxable income above the personal allowance. Scottish rates not modelled in v0."
+      },
+      "personal_savings_allowance": {
+        "value": { "basic": 1000, "higher": 500, "additional": 0 },
+        "source": "ITA 2007 s12B",
+        "status": "published"
+      },
+      "starting_rate_for_savings_band": {
+        "value": 5000,
+        "source": "ITA 2007 s12",
+        "status": "published"
+      }
+    },
+    "dividends": {
+      "dividend_allowance": {
+        "value": 500,
+        "source": "ITA 2007 s13A; reduced to £500 from 2024/25",
+        "status": "published"
+      },
+      "rates": {
+        "value": { "basic": 0.0875, "higher": 0.3375, "additional": 0.3935 },
+        "source": "ITA 2007 s8",
+        "status": "published"
+      }
+    },
+    "capital_gains": {
+      "annual_exempt_amount": {
+        "value": 3000,
+        "source": "TCGA 1992 s1K; £3,000 from 2024/25",
+        "status": "published"
+      },
+      "rates_general": {
+        "value": { "basic": 0.18, "higher": 0.24 },
+        "source": "TCGA 1992 s1H as amended by Autumn Budget 2024 (rates from 30 Oct 2024)",
+        "status": "published"
+      },
+      "rates_residential_property": {
+        "value": { "basic": 0.18, "higher": 0.24 },
+        "source": "TCGA 1992 s1H; residential rates aligned with general rates from 2024/25",
+        "status": "published"
+      }
+    },
+    "wrappers": {
+      "isa_annual_allowance": {
+        "value": 20000,
+        "source": "ISA Regulations 1998 (SI 1998/1870); £20,000 frozen",
+        "status": "published"
+      },
+      "pension_annual_allowance": {
+        "value": 60000,
+        "source": "FA 2004 s228; £60,000 from 2023/24",
+        "status": "published"
+      },
+      "pension_mpaa": {
+        "value": 10000,
+        "source": "FA 2004 s227ZA; £10,000 from 2023/24",
+        "status": "published"
+      },
+      "pension_taper_threshold_income": {
+        "value": 200000,
+        "source": "FA 2004 s228ZA",
+        "status": "published"
+      },
+      "pension_taper_adjusted_income": {
+        "value": 260000,
+        "source": "FA 2004 s228ZA",
+        "status": "published"
+      },
+      "lump_sum_allowance": {
+        "value": 268275,
+        "source": "FA 2024 abolition of LTA; Lump Sum Allowance from 6 Apr 2024",
+        "status": "published"
+      },
+      "lump_sum_and_death_benefit_allowance": {
+        "value": 1073100,
+        "source": "FA 2024; LSDBA from 6 Apr 2024",
+        "status": "published"
+      }
+    },
+    "iht": {
+      "nil_rate_band": {
+        "value": 325000,
+        "source": "IHTA 1984 s7 & Sch 1; frozen to April 2030 (Autumn Budget 2024)",
+        "status": "published"
+      },
+      "residence_nil_rate_band": {
+        "value": 175000,
+        "source": "IHTA 1984 s8D-8M; frozen to April 2030",
+        "status": "published"
+      },
+      "rnrb_taper_threshold": {
+        "value": 2000000,
+        "source": "IHTA 1984 s8D(5)",
+        "status": "published"
+      },
+      "rate_on_death": {
+        "value": 0.4,
+        "source": "IHTA 1984 s7",
+        "status": "published"
+      },
+      "long_term_residence_rule": {
+        "value": { "resident_years_required": 10, "lookback_years": 20 },
+        "source": "FA 2025 residence-based IHT regime from 6 Apr 2025: worldwide scope once UK-resident in 10 of the previous 20 tax years",
+        "status": "published",
+        "notes": "Replaces domicile as the IHT connecting factor. Tail provisions (3-10 years post-departure) not modelled in v0; flag as ambiguity if relevant."
+      }
+    },
+    "residence_regimes": {
+      "fig_regime": {
+        "value": { "years": 4 },
+        "source": "FA 2025: 4-year foreign income and gains regime for new arrivals from 6 Apr 2025 (replaces remittance basis)",
+        "status": "published"
+      }
+    },
+    "reporting_funds": {
+      "offshore_income_gain_treatment": {
+        "value": "non_reporting_fund_gains_taxed_as_income",
+        "source": "Offshore Funds (Tax) Regulations 2009 (SI 2009/3001)",
+        "status": "published",
+        "notes": "Gains on non-reporting offshore funds are offshore income gains taxed at income rates; relevant to cost/risk flags for US-domiciled ETFs held by UK residents."
+      }
+    }
+  }
+}

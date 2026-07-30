@@ -1,0 +1,39 @@
+========================================================================
+ALDERBROOK PLATFORM
+========================================================================
+
+VALUATION STATEMENT
+Period: 2026-04-01 to 2026-06-30
+Statement currency: GBP
+
+MS ELEANOR VANCE
+14 Larkspur Mews
+London W1U 0XX
+
+------------------------------------------------------------------------
+General Investment Account   Account no: ALD-4471902
+------------------------------------------------------------------------
+Holding                                     Units        Price       Value
+Sterling Park UK Equity Income OEIC Acc      12500       2.2210 £27,762.50
+  ISIN: GB00SYNTH014
+Atlas Global Equity UCITS ETF                  450      65.0200 £29,259.00
+  ISIN: IE00SYNTH021
+Thames Utilities PLC Ordinary 25p             1800       6.3100 £11,358.00
+  ISIN: GB00SYNTH052
+Cash balance                                                 £1,215.80
+TOTAL (GBP)                                               £69,595.30
+
+------------------------------------------------------------------------
+Stocks & Shares ISA   Account no: ALD-4471903
+------------------------------------------------------------------------
+Holding                                     Units        Price       Value
+Atlas Global Equity UCITS ETF                  640      65.0200 £41,612.80
+  ISIN: IE00SYNTH021
+Sterling Park UK Equity Income OEIC Acc       8000       2.2210 £17,768.00
+  ISIN: GB00SYNTH014
+Cash balance                                                 £101.12
+TOTAL (GBP)                                               £59,481.92
+
+========================================================================
+SYNTHETIC FIXTURE — fictional institution, client and holdings (see NOTICE).
+========================================================================

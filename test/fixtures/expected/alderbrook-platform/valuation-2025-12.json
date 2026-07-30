@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Alderbrook Platform",
+    "doc_type": "valuation",
+    "period": {
+      "from": "2025-10-01",
+      "to": "2025-12-31"
+    },
+    "statement_currency": "GBP"
+  },
+  "accounts": [
+    {
+      "account_token": "A1",
+      "wrapper_hint": "gia",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Sterling Park UK Equity Income OEIC Acc",
+          "identifiers": {
+            "isin": "GB00SYNTH014",
+            "sedol": "B1SYN01"
+          },
+          "units": 12500,
+          "price": {
+            "amount": 2.144,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 26800,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Atlas Global Equity UCITS ETF",
+          "identifiers": {
+            "isin": "IE00SYNTH021",
+            "ticker": "ATLG"
+          },
+          "units": 450,
+          "price": {
+            "amount": 62.1,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 27945,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Thames Utilities PLC Ordinary 25p",
+          "identifiers": {
+            "isin": "GB00SYNTH052",
+            "sedol": "B1SYN52"
+          },
+          "units": 1800,
+          "price": {
+            "amount": 6.42,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 11556,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        }
+      ],
+      "cash_balance": {
+        "amount": 1204.5,
+        "currency": "GBP"
+      }
+    },
+    {
+      "account_token": "A2",
+      "wrapper_hint": "isa",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Atlas Global Equity UCITS ETF",
+          "identifiers": {
+            "isin": "IE00SYNTH021",
+            "ticker": "ATLG"
+          },
+          "units": 610,
+          "price": {
+            "amount": 62.1,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 37881,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Sterling Park UK Equity Income OEIC Acc",
+          "identifiers": {
+            "isin": "GB00SYNTH014",
+            "sedol": "B1SYN01"
+          },
+          "units": 8000,
+          "price": {
+            "amount": 2.144,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 17152,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        }
+      ],
+      "cash_balance": {
+        "amount": 310.25,
+        "currency": "GBP"
+      }
+    }
+  ],
+  "overall_confidence": 0.97
+}

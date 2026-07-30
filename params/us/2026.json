@@ -1,0 +1,149 @@
+{
+  "jurisdiction": "US",
+  "tax_year": "2026",
+  "effective": { "from": "2026-01-01", "to": "2026-12-31" },
+  "currency": "USD",
+  "params": {
+    "income_tax": {
+      "brackets_single": {
+        "value": [
+          { "rate": 0.1, "up_to": 12400 },
+          { "rate": 0.12, "up_to": 50400 },
+          { "rate": 0.22, "up_to": 105475 },
+          { "rate": 0.24, "up_to": 201350 },
+          { "rate": 0.32, "up_to": 255700 },
+          { "rate": 0.35, "up_to": 640600 },
+          { "rate": 0.37, "up_to": null }
+        ],
+        "source": "IRC s1 as made permanent by OBBBA 2025; 2026 inflation adjustments per IRS projections",
+        "status": "projected",
+        "notes": "Refresh from IRS Rev. Proc. for TY2026 when published."
+      },
+      "brackets_mfj": {
+        "value": [
+          { "rate": 0.1, "up_to": 24800 },
+          { "rate": 0.12, "up_to": 100800 },
+          { "rate": 0.22, "up_to": 210950 },
+          { "rate": 0.24, "up_to": 402725 },
+          { "rate": 0.32, "up_to": 511400 },
+          { "rate": 0.35, "up_to": 768700 },
+          { "rate": 0.37, "up_to": null }
+        ],
+        "source": "IRC s1 as made permanent by OBBBA 2025; 2026 inflation adjustments per IRS projections",
+        "status": "projected"
+      },
+      "standard_deduction": {
+        "value": { "single": 16100, "mfj": 32200, "mfs": 16100 },
+        "source": "IRC s63(c) as amended by OBBBA 2025 ($15,750/$31,500 for 2025, indexed)",
+        "status": "projected"
+      },
+      "top_ordinary_rate": {
+        "value": 0.37,
+        "source": "IRC s1(j) made permanent by OBBBA 2025",
+        "status": "published",
+        "notes": "Used by the PFIC excess-distribution calculation (s1291 taxes allocations at highest ordinary rate)."
+      }
+    },
+    "capital_gains": {
+      "ltcg_thresholds_single": {
+        "value": [
+          { "rate": 0.0, "up_to": 49450 },
+          { "rate": 0.15, "up_to": 545500 },
+          { "rate": 0.2, "up_to": null }
+        ],
+        "source": "IRC s1(h); 2026 inflation adjustments per IRS projections",
+        "status": "projected"
+      },
+      "ltcg_thresholds_mfj": {
+        "value": [
+          { "rate": 0.0, "up_to": 98900 },
+          { "rate": 0.15, "up_to": 613700 },
+          { "rate": 0.2, "up_to": null }
+        ],
+        "source": "IRC s1(h); 2026 inflation adjustments per IRS projections",
+        "status": "projected"
+      },
+      "niit": {
+        "value": { "rate": 0.038, "magi_threshold_single": 200000, "magi_threshold_mfj": 250000 },
+        "source": "IRC s1411; thresholds statutory and unindexed",
+        "status": "published"
+      }
+    },
+    "pfic": {
+      "regimes": {
+        "value": ["excess_distribution_1291", "qef_1293", "mtm_1296"],
+        "source": "IRC ss1291-1298",
+        "status": "published",
+        "notes": "Excess-distribution is the default; QEF requires fund-supplied PFIC annual information statements (rarely available for UK funds); MTM requires marketable stock."
+      },
+      "form": {
+        "value": "8621",
+        "source": "IRC s1298(f); Form 8621 required per PFIC per year (limited exceptions)",
+        "status": "published"
+      },
+      "de_minimis_reporting_exception": {
+        "value": { "aggregate_value_single": 25000, "aggregate_value_mfj": 50000 },
+        "source": "Treas. Reg. 1.1298-1(c)(2): s1298(f) filing exception for aggregate PFIC value under thresholds (no excess distributions, no elections)",
+        "status": "published",
+        "notes": "Reporting exception only — the taxing regime still applies on disposition/distribution."
+      },
+      "definition_tests": {
+        "value": { "income_test_passive_share": 0.75, "asset_test_passive_share": 0.5 },
+        "source": "IRC s1297(a)",
+        "status": "published"
+      }
+    },
+    "estate_gift": {
+      "estate_exemption": {
+        "value": 15000000,
+        "source": "IRC s2010(c) as amended by OBBBA 2025: $15,000,000 basic exclusion for 2026, indexed thereafter",
+        "status": "published"
+      },
+      "estate_top_rate": {
+        "value": 0.4,
+        "source": "IRC s2001(c)",
+        "status": "published"
+      },
+      "nonresident_alien_exemption_equivalent": {
+        "value": 60000,
+        "source": "IRC s2102(b): unified credit of $13,000 ≈ $60,000 exemption equivalent for non-resident non-citizens (US-situs assets)",
+        "status": "published",
+        "notes": "UK/US estate tax treaty (1979) may extend a prorated exemption — modelled as treaty credit assumption in Module 3, stated in report."
+      },
+      "annual_gift_exclusion": {
+        "value": 19000,
+        "source": "IRC s2503(b); 2026 inflation adjustment per IRS projections",
+        "status": "projected"
+      }
+    },
+    "international": {
+      "feie": {
+        "value": 132400,
+        "source": "IRC s911; 2026 inflation adjustment per IRS projections",
+        "status": "projected"
+      },
+      "fbar_threshold": {
+        "value": 10000,
+        "source": "31 CFR 1010.350: aggregate foreign account value exceeding $10,000 at any time in year",
+        "status": "published"
+      },
+      "form_8938_thresholds_abroad": {
+        "value": { "single_year_end": 200000, "single_any_time": 300000, "mfj_year_end": 400000, "mfj_any_time": 600000 },
+        "source": "IRC s6038D; Treas. Reg. 1.6038D-2 (taxpayers living abroad)",
+        "status": "published"
+      }
+    },
+    "situs": {
+      "us_situs_asset_classes": {
+        "value": ["us_incorporated_stock", "us_real_property", "us_tangible_property", "us_situs_debt_non_portfolio"],
+        "source": "IRC ss2104-2105; US-incorporated stock is US-situs regardless of custody location (including via ADR)",
+        "status": "published"
+      },
+      "non_us_situs_asset_classes": {
+        "value": ["non_us_incorporated_stock", "us_bank_deposits_non_business", "portfolio_debt", "life_insurance_proceeds"],
+        "source": "IRC s2105: bank deposits and portfolio-interest debt of NRAs excluded from US situs",
+        "status": "published"
+      }
+    }
+  }
+}

@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridian.local/schema/ledger.schema.json",
+  "title": "Meridian canonical wealth ledger",
+  "description": "The canonical, human-readable wealth ledger. All monetary amounts are {amount, currency}; all dates ISO 8601; all IDs ULIDs. Nothing enters the ledger without a source_document_id or an explicit manual source with operator initials (SPEC §4).",
+  "type": "object",
+  "required": ["schema_version", "household", "accounts", "instruments", "holdings", "transactions", "documents", "fx_rates"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "household": {
+      "type": "object",
+      "required": ["id", "base_currency", "persons"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/ulid" },
+        "base_currency": { "$ref": "#/$defs/currency" },
+        "secondary_currency": { "$ref": "#/$defs/currency" },
+        "persons": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "display_token", "tax_profile"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "$ref": "#/$defs/ulid" },
+              "display_token": {
+                "type": "string",
+                "pattern": "^P[0-9]+$",
+                "description": "Redaction token; real name held only in the local vault file."
+              },
+              "tax_profile": {
+                "type": "object",
+                "required": ["uk_resident", "us_person"],
+                "additionalProperties": false,
+                "properties": {
+                  "uk_resident": { "type": "boolean" },
+                  "uk_domicile_status": {
+                    "type": "string",
+                    "enum": ["ltr_flag", "not_ltr", "unknown"],
+                    "description": "Post-2025 UK regime: long-term residence flag (10 of previous 20 tax years) replaces domicile for IHT scope."
+                  },
+                  "us_person": { "type": "boolean" },
+                  "us_person_basis": {
+                    "type": "string",
+                    "enum": ["citizen", "green_card", "substantial_presence"]
+                  },
+                  "state_exposure": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "Optional US state code."
+                  },
+                  "treaty_positions": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "person_ids", "institution", "account_token", "wrapper", "wrapper_jurisdiction", "custody_currency", "data_asof"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/ulid" },
+          "person_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ulid" } },
+          "institution": { "type": "string", "minLength": 1 },
+          "account_token": {
+            "type": "string",
+            "pattern": "^A[0-9]+$",
+            "description": "Redacted account number token; real number held only in the local vault file."
+          },
+          "wrapper": { "$ref": "#/$defs/wrapper" },
+          "wrapper_jurisdiction": { "type": "string", "enum": ["UK", "US", "OTHER"] },
+          "custody_currency": { "$ref": "#/$defs/currency" },
+          "opened": {
+            "oneOf": [{ "$ref": "#/$defs/isoDate" }, { "type": "null" }]
+          },
+          "data_asof": {
+            "$ref": "#/$defs/isoDate",
+            "description": "Valuation date of the last accepted parse."
+          }
+        }
+      }
+    },
+    "instruments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "identifiers", "name", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/ulid" },
+          "identifiers": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "isin": { "type": "string", "pattern": "^[A-Z]{2}[A-Z0-9]{9}[0-9]$" },
+              "sedol": { "type": "string", "pattern": "^[B-DF-HJ-NP-TV-Z0-9]{6}[0-9]$" },
+              "ticker": { "type": "string", "minLength": 1, "maxLength": 12 },
+              "cusip": { "type": "string", "pattern": "^[A-Z0-9]{9}$" }
+            }
+          },
+          "name": { "type": "string", "minLength": 1 },
+          "type": { "$ref": "#/$defs/instrumentType" },
+          "domicile": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country of domicile."
+          },
+          "hmrc_reporting_fund": {
+            "type": "boolean",
+            "description": "From the bundled HMRC reporting fund list snapshot."
+          },
+          "us_registered": {
+            "type": "boolean",
+            "description": "US '40 Act registered fund flag."
+          },
+          "pfic_status": {
+            "type": "string",
+            "enum": ["not_assessed", "not_pfic", "pfic", "needs_classification"],
+            "description": "Computed by Module 3 rule cascade; never hand-set without review."
+          },
+          "needs_review": { "type": "boolean" },
+          "prices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["date", "price", "source"],
+              "additionalProperties": false,
+              "properties": {
+                "date": { "$ref": "#/$defs/isoDate" },
+                "price": { "$ref": "#/$defs/money" },
+                "source": { "type": "string", "enum": ["statement", "feed", "manual"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "holdings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["account_id", "instrument_id", "asof", "units", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "account_id": { "$ref": "#/$defs/ulid" },
+          "instrument_id": { "$ref": "#/$defs/ulid" },
+          "asof": { "$ref": "#/$defs/isoDate" },
+          "units": { "type": "number" },
+          "book_cost": { "$ref": "#/$defs/money" },
+          "value": { "$ref": "#/$defs/money" },
+          "source_document_id": { "$ref": "#/$defs/ulid" },
+          "source": { "const": "manual" },
+          "operator_initials": { "type": "string", "minLength": 2, "maxLength": 4 }
+        },
+        "anyOf": [
+          { "required": ["source_document_id"] },
+          { "required": ["source", "operator_initials"] }
+        ]
+      }
+    },
+    "transactions": {
+      "type": "array",
+      "description": "Optional in v0: statement snapshots suffice; performance falls back to Modified Dietz between snapshots (SPEC §6.2).",
+      "items": {
+        "type": "object",
+        "required": ["account_id", "date", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "account_id": { "$ref": "#/$defs/ulid" },
+          "date": { "$ref": "#/$defs/isoDate" },
+          "type": {
+            "type": "string",
+            "enum": ["buy", "sell", "dividend", "interest", "fee", "contribution", "withdrawal", "transfer_in", "transfer_out", "fx"]
+          },
+          "instrument_id": {
+            "oneOf": [{ "$ref": "#/$defs/ulid" }, { "type": "null" }]
+          },
+          "units": { "type": "number" },
+          "gross": { "$ref": "#/$defs/money" },
+          "fees": { "$ref": "#/$defs/money" },
+          "net": { "$ref": "#/$defs/money" },
+          "source_document_id": { "$ref": "#/$defs/ulid" },
+          "source": { "const": "manual" },
+          "operator_initials": { "type": "string", "minLength": 2, "maxLength": 4 }
+        },
+        "anyOf": [
+          { "required": ["source_document_id"] },
+          { "required": ["source", "operator_initials"] }
+        ]
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "filename", "sha256", "institution", "doc_type", "period"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/ulid" },
+          "filename": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "institution": { "type": "string", "minLength": 1 },
+          "doc_type": { "$ref": "#/$defs/docType" },
+          "period": {
+            "type": "object",
+            "required": ["from", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "$ref": "#/$defs/isoDate" },
+              "to": { "$ref": "#/$defs/isoDate" }
+            }
+          },
+          "parse_run_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "fx_rates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "pair", "rate", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "date": { "$ref": "#/$defs/isoDate" },
+          "pair": { "type": "string", "pattern": "^[A-Z]{6}$" },
+          "rate": { "type": "number", "exclusiveMinimum": 0 },
+          "source": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ulid": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "ULID (Crockford base32, 26 chars)."
+    },
+    "isoDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 calendar date."
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 currency code."
+    },
+    "money": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "additionalProperties": false,
+      "properties": {
+        "amount": { "type": "number" },
+        "currency": { "$ref": "#/$defs/currency" }
+      }
+    },
+    "wrapper": {
+      "type": "string",
+      "enum": ["gia", "isa", "sipp", "uk_bond_onshore", "uk_bond_offshore", "us_brokerage", "ira_trad", "ira_roth", "401k", "529", "bank_current", "bank_savings", "property", "private_holding"]
+    },
+    "instrumentType": {
+      "type": "string",
+      "enum": ["equity", "bond", "oeic", "ucits_etf", "us_etf", "investment_trust", "mutual_fund_us", "mmf", "cash", "property", "private_equity", "other_pooled"]
+    },
+    "docType": {
+      "type": "string",
+      "enum": ["valuation", "transactions", "mifid_costs", "contract_note", "tax_voucher"]
+    }
+  }
+}

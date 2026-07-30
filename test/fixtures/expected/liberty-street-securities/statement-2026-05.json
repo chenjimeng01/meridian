@@ -1,0 +1,93 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Liberty Street Securities",
+    "doc_type": "valuation",
+    "period": {
+      "from": "2026-05-01",
+      "to": "2026-05-31"
+    },
+    "statement_currency": "USD"
+  },
+  "accounts": [
+    {
+      "account_token": "A4",
+      "wrapper_hint": "us_brokerage",
+      "currency": "USD",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Amalgamated Tech Inc Common Stock",
+          "identifiers": {
+            "isin": "US0000SYN047",
+            "ticker": "AMTK",
+            "cusip": "SYN000104"
+          },
+          "units": 85,
+          "price": {
+            "amount": 208.11,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 17689.35,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Continental Rail Corp Common Stock",
+          "identifiers": {
+            "isin": "US0000SYN062",
+            "ticker": "CRRC",
+            "cusip": "SYN000106"
+          },
+          "units": 60,
+          "price": {
+            "amount": 97.85,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 5871,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Keystone Treasury Money Market Fund",
+          "identifiers": {
+            "isin": "US0000SYN070",
+            "ticker": "KTMXX"
+          },
+          "units": 12410,
+          "price": {
+            "amount": 1,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 12410,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        }
+      ],
+      "cash_balance": {
+        "amount": 152.4,
+        "currency": "USD"
+      },
+      "movements": [
+        {
+          "date": "2026-05-08",
+          "type": "buy",
+          "description": "Bought 5 CRRC @ 97.10",
+          "units": 5,
+          "amount": {
+            "amount": 485.5,
+            "currency": "USD"
+          },
+          "confidence": 0.97
+        }
+      ]
+    }
+  ],
+  "overall_confidence": 0.97
+}

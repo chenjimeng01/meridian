@@ -1,0 +1,34 @@
+========================================================================
+HARCOURT PRIVATE BANK
+========================================================================
+
+VALUATION STATEMENT
+Period: 2026-04-01 to 2026-06-30
+Statement currency: GBP
+
+MS ELEANOR VANCE & MR THOMAS VANCE
+14 Larkspur Mews
+London W1U 0XX
+
+Exchange rate applied: GBP/USD 1.2800
+
+------------------------------------------------------------------------
+Discretionary Portfolio (managed by Sterling Park Wealth)   Account no: HPB-0055271
+------------------------------------------------------------------------
+Holding                                     Units        Price       Value
+Pioneer S&P Index Fund                         300     152.3500 $45,705.00
+  ISIN: US0000SYN039
+Amalgamated Tech Inc Common Stock              120     216.4000 $25,968.00
+  ISIN: US0000SYN047
+UK Treasury Gilt 4.25% 2032                  30000       0.9910 £29,730.00
+  ISIN: GB00SYNGLT08
+TOTAL (GBP)                                               £85,724.53
+
+------------------------------------------------------------------------
+Reserve Deposit Account   Account no: HPB-0055272
+------------------------------------------------------------------------
+Balance: £85,300.00
+
+========================================================================
+SYNTHETIC FIXTURE — fictional institution, client and holdings (see NOTICE).
+========================================================================

@@ -1,0 +1,92 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Liberty Street Securities",
+    "doc_type": "valuation",
+    "period": {
+      "from": "2026-04-01",
+      "to": "2026-04-30"
+    },
+    "statement_currency": "USD"
+  },
+  "accounts": [
+    {
+      "account_token": "A4",
+      "wrapper_hint": "us_brokerage",
+      "currency": "USD",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Amalgamated Tech Inc Common Stock",
+          "identifiers": {
+            "isin": "US0000SYN047",
+            "ticker": "AMTK",
+            "cusip": "SYN000104"
+          },
+          "units": 85,
+          "price": {
+            "amount": 202.4,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 17204,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Continental Rail Corp Common Stock",
+          "identifiers": {
+            "isin": "US0000SYN062",
+            "ticker": "CRRC",
+            "cusip": "SYN000106"
+          },
+          "units": 55,
+          "price": {
+            "amount": 96.3,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 5296.5,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Keystone Treasury Money Market Fund",
+          "identifiers": {
+            "isin": "US0000SYN070",
+            "ticker": "KTMXX"
+          },
+          "units": 12400,
+          "price": {
+            "amount": 1,
+            "currency": "USD"
+          },
+          "value": {
+            "amount": 12400,
+            "currency": "USD"
+          },
+          "confidence": 0.98
+        }
+      ],
+      "cash_balance": {
+        "amount": 152.4,
+        "currency": "USD"
+      },
+      "movements": [
+        {
+          "date": "2026-04-15",
+          "type": "dividend",
+          "description": "AMTK cash dividend",
+          "amount": {
+            "amount": 34.2,
+            "currency": "USD"
+          },
+          "confidence": 0.97
+        }
+      ]
+    }
+  ],
+  "overall_confidence": 0.97
+}

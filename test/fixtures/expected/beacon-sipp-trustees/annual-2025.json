@@ -1,0 +1,98 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Beacon SIPP Trustees",
+    "doc_type": "valuation",
+    "period": {
+      "from": "2024-04-06",
+      "to": "2025-04-05"
+    },
+    "statement_currency": "GBP"
+  },
+  "accounts": [
+    {
+      "account_token": "A3",
+      "wrapper_hint": "sipp",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "holdings": [
+        {
+          "name": "Atlas Global Equity UCITS ETF",
+          "identifiers": {
+            "isin": "IE00SYNTH021",
+            "ticker": "ATLG"
+          },
+          "units": 1050,
+          "price": {
+            "amount": 59.4,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 62370,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        },
+        {
+          "name": "Sterling Park UK Equity Income OEIC Acc",
+          "identifiers": {
+            "isin": "GB00SYNTH014",
+            "sedol": "B1SYN01"
+          },
+          "units": 16500,
+          "price": {
+            "amount": 2.071,
+            "currency": "GBP"
+          },
+          "value": {
+            "amount": 34171.5,
+            "currency": "GBP"
+          },
+          "confidence": 0.98
+        }
+      ],
+      "cash_balance": {
+        "amount": 1890,
+        "currency": "GBP"
+      },
+      "fees": [
+        {
+          "label": "Annual scheme administration fee",
+          "category": "platform",
+          "amount": {
+            "amount": 255,
+            "currency": "GBP"
+          },
+          "period": {
+            "from": "2024-04-06",
+            "to": "2025-04-05"
+          },
+          "confidence": 0.97
+        }
+      ],
+      "movements": [
+        {
+          "date": "2025-04-05",
+          "type": "contribution",
+          "description": "Employer contributions (year total)",
+          "amount": {
+            "amount": 12000,
+            "currency": "GBP"
+          },
+          "confidence": 0.97
+        },
+        {
+          "date": "2025-04-05",
+          "type": "contribution",
+          "description": "Member contributions incl. tax relief (year total)",
+          "amount": {
+            "amount": 8000,
+            "currency": "GBP"
+          },
+          "confidence": 0.97
+        }
+      ]
+    }
+  ],
+  "overall_confidence": 0.97
+}

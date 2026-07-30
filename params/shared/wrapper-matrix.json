@@ -1,0 +1,176 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "wrapper-matrix",
+  "effective": { "from": "2026-01-01", "to": "2099-12-31" },
+  "severity_levels": ["OK", "INFO", "WARN", "CRITICAL"],
+  "matrix": {
+    "gia": {
+      "us_person": {
+        "severity": "WARN",
+        "explanation": "UK general investment account is transparent for US tax, but non-US pooled holdings inside it are PFIC candidates and UK/US basis, timing and FX differences create double-reporting friction.",
+        "sources": ["IRC ss1291-1298", "UK/US DTA 2001 Art. 24 (relief from double taxation)"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "Standard UK taxable account: dividends, interest and gains taxed per UK rules.",
+        "sources": ["ITA 2007", "TCGA 1992"]
+      }
+    },
+    "isa": {
+      "us_person": {
+        "severity": "WARN",
+        "explanation": "ISA is UK tax-free but has no US treaty recognition: income and gains are US-taxable annually, and fund holdings inside are PFIC candidates. Annual US drag estimated where holdings data allows.",
+        "sources": ["UK/US DTA 2001 (no ISA provision)", "IRC ss61, 1291-1298"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "Income and gains free of UK tax.",
+        "sources": ["ITTOIA 2005 ss694-701", "ISA Regulations 1998 (SI 1998/1870)"]
+      }
+    },
+    "sipp": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "Treated as a treaty-recognised pension: growth deferral generally available under Art. 17/18 positions. Badge carries stated assumptions; PFIC exposure inside the wrapper flagged WARN with wrapper context, not CRITICAL.",
+        "sources": ["UK/US DTA 2001 Arts. 17-18", "IRS Rev. Proc. 2014-55 analogy (position, not authority)"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "Registered pension scheme: relief on contributions within allowances, tax-free growth, PCLS within Lump Sum Allowance.",
+        "sources": ["FA 2004 Part 4"]
+      }
+    },
+    "uk_bond_onshore": {
+      "us_person": {
+        "severity": "CRITICAL",
+        "explanation": "UK insurance bond held by a US person: underlying funds are PFIC-in-a-wrapper, the policy may fail IRC s7702 life-insurance definition (taxed as investment), and insurer-level 953(d) issues can apply. Flag only — no advice text.",
+        "sources": ["IRC ss1291-1298", "IRC s7702", "IRC s953(d)"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Chargeable event regime: 5% cumulative withdrawal allowance, top-slicing relief; gains taxed as income with basic-rate credit.",
+        "sources": ["ITTOIA 2005 Part 4 Ch 9"]
+      }
+    },
+    "uk_bond_offshore": {
+      "us_person": {
+        "severity": "CRITICAL",
+        "explanation": "Offshore bond held by a US person: PFIC-in-a-wrapper plus potential s7702 failure; no US recognition of the UK chargeable-event regime. Flag only — no advice text.",
+        "sources": ["IRC ss1291-1298", "IRC s7702"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Chargeable event regime without basic-rate credit; gross roll-up inside the bond.",
+        "sources": ["ITTOIA 2005 Part 4 Ch 9"]
+      }
+    },
+    "us_brokerage": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "Standard US taxable brokerage; US-registered funds are not PFICs.",
+        "sources": ["IRC s61", "IRC s1297 (US-registered funds out of scope)"]
+      },
+      "uk_resident": {
+        "severity": "WARN",
+        "explanation": "US-domiciled funds/ETFs held by a UK resident are usually non-reporting funds: gains taxed as offshore income gains at income rates unless the share class has UK reporting-fund status. Check the bundled HMRC list.",
+        "sources": ["Offshore Funds (Tax) Regulations 2009 (SI 2009/3001)", "HMRC approved reporting funds list"]
+      }
+    },
+    "ira_trad": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "US tax-deferred retirement account; distributions taxed as income.",
+        "sources": ["IRC s408"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Treaty pension: UK generally recognises deferral under Art. 17/18; lump-sum vs periodic distribution treatment differs — noted per treaty position.",
+        "sources": ["UK/US DTA 2001 Arts. 17-18"]
+      }
+    },
+    "ira_roth": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "US tax-free retirement account (qualified distributions).",
+        "sources": ["IRC s408A"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Treaty position generally preserves US tax-free character for UK residents under Art. 17(1)(b); stated as a modelling assumption.",
+        "sources": ["UK/US DTA 2001 Art. 17(1)(b)"]
+      }
+    },
+    "401k": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "US employer pension; tax-deferred.",
+        "sources": ["IRC s401(k)"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Treaty-recognised pension for UK residents (Art. 17/18); US-situs for estate purposes — split out in the situs table.",
+        "sources": ["UK/US DTA 2001 Arts. 17-18", "IRC s2104"]
+      }
+    },
+    "529": {
+      "us_person": {
+        "severity": "OK",
+        "explanation": "US education savings plan; tax-free for qualified education expenses.",
+        "sources": ["IRC s529"]
+      },
+      "uk_resident": {
+        "severity": "WARN",
+        "explanation": "No UK recognition: growth potentially taxable to a UK-resident owner; underlying funds may be offshore funds for UK purposes.",
+        "sources": ["No UK/US DTA provision for s529 plans", "Offshore Funds (Tax) Regulations 2009"]
+      }
+    },
+    "bank_current": {
+      "us_person": {
+        "severity": "INFO",
+        "explanation": "Non-US accounts count toward FBAR/Form 8938 thresholds; interest US-taxable.",
+        "sources": ["31 CFR 1010.350", "IRC s6038D"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "Interest taxable within personal savings allowance rules.",
+        "sources": ["ITA 2007 s12B"]
+      }
+    },
+    "bank_savings": {
+      "us_person": {
+        "severity": "INFO",
+        "explanation": "Non-US accounts count toward FBAR/Form 8938 thresholds; interest US-taxable. Cash ISAs additionally carry the ISA WARN.",
+        "sources": ["31 CFR 1010.350", "IRC s6038D"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "Interest taxable within personal savings allowance rules.",
+        "sources": ["ITA 2007 s12B"]
+      }
+    },
+    "property": {
+      "us_person": {
+        "severity": "INFO",
+        "explanation": "US persons are taxable on worldwide property income/gains; s121 exclusion and UK PPR relief interact imperfectly; FX gain on repaying a foreign mortgage can be US-taxable.",
+        "sources": ["IRC s121", "IRC s988 (mortgage FX)", "TCGA 1992 ss222-226 (PPR)"]
+      },
+      "uk_resident": {
+        "severity": "OK",
+        "explanation": "UK property taxed per UK rules; main residence relief may apply.",
+        "sources": ["TCGA 1992 ss222-226"]
+      }
+    },
+    "private_holding": {
+      "us_person": {
+        "severity": "WARN",
+        "explanation": "Non-US private companies can trigger CFC or PFIC status and Form 5471/8621 filings depending on ownership and asset/income mix — flagged needs_classification for operator review.",
+        "sources": ["IRC ss951-965 (CFC)", "IRC s1297"]
+      },
+      "uk_resident": {
+        "severity": "INFO",
+        "explanation": "Unlisted holdings: valuation is operator-supplied; BADR/IHT business relief positions out of scope in v0.",
+        "sources": ["Meridian v0 scope decision (SPEC §1)"]
+      }
+    }
+  }
+}

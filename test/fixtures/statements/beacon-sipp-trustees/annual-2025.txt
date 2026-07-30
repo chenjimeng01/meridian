@@ -1,0 +1,32 @@
+========================================================================
+BEACON SIPP TRUSTEES
+========================================================================
+
+VALUATION STATEMENT
+Period: 2024-04-06 to 2025-04-05
+Statement currency: GBP
+
+MS ELEANOR VANCE
+
+------------------------------------------------------------------------
+Self-Invested Personal Pension   Account no: BST-118834
+------------------------------------------------------------------------
+Holding                                     Units        Price       Value
+Atlas Global Equity UCITS ETF                 1050      59.4000 £62,370.00
+  ISIN: IE00SYNTH021
+Sterling Park UK Equity Income OEIC Acc      16500       2.0710 £34,171.50
+  ISIN: GB00SYNTH014
+Cash balance                                                 £1,890.00
+TOTAL (GBP)                                               £98,431.50
+
+Charges for the period:
+  Annual scheme administration fee             £255.00
+  TOTAL COSTS AND CHARGES                      £255.00
+
+Activity during the period:
+  2025-04-05  CONTRIBUTION  £12,000.00  Employer contributions (year total)
+  2025-04-05  CONTRIBUTION  £8,000.00  Member contributions incl. tax relief (year total)
+
+========================================================================
+SYNTHETIC FIXTURE — fictional institution, client and holdings (see NOTICE).
+========================================================================

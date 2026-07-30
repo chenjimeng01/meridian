@@ -1,0 +1,14 @@
+NOTICE — Meridian (v0)
+
+1. Personal-time, clean-sheet project. No employer code, data, documents, or
+   other intellectual property has been referenced, imported, or reproduced.
+2. All fixture statements in test/fixtures/ are synthetic: institutions,
+   people, account numbers, holdings, and values are fictional. Any
+   resemblance to real institutions or persons is coincidental.
+3. Tax and regulatory parameters in params/ are transcribed from public
+   sources cited inline in each file; entries marked "projected" are
+   inflation-adjusted estimates, not published figures.
+4. Benchmark series bundled in params/shared/benchmarks/ are synthetic
+   placeholders for v0 testing (source: "synthetic_v0") and are not market data.
+5. v0 processes synthetic/own data only. Prerequisites for third-party client
+   data are tracked in PRE_LAUNCH.md and are not met.

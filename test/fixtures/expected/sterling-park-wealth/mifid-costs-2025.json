@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "source": {
+    "institution": "Sterling Park Wealth",
+    "doc_type": "mifid_costs",
+    "period": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+    },
+    "statement_currency": "GBP"
+  },
+  "accounts": [
+    {
+      "account_token": "A5",
+      "wrapper_hint": "gia",
+      "currency": "GBP",
+      "confidence": 0.98,
+      "fees": [
+        {
+          "label": "Discretionary management fee",
+          "category": "platform",
+          "amount": {
+            "amount": 820,
+            "currency": "GBP"
+          },
+          "rate_bps": 100,
+          "period": {
+            "from": "2025-01-01",
+            "to": "2025-12-31"
+          },
+          "confidence": 0.97
+        },
+        {
+          "label": "Underlying fund ongoing charges",
+          "category": "fund_ocf",
+          "amount": {
+            "amount": 198,
+            "currency": "GBP"
+          },
+          "rate_bps": 24,
+          "period": {
+            "from": "2025-01-01",
+            "to": "2025-12-31"
+          },
+          "confidence": 0.97
+        },
+        {
+          "label": "Transaction costs",
+          "category": "transaction",
+          "amount": {
+            "amount": 88,
+            "currency": "GBP"
+          },
+          "period": {
+            "from": "2025-01-01",
+            "to": "2025-12-31"
+          },
+          "confidence": 0.97
+        },
+        {
+          "label": "Foreign exchange spreads",
+          "category": "fx_spread",
+          "amount": {
+            "amount": 52,
+            "currency": "GBP"
+          },
+          "period": {
+            "from": "2025-01-01",
+            "to": "2025-12-31"
+          },
+          "confidence": 0.97
+        }
+      ]
+    }
+  ],
+  "overall_confidence": 0.97
+}
