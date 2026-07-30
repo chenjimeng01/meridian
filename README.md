@@ -5,7 +5,12 @@ statements as PDFs, parse them into a canonical wealth ledger (human-confirmed),
 and produce a mobile-first consolidated report — with first-class US/UK
 cross-border intelligence (PFIC detection, wrapper conflicts, situs exposure).
 
-See `SPEC.md` for the full build specification and `PROGRESS.md` for build state.
+**Try it: <https://chenjimeng01.github.io/meridian/>** — runs entirely in your
+browser; nothing is uploaded.
+
+**[MANUAL.md](MANUAL.md)** is the instruction manual. `SPEC.md` is the build
+specification, `PROGRESS.md` the build state, and `PHASE_REVIEW_1..6.md` the
+independent reviews of each phase.
 
 ## Clean-sheet declaration
 
