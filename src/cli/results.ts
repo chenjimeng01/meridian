@@ -52,6 +52,8 @@ export interface Results {
       accepted_at?: string;
     }[];
     instrumentsNeedingConfirmation: string[];
+    /** Account token → the valuation date behind its figure (§8 section 1). */
+    accountFreshness: Record<string, string>;
   };
   warnings: string[];
   disclaimer: string;
@@ -242,6 +244,15 @@ export function buildResults(input: BuildResultsInput): Results {
         }))
         .sort((a, b) => a.filename.localeCompare(b.filename)),
       instrumentsNeedingConfirmation,
+      accountFreshness: Object.fromEntries(
+        ledger.accounts.map((account) => {
+          const dates = ledger.holdings
+            .filter((h) => h.account_id === account.id && h.asof <= asof)
+            .map((h) => h.asof)
+            .sort();
+          return [account.account_token, dates[dates.length - 1] ?? account.data_asof];
+        })
+      ),
     },
     warnings: [...new Set(warnings)],
     disclaimer: DISCLAIMER,

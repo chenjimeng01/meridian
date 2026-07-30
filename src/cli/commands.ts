@@ -14,6 +14,9 @@ import { renderReviewHtml } from "../ingest/review-html.ts";
 import { extractWithClaude } from "../ingest/extract-llm.ts";
 import { fileAuditAppender } from "../ingest/audit.ts";
 import { buildResults, type Results } from "./results.ts";
+import { renderReport } from "../report/render.ts";
+import { narrateSection, type NarrativeSections } from "../report/narrative.ts";
+import { fileAuditAppender as auditAppender } from "../ingest/audit.ts";
 import type { Ledger, LineDecision, LineRef, MetadataConfirmation, ParseRun } from "../ingest/types.ts";
 
 export interface BaseOptions {
@@ -372,9 +375,21 @@ export interface ReportOptions extends BaseOptions {
   householdId: string;
   asof: string;
   paramsRoot?: string;
+  /** Also render the §8 client report alongside the results JSON. */
+  html?: boolean;
+  deck?: boolean;
+  /** SPEC §6.2 composite, e.g. { global_equity_gbp: 0.6, global_bonds_gbp: 0.4 }. */
+  benchmarkWeights?: Record<string, number>;
+  narrative?: NarrativeSections;
 }
 
-export function cmdReport(options: ReportOptions): { resultsPath: string; results: Results; store: HouseholdStore } {
+export function cmdReport(options: ReportOptions): {
+  resultsPath: string;
+  results: Results;
+  store: HouseholdStore;
+  reportPath?: string;
+  deckPath?: string;
+} {
   const store = openStore(options.dataRoot, options.householdId);
   const ledger = store.loadLedger();
   const results = buildResults({
@@ -382,7 +397,60 @@ export function cmdReport(options: ReportOptions): { resultsPath: string; result
     asof: options.asof,
     generatedAt: options.now(),
     ...(options.paramsRoot ? { paramsRoot: options.paramsRoot } : {}),
+    ...(options.benchmarkWeights ? { benchmark: { weights: options.benchmarkWeights } } : {}),
   });
   const resultsPath = store.saveReport(`results-${options.asof}.json`, JSON.stringify(results, null, 2) + "\n");
-  return { resultsPath, results, store };
+
+  let reportPath: string | undefined;
+  let deckPath: string | undefined;
+  if (options.html) {
+    reportPath = store.saveReport(
+      `report-${options.asof}.html`,
+      renderReport(results, options.narrative ? { narrative: options.narrative } : {})
+    );
+  }
+  if (options.deck) {
+    deckPath = store.saveReport(
+      `deck-${options.asof}.html`,
+      renderReport(results, { mode: "deck", ...(options.narrative ? { narrative: options.narrative } : {}) })
+    );
+  }
+  return {
+    resultsPath,
+    results,
+    store,
+    ...(reportPath ? { reportPath } : {}),
+    ...(deckPath ? { deckPath } : {}),
+  };
+}
+
+/**
+ * Generates commentary for each section (SPEC §8 `--narrate`). Only the
+ * computed results are sent — they carry redaction tokens, not identifiers —
+ * and any reply that invents a number is dropped rather than rendered.
+ */
+export async function generateNarrative(
+  results: Results,
+  deps: { apiKey: string; now: () => string; auditPath?: string; fetchFn?: typeof fetch }
+): Promise<{ narrative: NarrativeSections; rejected: string[] }> {
+  const narrative: NarrativeSections = {};
+  const rejected: string[] = [];
+  const sections: (keyof NarrativeSections)[] = ["wealth", "cost", "performance", "exposure"];
+  if (results.usConnect) sections.push("usConnect");
+
+  for (const section of sections) {
+    try {
+      narrative[section] = await narrateSection(section, results, {
+        apiKey: deps.apiKey,
+        fetchFn: deps.fetchFn ?? fetch,
+        appendAudit: auditAppender(deps.auditPath ?? join(process.cwd(), "NETWORK_AUDIT.md")),
+        now: deps.now,
+      });
+    } catch (error) {
+      // A rejected or failed section is simply absent — the report never shows
+      // commentary the validator would not stand behind.
+      rejected.push(`${section}: ${(error as Error).message}`);
+    }
+  }
+  return { narrative, rejected };
 }

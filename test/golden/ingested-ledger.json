@@ -323,6 +323,7 @@
       "name": "Cash (GBP)",
       "type": "cash",
       "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
       "prices": []
     },
     {
@@ -463,6 +464,7 @@
       "name": "Cash (USD)",
       "type": "cash",
       "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
       "prices": []
     },
     {

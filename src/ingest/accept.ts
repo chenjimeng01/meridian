@@ -146,6 +146,11 @@ function cashInstrument(ledger: Ledger, currency: string, ids: IdFactory): strin
     name,
     type: "cash",
     pfic_status: "not_assessed",
+    // Cash is the one instrument whose type is not inferred: the pipeline
+    // creates it from an explicit cash-balance line, so there is nothing for
+    // an operator to confirm. Leaving it unconfirmed would fill the §7.1
+    // output with "needs classification" rows for cash balances.
+    metadata_confirmed: true,
     prices: [],
   };
   ledger.instruments.push(created);

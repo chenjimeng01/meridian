@@ -9,7 +9,7 @@
 //   meridian report --household <id> --asof <YYYY-MM-DD>
 //
 // This file is the only place the real clock is read.
-import { cmdHouseholds, cmdIngest, cmdIngestLive, cmdReport, cmdReview } from "./commands.ts";
+import { cmdHouseholds, cmdIngest, cmdIngestLive, cmdReport, cmdReview, generateNarrative } from "./commands.ts";
 
 const DEFAULT_DATA_ROOT = "./data";
 
@@ -39,7 +39,7 @@ const USAGE = `meridian — cross-border wealth intelligence (v0, local-first)
   households list                        list households under the data root
   ingest <file> --household <id>         parse a statement into a review file
   review <run-id> --household <id>       accept/reject a parse run's lines
-  report --household <id> --asof <date>  compute the results JSON
+  report --household <id> --asof <date>  compute results, and --html the report
 
 Common flags:
   --data-root <dir>        where household data lives (default ${DEFAULT_DATA_ROOT})
@@ -48,6 +48,11 @@ Common flags:
   --reaccept               reverse a prior acceptance and apply the run again
   --decisions <file>       per-line decisions JSON (review)
   --confirm-metadata <f>   instrument name -> confirmed type/domicile (review)
+  --html                   also render the mobile-first client report
+  --deck                   also render the paged screen-sharing deck
+  --benchmark a=0.6,b=0.4  assign a composite benchmark (report)
+  --narrate                add AI commentary; numbers are validated against
+                           the computed results and dropped if invented
 
 Analysis and information only. Not a personal recommendation. Not tax advice.`;
 
@@ -130,11 +135,39 @@ async function main(argv: string[]): Promise<number> {
     }
 
     case "report": {
-      const { resultsPath, results } = cmdReport({
+      const householdId = requireFlag(flags, "household");
+      const asof = requireFlag(flags, "asof");
+      const benchmarkWeights =
+        typeof flags.benchmark === "string"
+          ? Object.fromEntries(
+              flags.benchmark.split(",").map((part) => {
+                const [name, weight] = part.split("=");
+                return [name!.trim(), Number(weight)];
+              })
+            )
+          : undefined;
+
+      // --narrate needs the computed results first: the model only ever
+      // describes numbers the engine already produced (SPEC §2.1, §8).
+      let narrative;
+      if (flags.narrate) {
+        const apiKey = typeof flags["api-key"] === "string" ? flags["api-key"] : process.env.ANTHROPIC_API_KEY;
+        if (!apiKey) throw new Error("report --narrate: pass --api-key or set ANTHROPIC_API_KEY");
+        const draft = cmdReport({ dataRoot, householdId, asof, now, ...(benchmarkWeights ? { benchmarkWeights } : {}) });
+        const generated = await generateNarrative(draft.results, { apiKey, now });
+        narrative = generated.narrative;
+        for (const rejection of generated.rejected) console.log(`  ! commentary omitted — ${rejection}`);
+      }
+
+      const { resultsPath, results, reportPath, deckPath } = cmdReport({
         dataRoot,
-        householdId: requireFlag(flags, "household"),
-        asof: requireFlag(flags, "asof"),
+        householdId,
+        asof,
         now,
+        html: flags.html === true || flags.narrate === true,
+        deck: flags.deck === true,
+        ...(benchmarkWeights ? { benchmarkWeights } : {}),
+        ...(narrative ? { narrative } : {}),
       });
       const total = results.consolidation.total;
       const secondary = total.secondary ? ` / ${total.secondary.currency} ${total.secondary.amount.toLocaleString("en-GB")}` : "";
@@ -144,6 +177,8 @@ async function main(argv: string[]): Promise<number> {
       }
       for (const warning of results.warnings) console.log(`  ! ${warning}`);
       console.log(`Results: ${resultsPath}`);
+      if (reportPath) console.log(`Report:  ${reportPath}`);
+      if (deckPath) console.log(`Deck:    ${deckPath}`);
       return 0;
     }
 

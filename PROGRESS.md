@@ -1,9 +1,55 @@
 # PROGRESS
 
-**Current phase:** 4 complete — Phase 5 (mobile-first report) may open
-**Status:** `npm test` green (148/148), lint + typecheck clean;
-PHASE_REVIEW_4 MUST-FIX items all resolved, 0 open
-**Last completed step:** 4.8 MUST-FIX resolution
+**Current phase:** 5 — Mobile-first client report (SPEC §8)
+**Status:** acceptance criteria met except Lighthouse (see below); 165/165
+green, lint + typecheck clean — awaiting phase-gate structural review
+**Last completed step:** 5.6 verified in a real browser
+
+## Phase 5 step plan
+
+Acceptance (§8): fixture household renders <400KB; Lighthouse thresholds met;
+offline reopen works; a PFIC-free household shows no red anywhere; print
+preview produces sane A4.
+
+- [x] 5.1 §8 acceptance criteria written as failing tests first
+- [x] 5.2 Design system (`src/report/styles.ts`): ink navy on paper white, one
+      brass accent, alert red EMITTED ONLY when a critical flag exists — a
+      palette token sitting unused would violate the "no red anywhere" criterion
+- [x] 5.3 Hand-rolled SVG charts, no chart library
+- [x] 5.4 Report renderer: sections ordered by the client's questions, the
+      dual-currency pair as the signature element, a currency toggle that swaps
+      primacy rather than hiding a currency
+- [x] 5.5 PWA (inline data-URL manifest + blob service worker, failing silently
+      on file://), A4 print stylesheet, `--deck` paged mode
+- [x] 5.6 Narrative mode: every numeral in generated commentary must appear in
+      the computed results or the section is dropped, not rendered
+- [ ] 5.7 Phase gate: structural review → PHASE_REVIEW_5.md
+
+## Phase 5 findings
+
+- **Lighthouse was NOT run.** Neither `lighthouse` nor `lhci` is installed on
+  this machine, so the "Lighthouse mobile >=90 performance / >=95
+  accessibility" criterion is UNVERIFIED. What was verified instead: the report
+  is 36KB against a 400KB budget, makes zero network requests, has no
+  horizontal scroll, and carries the accessibility rails §8 lists
+  (reduced-motion, visible focus, landmarks, 44px targets, text alternatives on
+  every chart). Someone must run Lighthouse before this criterion can be
+  claimed.
+- **SVG text does not belong in a scaled chart.** Labels sized correctly at
+  390px rendered at roughly 30px on desktop, because `<svg width="100%">`
+  scales its own text with the container. Chart text is now HTML — real,
+  selectable, respecting the reader's font size — and the SVG carries geometry
+  only. Bars are `aria-hidden` because the adjacent text already says what they
+  say; charts that carry information text cannot (the drag projection, the cost
+  band) keep `role="img"` and a `<title>`.
+- **Cash was being reported as "needs classification".** The §7.1 gate is right
+  to distrust inferred metadata, but cash is not inferred — the pipeline
+  creates it from an explicit cash-balance line. It is now created
+  `metadata_confirmed: true`, which removed six meaningless rows from the PFIC
+  table. The end-to-end test was narrowed to match the real guarantee
+  (instruments read off a document) rather than weakened.
+- **Wrapper enums were leaking into the client report** ("bank_savings",
+  "us_brokerage"). Presentation labels now live in `src/report/format.ts`.
 
 ## Phase 4 step plan
 

@@ -65,14 +65,22 @@ function analyse(ledger: any) {
 
 test("without confirmation the real ingest path classifies nothing — the conservative default", () => {
   const ledger = ingest(false);
-  assert.ok(ledger.instruments.every((i) => i.metadata_confirmed !== true), "ingest may never assert confirmation itself");
+  assert.ok(
+    ledger.instruments.filter((i) => i.type !== "cash").every((i) => i.metadata_confirmed !== true),
+    "ingest may never assert confirmation for an instrument it read off a document"
+  );
 
   const result = analyse(ledger)!;
   assert.ok(result, "the household has a US person, so the module must run");
-  const outcomes = new Set(result.pfic.holdings.map((h: any) => h.outcome));
-  assert.deepEqual([...outcomes], ["needs_classification"], "everything must be referred, not silently cleared");
+  // Cash is excluded: the pipeline creates it from an explicit balance line, so
+  // its type is a fact rather than an inference and there is nothing for an
+  // operator to confirm. The guarantee is about instruments read off a document.
+  const inferred = result.pfic.holdings.filter((h: any) => !h.instrumentName.startsWith("Cash ("));
+  assert.ok(inferred.length > 0, "guard: there are instruments whose type was inferred");
+  const outcomes = new Set(inferred.map((h: any) => h.outcome));
+  assert.deepEqual([...outcomes], ["needs_classification"], "everything inferred must be referred, not silently cleared");
   assert.equal(
-    result.pfic.holdings.some((h: any) => h.outcome === "not_pfic"),
+    inferred.some((h: any) => h.outcome === "not_pfic"),
     false,
     "nothing may be declared safe on inferred metadata"
   );
