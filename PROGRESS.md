@@ -1,8 +1,29 @@
 # PROGRESS
 
-**Current phase:** 1 complete — Phase 2 (ingestion pipeline) may open
-**Status:** `npm test` green (28/28); PHASE_REVIEW_1.md: 0 MUST-FIX, 3 SHOULD-FIX carried into Phase 2 entry tasks
-**Last completed step:** 1.7 phase-gate review written (see PHASE_REVIEW_1.md — conducted by Fable 5 main loop, Opus subagent blocked by monthly spend limit; human may wish to re-run)
+**Current phase:** 2 — Ingestion pipeline (SPEC §5)
+**Status:** in progress
+**Last completed step:** Phase 1 gate closed (PHASE_REVIEW_1.md, 0 MUST-FIX)
+
+## Phase 2 step plan
+
+Acceptance criteria (§5): (a) 3 fixtures per priority parser parse to expected
+canonical output byte-for-byte after operator acceptance; (b) a failing-path
+test proves the redaction assertion blocks an unredacted network call;
+(c) NETWORK_AUDIT.md records every API call.
+
+- [ ] 2.0 Entry tasks from PHASE_REVIEW_1: regen-and-byte-compare determinism
+      test; §9 pre-commit PII scan hook; text-ingest-path decision recorded
+- [ ] 2.1 Failing tests written restating §5 acceptance criteria
+- [ ] 2.2 Redaction engine + vault (salted stable tokens, chmod 600, assertRedacted)
+- [ ] 2.3 Fingerprint & classify (sha256, institution/doc_type heuristics)
+- [ ] 2.4 Deterministic fixture extractor (text layout parser → parse-output JSON)
+- [ ] 2.5 LLM extractor shell (redaction-gated, ajv-validated, one retry,
+      NETWORK_AUDIT append; fake-fetch tested — no real egress in tests)
+- [ ] 2.6 Instrument matching (deterministic identifiers first, fuzzy proposes only)
+- [ ] 2.7 Accept flow: parse output → ledger application, deterministic IDs,
+      golden ingested ledger byte-for-byte
+- [ ] 2.8 Mobile review diff HTML per parse run
+- [ ] 2.9 Phase gate: tests green + structural review → PHASE_REVIEW_2.md
 
 ## Phase 1 step plan
 

@@ -27,7 +27,21 @@
             "to": { "$ref": "#/$defs/isoDate" }
           }
         },
-        "statement_currency": { "$ref": "#/$defs/currency" }
+        "statement_currency": { "$ref": "#/$defs/currency" },
+        "fx_rates": {
+          "type": "array",
+          "description": "Exchange rates printed on the statement itself — first in the fx-policy source order.",
+          "items": {
+            "type": "object",
+            "required": ["pair", "rate"],
+            "additionalProperties": false,
+            "properties": {
+              "pair": { "type": "string", "pattern": "^[A-Z]{6}$" },
+              "rate": { "type": "number", "exclusiveMinimum": 0 },
+              "date": { "$ref": "#/$defs/isoDate" }
+            }
+          }
+        }
       }
     },
     "accounts": {

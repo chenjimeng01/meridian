@@ -6,14 +6,16 @@
 // ALL data here is fictional (see NOTICE). Outputs are committed; regeneration
 // must produce byte-identical files (deterministic, no clock, no RNG).
 //
-// Usage: node scripts/gen-fixtures.mjs
+// Usage: node scripts/gen-fixtures.mjs [output-dir]
+//   output-dir defaults to <repo>/test/fixtures; the determinism test passes a
+//   temp dir and byte-compares against the committed fixtures.
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const FIX = join(ROOT, "test", "fixtures");
+const FIX = process.argv[2] ?? join(ROOT, "test", "fixtures");
 
 // Deterministic ULIDs for fixtures: valid Crockford base32, sequential.
 const ulid = (n) => "01MER1D1AN" + String(n).padStart(16, "0");
@@ -257,6 +259,16 @@ function renderStatement(doc) {
 // ---------------------------------------------------------------------------
 // Expected parse output (conforms to schema/parse-output.schema.json)
 // ---------------------------------------------------------------------------
+// A holding row prints exactly one identifier line (ISIN preferred, else
+// ticker); the expected extraction may only contain what the statement shows —
+// enrichment to full identifier sets happens at the match/accept stage.
+const visibleIdentifiers = (inst) =>
+  inst.identifiers.isin
+    ? { isin: inst.identifiers.isin }
+    : inst.identifiers.ticker
+      ? { ticker: inst.identifiers.ticker }
+      : {};
+
 function renderExpected(doc) {
   return {
     schema_version: "0.1",
@@ -265,6 +277,7 @@ function renderExpected(doc) {
       doc_type: doc.doc_type,
       period: doc.period,
       statement_currency: doc.statement_currency,
+      ...(doc.fxRate ? { fx_rates: [{ pair: "GBPUSD", rate: doc.fxRate }] } : {}),
     },
     accounts: doc.accounts.map((acct) => {
       const a = ACCOUNTS[acct.key];
@@ -280,7 +293,7 @@ function renderExpected(doc) {
           const cur = ccy ?? doc.statement_currency;
           return {
             name: inst.name,
-            identifiers: inst.identifiers,
+            identifiers: visibleIdentifiers(inst),
             units,
             price: { amount: price, currency: cur },
             value: { amount: r2(units * price), currency: cur },
@@ -300,11 +313,12 @@ function renderExpected(doc) {
         }));
       }
       if (acct.movements?.length) {
+        // No units field: the statement's activity lines carry units only in
+        // free text; the extractor must not invent structure it cannot see.
         out.movements = acct.movements.map((m) => ({
           date: m.date,
           type: m.type,
           description: m.description,
-          ...(m.units ? { units: m.units } : {}),
           amount: { amount: m.amount, currency: doc.statement_currency },
           confidence: 0.97,
         }));

@@ -19,8 +19,7 @@
         {
           "name": "Sterling Park UK Equity Income OEIC Acc",
           "identifiers": {
-            "isin": "GB00SYNTH014",
-            "sedol": "B1SYN01"
+            "isin": "GB00SYNTH014"
           },
           "units": 12500,
           "price": {
@@ -36,8 +35,7 @@
         {
           "name": "Atlas Global Equity UCITS ETF",
           "identifiers": {
-            "isin": "IE00SYNTH021",
-            "ticker": "ATLG"
+            "isin": "IE00SYNTH021"
           },
           "units": 450,
           "price": {
@@ -53,8 +51,7 @@
         {
           "name": "Thames Utilities PLC Ordinary 25p",
           "identifiers": {
-            "isin": "GB00SYNTH052",
-            "sedol": "B1SYN52"
+            "isin": "GB00SYNTH052"
           },
           "units": 1800,
           "price": {
@@ -82,8 +79,7 @@
         {
           "name": "Atlas Global Equity UCITS ETF",
           "identifiers": {
-            "isin": "IE00SYNTH021",
-            "ticker": "ATLG"
+            "isin": "IE00SYNTH021"
           },
           "units": 610,
           "price": {
@@ -99,8 +95,7 @@
         {
           "name": "Sterling Park UK Equity Income OEIC Acc",
           "identifiers": {
-            "isin": "GB00SYNTH014",
-            "sedol": "B1SYN01"
+            "isin": "GB00SYNTH014"
           },
           "units": 8000,
           "price": {

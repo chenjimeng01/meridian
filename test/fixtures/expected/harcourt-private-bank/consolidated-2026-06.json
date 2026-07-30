@@ -7,7 +7,13 @@
       "from": "2026-04-01",
       "to": "2026-06-30"
     },
-    "statement_currency": "GBP"
+    "statement_currency": "GBP",
+    "fx_rates": [
+      {
+        "pair": "GBPUSD",
+        "rate": 1.28
+      }
+    ]
   },
   "accounts": [
     {
@@ -19,8 +25,7 @@
         {
           "name": "Pioneer S&P Index Fund",
           "identifiers": {
-            "isin": "US0000SYN039",
-            "ticker": "PIOSX"
+            "isin": "US0000SYN039"
           },
           "units": 300,
           "price": {
@@ -36,9 +41,7 @@
         {
           "name": "Amalgamated Tech Inc Common Stock",
           "identifiers": {
-            "isin": "US0000SYN047",
-            "ticker": "AMTK",
-            "cusip": "SYN000104"
+            "isin": "US0000SYN047"
           },
           "units": 120,
           "price": {

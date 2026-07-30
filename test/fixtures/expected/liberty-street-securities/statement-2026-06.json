@@ -19,9 +19,7 @@
         {
           "name": "Amalgamated Tech Inc Common Stock",
           "identifiers": {
-            "isin": "US0000SYN047",
-            "ticker": "AMTK",
-            "cusip": "SYN000104"
+            "isin": "US0000SYN047"
           },
           "units": 85,
           "price": {
@@ -37,9 +35,7 @@
         {
           "name": "Continental Rail Corp Common Stock",
           "identifiers": {
-            "isin": "US0000SYN062",
-            "ticker": "CRRC",
-            "cusip": "SYN000106"
+            "isin": "US0000SYN062"
           },
           "units": 60,
           "price": {
@@ -55,8 +51,7 @@
         {
           "name": "Keystone Treasury Money Market Fund",
           "identifiers": {
-            "isin": "US0000SYN070",
-            "ticker": "KTMXX"
+            "isin": "US0000SYN070"
           },
           "units": 12451.15,
           "price": {
