@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian — cross-border wealth intelligence</title>
+<meta name="description" content="Consolidate statements into one wealth ledger, with US/UK cross-border intelligence. Runs entirely in your browser.">
+<style>
+  :root {
+    --paper:#FAFAF7; --paper-sunk:#F2F1EA; --ink:#101B2D; --ink-soft:#4A5568;
+    --brass:#8C7A3F; --brass-text:#6B5C2E; --rule:#DEDCD2; --rule-strong:#B4B0A2;
+    --ok:#2E6B4F; --alert:#A3231B;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Hoefler Text",Georgia,serif;
+    --sans:Seravek,"Gill Sans Nova","Gill Sans",Ubuntu,Calibri,"Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after { box-sizing:border-box; }
+  body { margin:0; overflow-x:hidden; background:var(--paper); color:var(--ink);
+    font:17px/1.55 var(--sans); -webkit-font-smoothing:antialiased; }
+  main { max-width:46rem; margin:0 auto; padding:1.25rem 1.15rem 5rem; }
+  h1,h2,h3 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
+  h1 { font-size:1.7rem; margin:0 0 .2rem; }
+  h2 { font-size:1.25rem; margin:0 0 .3rem; }
+  p { max-width:34rem; margin:.5rem 0; }
+  .muted { color:var(--ink-soft); } .small { font-size:.85rem; } .mono { font-family:var(--mono); }
+  .eyebrow { font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--brass-text); font-weight:600; margin:0 0 .3rem; }
+
+  header { border-bottom:1px solid var(--rule-strong); padding-bottom:1.1rem; }
+  .privacy { border:1px solid var(--brass); background:var(--paper-sunk);
+    padding:.8rem .9rem; margin:1.1rem 0 0; }
+  .privacy strong { color:var(--brass-text); }
+
+  section { border-top:1px solid var(--rule); margin-top:2rem; padding-top:1.4rem; }
+  section[hidden] { display:none; }
+  .step { display:flex; align-items:baseline; gap:.6rem; }
+  .step .n { font-family:var(--serif); font-size:1.5rem; color:var(--brass-text); }
+
+  button { font:inherit; font-size:.9rem; min-height:44px; padding:0 1rem; cursor:pointer;
+    border:1px solid var(--ink); background:var(--ink); color:var(--paper); border-radius:2px; }
+  button.ghost { background:var(--paper); color:var(--ink); border-color:var(--rule-strong); }
+  button:hover { opacity:.9; }
+  :focus-visible { outline:2px solid var(--brass); outline-offset:2px; }
+  .actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem; }
+
+  input[type=text], input[type=date], select, textarea {
+    font:inherit; font-size:.9rem; padding:.5rem .55rem; min-height:44px;
+    border:1px solid var(--rule-strong); border-radius:2px; background:var(--paper); color:var(--ink); }
+  textarea { width:100%; min-height:8rem; font-family:var(--mono); font-size:.8rem; }
+  label.field { display:flex; flex-direction:column; gap:.25rem; font-size:.85rem; }
+  .fields { display:flex; gap:.8rem; flex-wrap:wrap; margin:.8rem 0; }
+
+  .drop { border:1.5px dashed var(--rule-strong); padding:1.4rem; text-align:center; border-radius:3px; }
+  .drop.over { border-color:var(--brass); background:var(--paper-sunk); }
+
+  .card { border:1px solid var(--rule); padding:.8rem .9rem; margin:.6rem 0; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:.6rem; }
+  .chip { border:1px solid var(--rule-strong); border-radius:999px; padding:.05rem .6rem;
+    font-size:.72rem; color:var(--ink-soft); white-space:nowrap; }
+
+  .instrument { display:grid; grid-template-columns:1fr; gap:.4rem; padding:.6rem 0;
+    border-bottom:1px solid var(--rule); font-size:.88rem; }
+  .instrument .reg { display:flex; align-items:center; gap:.4rem; font-size:.82rem; min-height:44px; }
+  @media (min-width:40rem) { .instrument { grid-template-columns:1fr 11rem 5rem 12rem; align-items:center; } }
+
+  .msg { border-left:2px solid var(--ok); padding:.15rem 0 .15rem .7rem; margin:.4rem 0;
+    font-size:.86rem; color:var(--ink-soft); }
+  .msg-error { border-left-color:var(--alert); color:var(--alert); }
+
+  #viewer-panel { margin-top:1.4rem; }
+  iframe { width:100%; height:min(78vh,780px); border:1px solid var(--rule-strong); background:#fff; }
+
+  footer { margin-top:3rem; border-top:1px solid var(--rule-strong); padding-top:1rem;
+    font-size:.75rem; color:var(--ink-soft); }
+  a { color:var(--brass-text); }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow">Meridian · v0</p>
+  <h1>Cross-border wealth intelligence</h1>
+  <p class="muted">Consolidate every statement into one ledger — in two currencies, with the
+  US/UK tax exposure nobody else automates.</p>
+
+  <div class="privacy">
+    <p style="margin:0"><strong>Your statements never leave this browser.</strong> This page is
+    static: there is no server to send anything to. Parsing, redaction, the tax
+    analysis and the report all run in this tab, and nothing is stored unless you
+    press Download. Reload and it is gone.</p>
+    <p class="small" style="margin:.4rem 0 0">Synthetic and your own data only — see
+    <span class="mono">PRE_LAUNCH.md</span> before using anyone else's.</p>
+  </div>
+</header>
+
+<section>
+  <div class="step"><span class="n">1</span><div>
+    <h2>Add statements</h2>
+    <p class="small muted">Text statements. PDFs need converting first — the desktop tool does that with pdftotext.</p>
+  </div></div>
+
+  <div class="actions">
+    <button type="button" id="demo">Load the worked example</button>
+    <label class="ghost" style="display:inline-flex"><button type="button" class="ghost"
+      onclick="document.getElementById('file').click()">Choose files…</button></label>
+    <input type="file" id="file" multiple accept=".txt,.text,text/plain" hidden>
+  </div>
+
+  <details style="margin-top:.9rem">
+    <summary class="small muted" style="cursor:pointer;min-height:44px">…or paste one</summary>
+    <textarea id="paste" placeholder="Paste the text of a statement"></textarea>
+    <div class="actions"><button type="button" class="ghost" id="paste-add">Read it</button></div>
+  </details>
+
+  <div id="messages" role="status" aria-live="polite"></div>
+  <div id="statements" style="margin-top:.8rem"></div>
+</section>
+
+<section id="step-review" hidden>
+  <div class="step"><span class="n">2</span><div>
+    <h2>Confirm what these instruments are</h2>
+  </div></div>
+  <div id="instruments"></div>
+  <div class="fields">
+    <label class="field">Your initials
+      <input type="text" id="operator" value="OP" maxlength="4" size="4"></label>
+  </div>
+  <div class="actions"><button type="button" id="accept">Accept into the ledger</button></div>
+</section>
+
+<section id="step-report" hidden>
+  <div class="step"><span class="n">3</span><div>
+    <h2>Build the report</h2>
+  </div></div>
+  <div class="fields">
+    <label class="field">As at
+      <input type="date" id="asof" value="2026-06-30"></label>
+  </div>
+  <div class="actions">
+    <button type="button" id="report">Build it</button>
+    <button type="button" class="ghost" id="reset">Clear everything</button>
+  </div>
+  <div class="actions" id="downloads" hidden>
+    <button type="button" class="ghost" id="dl-report">Download report</button>
+    <button type="button" class="ghost" id="dl-results">Download results JSON</button>
+    <button type="button" class="ghost" id="dl-ledger">Download ledger</button>
+  </div>
+</section>
+
+<div id="viewer-panel" hidden>
+  <h3 id="viewer-title">Report</h3>
+  <iframe id="viewer" title="Generated document" sandbox="allow-same-origin"></iframe>
+</div>
+
+<footer>
+  <p>Analysis and information only. Not a personal recommendation. Not tax advice.
+  US tax outcomes depend on elections and filings not visible to this system.</p>
+  <p>Everything in the worked example is fictional. Runs entirely client-side; no analytics, no cookies, no network calls.</p>
+</footer>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

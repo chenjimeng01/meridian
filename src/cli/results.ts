@@ -73,6 +73,11 @@ export interface BuildResultsInput {
   asof: string;
   generatedAt: string;
   paramsRoot?: string;
+  /**
+   * Supplies params directly instead of reading them from disk. The browser
+   * build passes bundled JSON; the rules are identical either way.
+   */
+  readParams?: (relativePath: string) => unknown;
   growthAssumption?: number;
   /** SPEC §6.2 user-assigned composite, e.g. { "global_equity_gbp": 0.6, ... }. */
   benchmark?: BenchmarkAssignment;
@@ -80,7 +85,8 @@ export interface BuildResultsInput {
 
 export function buildResults(input: BuildResultsInput): Results {
   const paramsRoot = input.paramsRoot ?? DEFAULT_PARAMS_ROOT;
-  const readParams = (rel: string) => JSON.parse(readFileSync(join(paramsRoot, rel), "utf8"));
+  const readParams =
+    input.readParams ?? ((rel: string) => JSON.parse(readFileSync(join(paramsRoot, rel), "utf8")));
 
   const assetClasses = readParams("shared/asset-classes.json");
   const fxPolicy = readParams("shared/fx-policy.json");

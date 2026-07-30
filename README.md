@@ -49,6 +49,26 @@ each parse, confirms instrument metadata, and produces:
 Add `--serve` to host them over http (`./scripts/demo.sh --serve`), which is
 how to look at the report on a phone — it is designed at 390px first.
 
+## The browser version
+
+```sh
+npm run serve:web     # builds docs/ and serves it at http://localhost:8799
+```
+
+`docs/` is a static site — it is what GitHub Pages serves. It runs the **same**
+engine as the CLI: the identical redaction, parser, consolidation, PFIC cascade
+and report renderer, compiled to run in the page rather than reimplemented, so
+the two cannot drift and produce different numbers.
+
+Nothing is uploaded anywhere. There is no server to upload to: a statement you
+choose is read by the page, processed in the tab, and discarded on reload
+unless you press Download. That is the only way a hosted interface is
+compatible with the local-first rule in `SPEC.md` §2.2.
+
+The desktop CLI remains the tool for real work — it keeps a durable ledger, an
+encrypted-at-rest vault, an acceptance audit trail and the parked-document
+workflow. The browser build is for showing someone what this does.
+
 ## Using it on your own documents
 
 ```sh

@@ -48,9 +48,17 @@ interface VocabDoc {
 
 let vocabCache: { safe: Set<string>; minRun: number } | null = null;
 
-function vocabulary(): { safe: Set<string>; minRun: number } {
-  if (vocabCache) return vocabCache;
-  const doc = JSON.parse(readFileSync(VOCAB_PATH, "utf8")) as VocabDoc;
+/**
+ * Supplies the vocabulary directly instead of reading it from disk. The
+ * browser build calls this at start-up: the rules are identical, they just
+ * arrive as a bundled import rather than a file read.
+ */
+export function primeRedactionVocabulary(doc: unknown): void {
+  vocabCache = null;
+  loadVocabulary(doc as VocabDoc);
+}
+
+function loadVocabulary(doc: VocabDoc): { safe: Set<string>; minRun: number } {
   const safe = new Set<string>();
   for (const [key, list] of Object.entries(doc.safe_tokens)) {
     if (key === "comment" || !Array.isArray(list)) continue;
@@ -58,6 +66,12 @@ function vocabulary(): { safe: Set<string>; minRun: number } {
   }
   vocabCache = { safe, minRun: doc.policy.min_run_length.value };
   return vocabCache;
+}
+
+function vocabulary(): { safe: Set<string>; minRun: number } {
+  if (vocabCache) return vocabCache;
+  const doc = JSON.parse(readFileSync(VOCAB_PATH, "utf8")) as VocabDoc;
+  return loadVocabulary(doc);
 }
 
 const stripEdges = (token: string) => token.replace(/^[([{"'`]+/, "").replace(/[)\]},.;:!?"'`]+$/, "");
