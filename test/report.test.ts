@@ -87,15 +87,77 @@ test("print: an A4 stylesheet exists and hides interactive chrome (§8)", () => 
   assert.match(usukHtml, /@media\s+print[\s\S]*?\.no-print[\s\S]*?display:\s*none/);
 });
 
-test("the PWA is installable and reopens offline (§8)", () => {
-  // Manifest and service worker are inlined as data/blob URLs so the file stays
-  // self-contained; opening it from disk must still work.
+test("the PWA manifest is complete, and no broken service worker ships (§8)", () => {
   assert.match(usukHtml, /rel="manifest"/);
-  assert.match(usukHtml, /serviceWorker/);
   assert.match(usukHtml, /application\/manifest\+json/);
-  // Registration must not throw when the page is opened from file:// where
-  // service workers are unavailable.
-  assert.match(usukHtml, /catch/);
+
+  const href = usukHtml.match(/rel="manifest" href="data:application\/manifest\+json,([^"]+)"/);
+  assert.ok(href, "the manifest must be inline so the file stays self-contained");
+  const manifest = JSON.parse(decodeURIComponent(href![1]!));
+  assert.ok(manifest.icons?.length, "an installable app needs icons");
+  assert.equal(manifest.start_url, "./", "'.' is unresolvable against a data: manifest");
+  assert.ok(manifest.name && manifest.theme_color);
+
+  // Chrome rejects blob:/data: service worker scripts outright, so a genuinely
+  // single-file report cannot register one. Shipping a registration that always
+  // throws would be claiming offline support the report does not have; being
+  // self-contained is what actually delivers it.
+  assert.equal(/navigator\.serviceWorker\.register/.test(usukHtml), false, "no service worker that cannot work");
+  assert.equal(/URL\.createObjectURL/.test(usukHtml), false);
+});
+
+test("no table is wider than the phone the report is designed for (§8)", () => {
+  // A min-width above the viewport does not "scroll inside its own container"
+  // in any useful sense — it puts a PFIC row's severity and value off-screen.
+  const tableRules = usukHtml.match(/table\s*\{[^}]*\}/g) ?? [];
+  for (const rule of tableRules) {
+    const minWidth = rule.match(/min-width:\s*([\d.]+)rem/);
+    if (minWidth) {
+      assert.ok(Number(minWidth[1]) <= 20, `a table declares min-width ${minWidth[1]}rem, wider than a 390px screen`);
+    }
+  }
+  assert.match(usukHtml, /@media \(max-width: 33\.99rem\)[\s\S]*?\.col-detail\s*\{\s*display:\s*none/, "secondary columns drop on a phone");
+  assert.match(usukHtml, /class="col-detail"/, "and something is actually marked as secondary");
+});
+
+test("the currency toggle swaps every pair, not just the headline (§8)", () => {
+  // The button says "Show in USD"; a reader who presses it must see the report
+  // in USD, not one number in USD.
+  assert.match(usukHtml, /:root\[data-primary="secondary"\] \.rowpair/, "table pairs must respond to the toggle");
+  assert.match(usukHtml, /:root\[data-primary="secondary"\] \.pair/);
+  const pairsInTables = (usukHtml.match(/class="rowpair"/g) ?? []).length;
+  assert.ok(pairsInTables >= 20, `only ${pairsInTables} dual-currency cells — the signature should be pervasive`);
+});
+
+test("every colour used for TEXT meets WCAG AA on the paper ground (§8)", () => {
+  const luminance = (hex: string) => {
+    const channel = (value: number) => {
+      const srgb = value / 255;
+      return srgb <= 0.03928 ? srgb / 12.92 : Math.pow((srgb + 0.055) / 1.055, 2.4);
+    };
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    return 0.2126 * channel(r!) + 0.7152 * channel(g!) + 0.0722 * channel(b!);
+  };
+  const ratio = (a: string, b: string) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi! + 0.05) / (lo! + 0.05);
+  };
+  const paper = "#FAFAF7";
+  const textColours = {
+    ink: "#101B2D",
+    inkSoft: "#4A5568",
+    brassText: "#6B5C2E",
+    alert: "#A3231B",
+    ok: "#2E6B4F",
+  };
+  for (const [name, colour] of Object.entries(textColours)) {
+    const contrast = ratio(colour, paper);
+    assert.ok(contrast >= 4.5, `${name} (${colour}) is ${contrast.toFixed(2)}:1 on paper — AA needs 4.5:1`);
+  }
+  // The plain accent is used for bars and rules only, which need 3:1.
+  assert.ok(ratio("#8C7A3F", paper) >= 3, "the non-text accent must still meet 3:1");
+  // And it must not be used for any text.
+  assert.equal(/color: var\(--brass\)/.test(usukHtml), false, "the low-contrast accent must never colour text");
 });
 
 test("dual currency is the signature: every headline is a stacked pair (§8)", () => {
@@ -161,11 +223,22 @@ test("performance is labelled by method and never presented as more precise than
   if (method === "modified_dietz") assert.match(usukHtml, /estimate/i);
 });
 
-test("--deck mode produces a paged summary (§8)", () => {
+test("--deck is a genuine paged summary, not the report with a class (§8)", () => {
   const deck = renderReport(usukResults, { mode: "deck" });
-  assert.match(deck, /class="[^"]*slide/);
+  assert.match(deck, /class="slide"/);
   assert.ok(bytes(deck) < 400 * 1024);
   assert.ok(deck.includes("£248,323.97"), "the deck carries the same figures as the report");
+
+  // Each slide must fit one screen, so it cannot contain the long tables.
+  assert.match(deck, /\.slide\s*\{[^}]*max-height:\s*100svh/);
+  const deckTables = (deck.match(/<table/g) ?? []).length;
+  const reportTables = (usukHtml.match(/<table/g) ?? []).length;
+  assert.ok(deckTables < reportTables / 2, `deck has ${deckTables} tables against the report's ${reportTables}`);
+  assert.ok(!deck.includes("Where every figure came from</p>\n<h2>Data appendix"), "the full appendix belongs in the report");
+
+  // A screen-share artifact that cannot show the second currency defeats the
+  // point of a dual-currency product.
+  assert.match(deck, /id="currency-toggle"/);
 });
 
 // --- narrative (§8): the model may never introduce a number ------------------

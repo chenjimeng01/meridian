@@ -34,6 +34,12 @@ export interface Results {
     household_id: string;
     base_currency: string;
     secondary_currency?: string;
+    /**
+     * The single base→secondary rate behind every figure in this report. The
+     * renderer uses it to show scalar amounts as dual-currency pairs; because
+     * it is the same rate the headline used, the two columns reconcile.
+     */
+    secondary_rate?: { pair: string; rate: number; date: string };
   };
   consolidation: ConsolidationResult;
   performance: PerformanceSection;
@@ -83,6 +89,17 @@ export function buildResults(input: BuildResultsInput): Results {
   const base = ledger.household.base_currency;
 
   const consolidation = consolidate({ ledger, assetClasses, fx, asof });
+
+  const secondaryCurrency = ledger.household.secondary_currency;
+  let secondaryRate: { pair: string; rate: number; date: string } | undefined;
+  if (secondaryCurrency && secondaryCurrency !== base) {
+    try {
+      const unit = convert({ amount: 1, currency: base }, secondaryCurrency, asof, fx);
+      secondaryRate = { pair: `${base}${secondaryCurrency}`, rate: unit.exact, date: unit.rateDate };
+    } catch {
+      secondaryRate = undefined;
+    }
+  }
   const risk = assessRisk({ consolidation, ledger, assetClasses, asof });
 
   // §6.3 cost stack. Fee transactions are matched to the account they were
@@ -223,6 +240,7 @@ export function buildResults(input: BuildResultsInput): Results {
       household_id: ledger.household.id,
       base_currency: base,
       ...(ledger.household.secondary_currency ? { secondary_currency: ledger.household.secondary_currency } : {}),
+      ...(secondaryRate ? { secondary_rate: secondaryRate } : {}),
     },
     consolidation,
     performance,

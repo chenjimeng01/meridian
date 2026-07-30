@@ -40,10 +40,29 @@ function pair(value: DualMoney): string {
   );
 }
 
+/**
+ * Builds a pair from a scalar base amount using the single rate the engine
+ * recorded for this report. The signature of the product is that every figure
+ * is legible in both currencies — a toggle that moves one number is a toggle
+ * that lies.
+ */
+function dualFromBase(amount: number, results: Results): DualMoney {
+  const base = { amount: Math.round(amount * 100) / 100, currency: results.meta.base_currency };
+  const rate = results.meta.secondary_rate;
+  if (!rate || !results.meta.secondary_currency) return { base };
+  return {
+    base,
+    secondary: {
+      amount: Math.round(amount * rate.rate * 100) / 100,
+      currency: results.meta.secondary_currency,
+    },
+  };
+}
+
 /** Inline row form of the same idea, for tables. */
 function rowPair(value: DualMoney): string {
   return (
-    `<span class="rowpair"><span>${esc(money(value.base))}</span>` +
+    `<span class="rowpair"><span class="a">${esc(money(value.base))}</span>` +
     (value.secondary ? `<span class="b">${esc(money(value.secondary))}</span>` : "") +
     `</span>`
   );
@@ -120,15 +139,15 @@ function costSection(results: Results, options: RenderOptions): string {
       (line) =>
         `<tr><td>${esc(line.label)}<span class="small muted"> · ${esc(line.accountToken ?? "")}</span></td>` +
         `<td>${esc((line.category ?? "other").replace(/_/g, " "))}</td>` +
-        `<td class="r num">${esc(money(line.amount))}</td>` +
-        `<td class="small muted mono">${esc(line.sourceDocument ?? "")}</td></tr>`
+        `<td class="r num">${rowPair(dualFromBase(line.amount.amount, results))}</td>` +
+        `<td class="small muted mono col-detail">${esc(line.sourceDocument ?? "")}</td></tr>`
     )
     .join("");
 
   return `<section id="cost"${options.mode === "deck" ? ' class="slide"' : ""}>
 <p class="eyebrow">${esc(SECTIONS.cost)}</p>
 <h2>Cost of ownership</h2>
-<p class="pair"><span class="primary">${esc(money(costStack.total.amount))}</span></p>
+${pair(dualFromBase(costStack.total.amount.amount, results))}
 <p class="asof">${esc(bps(costStack.total.bps))} a year · charges disclosed for the year to ${esc(longDate(costStack.period.to))}</p>
 ${commentary(options.narrative?.cost)}
 ${stackedBar(categories, { title: "Cost by category", formatValue: (v) => money({ amount: v, currency }) })}
@@ -136,15 +155,17 @@ ${stackedBar(categories, { title: "Cost by category", formatValue: (v) => money(
 ${dragChart({
   title: `Growth before and after costs over ${compoundingDrag.years} years`,
   years: compoundingDrag.years,
-  startingValue: compoundingDrag.grossTerminal.amount / Math.pow(1 + 0.05, compoundingDrag.years),
-  grossRate: 0.05,
-  netRate: 0.05 - costStack.total.bps / 10_000,
+  // Taken from the projection itself. Re-deriving these from literals is how a
+  // chart comes to contradict the sentence printed directly beneath it.
+  startingValue: compoundingDrag.startingValue.amount,
+  grossRate: compoundingDrag.grossGrowthRate,
+  netRate: compoundingDrag.grossGrowthRate - compoundingDrag.annualFeeRate,
   formatValue: (v) => moneyShort({ amount: v, currency }),
 })}
 <p class="small muted">Before costs ${esc(money(compoundingDrag.grossTerminal, 0))} · after costs ${esc(money(compoundingDrag.netTerminal, 0))} · the difference is ${esc(money(compoundingDrag.drag, 0))}. Assumes ${esc(compoundingDrag.assumption)}.</p>
 <h3>Every charge, and the document it came from</h3>
 <div class="scroll" role="region" aria-label="Charges" tabindex="0">
-<table><thead><tr><th>Charge</th><th>Category</th><th class="r">Amount</th><th>Source</th></tr></thead>
+<table><thead><tr><th>Charge</th><th>Category</th><th class="r">Amount</th><th class="col-detail">Source</th></tr></thead>
 <tbody>${lines || `<tr><td colspan="4" class="muted">No charges disclosed for this period.</td></tr>`}</tbody></table></div>
 </section>`;
 }
@@ -199,7 +220,7 @@ function exposureSection(results: Results, options: RenderOptions): string {
     .map(
       (flag) =>
         `<tr><td>${esc(flag.label)}</td><td class="r num">${esc(percent(flag.share))}</td>` +
-        `<td class="r num">${esc(money({ amount: flag.amount, currency }))}</td></tr>`
+        `<td class="r num">${rowPair(dualFromBase(flag.amount, results))}</td></tr>`
     )
     .join("");
 
@@ -229,8 +250,8 @@ ${sliceTable(consolidation.byCurrency, "Currency")}
 ${Object.entries(risk.wrappedRatioByJurisdiction)
   .map(
     ([jurisdiction, split]) =>
-      `<tr><td>${esc(jurisdiction)}</td><td class="r num">${esc(money({ amount: split.wrapped, currency }))}</td>` +
-      `<td class="r num">${esc(money({ amount: split.unwrapped, currency }))}</td></tr>`
+      `<tr><td>${esc(jurisdiction)}</td><td class="r num">${rowPair(dualFromBase(split.wrapped, results))}</td>` +
+      `<td class="r num">${rowPair(dualFromBase(split.unwrapped, results))}</td></tr>`
   )
   .join("")}
 </tbody></table></div>
@@ -251,7 +272,7 @@ function usConnectSection(results: Results, options: RenderOptions): string {
         `<tr${holding.severity === "CRITICAL" ? ' class="critical-row"' : ""}>` +
         `<td>${esc(holding.instrumentName)}<span class="small muted"> · ${esc(holding.accountToken)} ${esc(wrapperLabel(holding.wrapper))}</span></td>` +
         `<td>${severityChip(holding.severity)}</td>` +
-        `<td class="r num">${esc(money({ amount: holding.valueBase, currency: results.consolidation.total.base.currency }))}</td></tr>`
+        `<td class="r num">${rowPair(dualFromBase(holding.valueBase, results))}</td></tr>`
     )
     .join("");
 
@@ -267,9 +288,9 @@ function usConnectSection(results: Results, options: RenderOptions): string {
     .map(
       (person: any) =>
         `<tr><td>${esc(person.personToken)}</td>` +
-        `<td class="r num">${esc(money({ amount: person.usSitus?.totalBase ?? 0, currency: results.consolidation.total.base.currency }))}</td>` +
-        `<td class="r num">${esc(money({ amount: person.nonUsSitus?.totalBase ?? 0, currency: results.consolidation.total.base.currency }))}</td>` +
-        `<td class="r num">${esc(money({ amount: person.unclassified?.totalBase ?? 0, currency: results.consolidation.total.base.currency }))}</td></tr>`
+        `<td class="r num">${rowPair(dualFromBase(person.usSitus?.totalBase ?? 0, results))}</td>` +
+        `<td class="r num">${rowPair(dualFromBase(person.nonUsSitus?.totalBase ?? 0, results))}</td>` +
+        `<td class="r num">${rowPair(dualFromBase(person.unclassified?.totalBase ?? 0, results))}</td></tr>`
     )
     .join("");
 
@@ -343,9 +364,9 @@ function appendixSection(results: Results, options: RenderOptions): string {
       (document) =>
         `<tr><td>${esc(document.filename)}<span class="small muted"> · ${esc(document.institution)}</span></td>` +
         `<td class="small">${esc(document.doc_type.replace(/_/g, " "))}</td>` +
-        `<td class="small num">${esc(document.period.from)} → ${esc(document.period.to)}</td>` +
+        `<td class="small num col-detail">${esc(document.period.from)} → ${esc(document.period.to)}</td>` +
         `<td class="small num">${document.parsed_at ? esc(document.parsed_at.slice(0, 10)) : "—"}</td>` +
-        `<td class="small mono">${esc(document.sha256.slice(0, 12))}</td></tr>`
+        `<td class="small mono col-detail">${esc(document.sha256.slice(0, 12))}</td></tr>`
     )
     .join("");
 
@@ -356,7 +377,7 @@ function appendixSection(results: Results, options: RenderOptions): string {
 <h2>Data appendix</h2>
 <p class="small muted">Every figure in this report comes from one of the documents below. Nothing was estimated or filled in.</p>
 <div class="scroll" role="region" aria-label="Source documents" tabindex="0">
-<table><thead><tr><th>Document</th><th>Type</th><th>Period</th><th>Parsed</th><th>Fingerprint</th></tr></thead>
+<table><thead><tr><th>Document</th><th>Type</th><th class="col-detail">Period</th><th>Parsed</th><th class="col-detail">Fingerprint</th></tr></thead>
 <tbody>${rows}</tbody></table></div>
 ${
   results.appendix.instrumentsNeedingConfirmation.length
@@ -368,54 +389,29 @@ ${warnings ? `<h3>What to read carefully</h3><ul class="warnings">${warnings}</u
 }
 
 /** Inlined PWA plumbing — no external files, works when opened from disk. */
+/** A brass "M" on paper, inline so the manifest needs no external file. */
+const ICON_SVG =
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">` +
+  `<rect width="64" height="64" fill="#101B2D"/>` +
+  `<text x="32" y="45" font-family="Georgia,serif" font-size="38" fill="#C4B587" text-anchor="middle">M</text></svg>`;
+
 export function manifestLink(title: string): string {
+  const icon = `data:image/svg+xml,${encodeURIComponent(ICON_SVG)}`;
   const manifest = {
     name: title,
     short_name: "Meridian",
     display: "standalone",
     background_color: "#FAFAF7",
     theme_color: "#101B2D",
-    start_url: ".",
+    // Resolved against the document, not the data: manifest — "." would be
+    // unresolvable from a data URL.
+    start_url: "./",
+    icons: [
+      { src: icon, sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: icon, sizes: "any", type: "image/svg+xml", purpose: "maskable" },
+    ],
   };
   return `<link rel="manifest" href="data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}">`;
-}
-
-function pwa(title: string): string {
-  const manifest = {
-    name: title,
-    short_name: "Meridian",
-    display: "standalone",
-    background_color: "#FAFAF7",
-    theme_color: "#101B2D",
-    start_url: ".",
-  };
-  const manifestJson = JSON.stringify(manifest).replace(/</g, "\\u003c");
-  return `<script>
-(function () {
-  try {
-    // The manifest is already linked statically as a data: URL; this upgrades
-    // it to a blob URL where that is better supported.
-    var manifest = ${manifestJson};
-    var blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
-    var existing = document.querySelector('link[rel="manifest"]');
-    if (existing) existing.href = URL.createObjectURL(blob);
-  } catch (e) { /* opened from file://; the report still reads fine */ }
-
-  // The report is already one self-contained file, so "offline" needs only a
-  // worker that serves this document back. Registration fails on file:// —
-  // that is expected and must not surface to the reader.
-  try {
-    if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
-      var sw = 'self.addEventListener("install",function(e){self.skipWaiting()});' +
-               'self.addEventListener("fetch",function(e){e.respondWith(caches.open("meridian").then(function(c){' +
-               'return c.match(e.request).then(function(r){return r || fetch(e.request).then(function(res){' +
-               'if(e.request.method==="GET"){c.put(e.request,res.clone())}return res})})}))});';
-      var swUrl = URL.createObjectURL(new Blob([sw], { type: "text/javascript" }));
-      navigator.serviceWorker.register(swUrl).catch(function () {});
-    }
-  } catch (e) { /* offline support is an enhancement, never a requirement */ }
-})();
-</script>`;
 }
 
 const CURRENCY_TOGGLE = `<script>
@@ -431,6 +427,79 @@ const CURRENCY_TOGGLE = `<script>
 })();
 </script>`;
 
+/**
+ * §8 `--deck`: "a paged summary for screen-sharing". A deck is not the report
+ * with a class on it — a 2,685px "slide" containing a twelve-row table is
+ * unusable on a shared screen. Each slide carries one idea and fits one view.
+ */
+function deckSlides(results: Results): string {
+  const { consolidation, costStack, performance, risk } = results;
+  const usConnect = results.usConnect as any;
+  const currency = consolidation.total.base.currency;
+
+  const slide = (eyebrow: string, body: string) =>
+    `<section class="slide"><p class="eyebrow">${esc(eyebrow)}</p>${body}</section>`;
+
+  const topPositions = risk.topPositions
+    .slice(0, 5)
+    .map(
+      (position) =>
+        `<tr><td>${esc(position.label)}</td><td class="r num">${esc(percent(position.shareOfTotal))}</td>` +
+        `<td class="r num">${rowPair(position.value)}</td></tr>`
+    )
+    .join("");
+
+  const criticalRows = ((usConnect?.pfic?.holdings ?? []) as any[])
+    .filter((holding) => holding.severity === "CRITICAL")
+    .slice(0, 6)
+    .map(
+      (holding) =>
+        `<tr class="critical-row"><td>${esc(holding.instrumentName)}` +
+        `<span class="small muted"> · ${esc(wrapperLabel(holding.wrapper))}</span></td>` +
+        `<td class="r num">${esc(money({ amount: holding.valueBase, currency }))}</td></tr>`
+    )
+    .join("");
+
+  return [
+    slide(SECTIONS.wealth, `<h2>Total wealth</h2>${pair(consolidation.total)}<p class="asof">as at ${esc(longDate(results.meta.asof))}</p>`),
+    slide(
+      SECTIONS.cost,
+      `<h2>What it costs</h2>${pair(dualFromBase(costStack.total.amount.amount, results))}` +
+        `<p class="asof">${esc(bps(costStack.total.bps))} a year · year to ${esc(longDate(costStack.period.to))}</p>` +
+        `<p class="small muted">Over ${results.compoundingDrag.years} years that is ${esc(money(results.compoundingDrag.drag, 0))} of growth foregone.</p>`
+    ),
+    slide(
+      SECTIONS.performance,
+      performance.portfolio
+        ? `<h2>How it has done</h2><p class="pair"><span class="primary">${esc(percent(performance.portfolio.return))}</span></p>` +
+            `<p class="asof">${esc(performance.portfolio.method === "twr" ? "Time-weighted" : "Modified Dietz")}` +
+            `${performance.portfolio.isEstimate ? " · estimate" : ""} · ${esc(longDate(performance.from))} to ${esc(longDate(performance.to))}</p>`
+        : `<h2>How it has done</h2><p class="muted">Not enough accepted valuation dates to measure a return yet.</p>`
+    ),
+    slide(
+      SECTIONS.exposure,
+      `<h2>Five largest positions</h2><div class="scroll" role="region" aria-label="Largest positions" tabindex="0">` +
+        `<table><thead><tr><th>Position</th><th class="r">Share</th><th class="r">Value</th></tr></thead><tbody>${topPositions}</tbody></table></div>`
+    ),
+    usConnect
+      ? slide(
+          SECTIONS.usConnect,
+          `<h2>US-connected exposure</h2><p class="flag-count num">${esc(usConnect.criticalCount)}</p>` +
+            `<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to address.</p>` +
+            (criticalRows
+              ? `<div class="scroll" role="region" aria-label="Critical holdings" tabindex="0">` +
+                `<table><thead><tr><th>Holding</th><th class="r">Value</th></tr></thead><tbody>${criticalRows}</tbody></table></div>`
+              : "")
+        )
+      : "",
+    slide(
+      SECTIONS.appendix,
+      `<h2>Where every figure came from</h2><p>${esc(results.appendix.documents.length)} source documents, ` +
+        `each fingerprinted and dated. The full appendix is in the written report.</p>`
+    ),
+  ].join("\n");
+}
+
 export function renderReport(results: Results, options: RenderOptions = {}): string {
   const hasAlert = Boolean((results.usConnect as any)?.criticalCount);
   const deck = options.mode === "deck";
@@ -439,7 +508,7 @@ export function renderReport(results: Results, options: RenderOptions = {}): str
   const secondary = results.consolidation.total.secondary?.currency;
 
   const toggle =
-    secondary && !deck
+    secondary
       ? `<button id="currency-toggle" class="no-print" type="button" aria-pressed="false" data-a="Show in ${esc(secondary)}" data-b="Show in ${esc(base)}">Show in ${esc(secondary)}</button>`
       : "";
 
@@ -466,19 +535,24 @@ ${manifestLink(title)}
   </div>
   <p class="asof">Two currencies, one truth. Prepared ${esc(longDate(results.meta.generated_at.slice(0, 10)))}.</p>
 </header>
-${wealthSection(results, options)}
-${costSection(results, options)}
-${performanceSection(results, options)}
-${exposureSection(results, options)}
-${usConnectSection(results, options)}
-${appendixSection(results, options)}
+${
+  deck
+    ? deckSlides(results)
+    : [
+        wealthSection(results, options),
+        costSection(results, options),
+        performanceSection(results, options),
+        exposureSection(results, options),
+        usConnectSection(results, options),
+        appendixSection(results, options),
+      ].join("\n")
+}
 <footer>
   <p>${esc(results.disclaimer)}</p>
   <p class="small">Household ${esc(results.meta.household_id)} · generated ${esc(results.meta.generated_at)}</p>
 </footer>
 </main>
 ${CURRENCY_TOGGLE}
-${pwa(title)}
 </body>
 </html>
 `;

@@ -113,6 +113,10 @@ export interface CompoundingDragResult {
   drag: Money;
   dragAsShareOfGross: number;
   years: number;
+  /** The starting value and rates actually used, so nothing re-derives them. */
+  startingValue: Money;
+  grossGrowthRate: number;
+  annualFeeRate: number;
   assumption: string;
 }
 
@@ -138,6 +142,9 @@ export function compoundingDrag(input: CompoundingDragInput): CompoundingDragRes
     drag: { amount: roundHalfEven(grossTerminal - netTerminal, MONEY_DECIMALS), currency },
     dragAsShareOfGross: grossTerminal === 0 ? 0 : (grossTerminal - netTerminal) / grossTerminal,
     years: input.years,
+    startingValue: input.startingValue,
+    grossGrowthRate: input.grossGrowthRate,
+    annualFeeRate: input.annualFeeRate,
     assumption: `growth at ${(input.grossGrowthRate * 100).toFixed(2)}% a year less an ongoing charge of ${(input.annualFeeRate * 100).toFixed(2)}% applied to the whole portfolio each year, with no contributions or withdrawals`,
   };
 }

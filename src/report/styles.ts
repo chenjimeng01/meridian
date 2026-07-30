@@ -31,7 +31,8 @@ export function styles(options: { hasAlert: boolean; deck: boolean }): string {
   --paper-sunk: #F2F1EA;
   --ink: #101B2D;
   --ink-soft: #4A5568;
-  --brass: #8C7A3F;
+  --brass: #8C7A3F;          /* non-text only: bars, swatches, rules (>=3:1) */
+  --brass-text: #6B5C2E;     /* 5.6:1 on paper — the accent wherever it is TEXT */
   --brass-soft: #C4B587;
   --rule: #DEDCD2;
   --rule-strong: #B4B0A2;
@@ -70,7 +71,7 @@ p { max-width: var(--measure); margin: 0.55rem 0; }
 .small { font-size: 0.82rem; }
 .eyebrow {
   font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--brass); font-weight: 600; margin: 0 0 0.35rem;
+  color: var(--brass-text); font-weight: 600; margin: 0 0 0.35rem;
 }
 
 /* --- masthead ------------------------------------------------------------ */
@@ -106,8 +107,13 @@ header { border-bottom: 1px solid var(--rule-strong); padding-bottom: 1.1rem; }
 }
 :root[data-primary="secondary"] .pair { flex-direction: row-reverse; justify-content: flex-end; }
 
-.rowpair { display: flex; gap: 0.5rem; align-items: baseline; justify-content: flex-end; }
-.rowpair .b { color: var(--ink-soft); font-size: 0.86em; }
+.rowpair { display: flex; gap: 0.5rem; align-items: baseline; justify-content: flex-end; flex-wrap: wrap; }
+.rowpair .a { transition: color 240ms ease; }
+.rowpair .b { color: var(--ink-soft); font-size: 0.86em; transition: color 240ms ease, font-size 240ms ease; }
+/* The toggle swaps which currency is primary everywhere a pair appears. */
+:root[data-primary="secondary"] .rowpair { flex-direction: row-reverse; }
+:root[data-primary="secondary"] .rowpair .a { color: var(--ink-soft); font-size: 0.86em; }
+:root[data-primary="secondary"] .rowpair .b { color: var(--ink); font-size: 1em; }
 
 /* --- controls ------------------------------------------------------------ */
 button {
@@ -115,7 +121,7 @@ button {
   border: 1px solid var(--rule-strong); border-radius: 2px;
   min-height: 44px; padding: 0 0.9rem; cursor: pointer;
 }
-button[aria-pressed="true"] { border-color: var(--brass); color: var(--brass); }
+button[aria-pressed="true"] { border-color: var(--brass-text); color: var(--brass-text); }
 :focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
 /* --- sections ------------------------------------------------------------ */
@@ -125,10 +131,20 @@ section:first-of-type { border-top: none; }
 .card { border: 1px solid var(--rule); padding: 0.85rem 0.95rem; margin: 0.6rem 0; }
 .grid { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
 
-/* --- tables scroll inside themselves, never the page --------------------- */
+/* --- tables ---------------------------------------------------------------
+   A minimum width wider than the target device does not "scroll inside its own
+   container" in any useful sense — it puts the severity and the value of a
+   PFIC row off the right-hand edge of the phone the report is designed for.
+   Tables fit the viewport; genuinely secondary columns are dropped below 34rem
+   and restored on wider screens and in print. */
 .scroll { overflow-x: auto; border: 1px solid var(--rule); }
-table { border-collapse: collapse; width: 100%; min-width: 30rem; font-size: 0.86rem; }
-th, td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; table-layout: auto; }
+th, td { text-align: left; padding: 0.5rem 0.55rem; border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: anywhere; }
+@media (max-width: 33.99rem) {
+  th, td { padding: 0.45rem 0.4rem; font-size: 0.98em; }
+  .col-detail { display: none; }
+}
+@media (min-width: 34rem) { th, td { padding: 0.5rem 0.7rem; } }
 th { font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
 td.r, th.r { text-align: right; }
 tr:last-child td { border-bottom: none; }
@@ -167,26 +183,26 @@ figure.chart { margin: 0.7rem 0 0; }
   padding: 0 0.6rem; font-size: 0.72rem; color: var(--ink-soft);
 }
 .chip-ok { border-color: var(--ok); color: var(--ok); }
-.chip-warn { border-color: var(--brass); color: var(--brass); }
+.chip-warn { border-color: var(--brass-text); color: var(--brass-text); }
 ${
   options.hasAlert
     ? `.chip-critical { border-color: var(--alert); color: var(--alert); }
 .flag-count { font-family: ${DISPLAY_SERIF}; font-size: 3rem; line-height: 1; color: var(--alert); }
 .critical-row { background: var(--alert-wash); }
 .rule-alert { border-left: 3px solid var(--alert); padding-left: 0.8rem; }`
-    : `.flag-count { font-family: ${DISPLAY_SERIF}; font-size: 3rem; line-height: 1; color: var(--brass); }`
+    : `.flag-count { font-family: ${DISPLAY_SERIF}; font-size: 3rem; line-height: 1; color: var(--brass-text); }`
 }
 
 /* --- commentary ---------------------------------------------------------- */
 .commentary { border-left: 2px solid var(--brass-soft); padding: 0.1rem 0 0.1rem 0.85rem; margin: 0.9rem 0; }
 .commentary .byline {
   font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--brass); font-weight: 600;
+  color: var(--brass-text); font-weight: 600;
 }
 
 .warnings { list-style: none; padding: 0; margin: 0.6rem 0 0; }
 .warnings li { font-size: 0.8rem; color: var(--ink-soft); padding-left: 1rem; text-indent: -1rem; }
-.warnings li::before { content: "— "; color: var(--brass); }
+.warnings li::before { content: "— "; color: var(--brass-text); }
 
 footer {
   margin-top: 3rem; border-top: 1px solid var(--rule-strong); padding-top: 1rem;
@@ -213,7 +229,8 @@ code, .mono { font-family: ${MONO}; font-size: 0.78em; }
   .no-print { display: none !important; }
   section { break-inside: avoid; border-top: 1px solid #ccc; }
   h2, h3 { break-after: avoid; }
-  table { min-width: 0; font-size: 9pt; }
+  table { font-size: 9pt; }
+  .col-detail { display: table-cell; }
   .scroll { overflow: visible; border: none; }
   a { text-decoration: none; color: inherit; }
 }
@@ -222,9 +239,12 @@ ${
     ? `
 /* --- deck mode: one idea per page ---------------------------------------- */
 .slide {
-  min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
-  border-top: none; padding: 2rem 0; scroll-snap-align: start;
+  min-height: 100svh; max-height: 100svh; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  border-top: none; padding: 1.5rem 0; scroll-snap-align: start; margin-top: 0;
 }
+.slide h2 { font-size: clamp(1.4rem, 5vw, 2rem); }
+.slide table { font-size: 0.92rem; }
 html { scroll-snap-type: y proximity; }
 @media print { .slide { min-height: 0; break-after: page; } }`
     : ""

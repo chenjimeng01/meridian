@@ -23,7 +23,66 @@ preview produces sane A4.
       on file://), A4 print stylesheet, `--deck` paged mode
 - [x] 5.6 Narrative mode: every numeral in generated commentary must appear in
       the computed results or the section is dropped, not rendered
-- [ ] 5.7 Phase gate: structural review → PHASE_REVIEW_5.md
+- [x] 5.7 Phase gate: PHASE_REVIEW_5.md (Opus) — 7 MUST-FIX, 14 SHOULD-FIX,
+      13 NOTE
+- [x] 5.8 MUST-FIX resolution (168/168 green):
+      - M1 the drag chart re-derived the projection with a hard-coded 5%, so at
+        any other growth assumption the chart contradicted the sentence beneath
+        it. `compoundingDrag` now returns the rates it used.
+      - M2 `table { min-width: 30rem }` put the severity and value columns of a
+        PFIC row off-screen at 390px — the exact device §8 designs for. Tables
+        now fit the viewport; genuinely secondary columns drop below 34rem and
+        return on wider screens and in print.
+      - M3 the button labelled "Show in USD" changed exactly one number. Every
+        figure is now a pair (45 of them, verified in-browser), `.rowpair`
+        responds to the toggle, and the engine exposes the single rate behind
+        the report so both columns reconcile.
+      - M4 the service worker never registered — Chrome rejects `blob:` worker
+        scripts, so a single-file report cannot have one. Rather than ship
+        plumbing that always threw, it is removed; the manifest gained icons
+        and a resolvable `start_url`. See the limitation note below.
+      - M5 `narrateSection` posted the operator's own filenames and wrote
+        `redaction_check: "pass"` without ever checking. It now strips
+        filenames, asserts the payload clean (tokens only, no paths), and only
+        then writes the audit row.
+      - M6 brass `#8C7A3F` on paper is 4.04:1 — below AA — and coloured every
+        eyebrow, chip and byline. Text now uses `#6B5C2E` (5.6:1); the original
+        accent is confined to bars and rules, which need 3:1. A test computes
+        the ratios rather than trusting the palette.
+      - M7 `--deck` was the report with a class; slides ran to 3.8x the
+        viewport. It is now a genuine paged summary — one idea per slide,
+        capped to `100svh`, 16KB against the report's 40KB, and it keeps the
+        currency toggle.
+      - Narrative validator: the year exemption accepted any amount from 1900
+        to 2099 (`£1,950` passed). Whole ISO dates present in the results are
+        now excluded first and bare four-digit runs must appear in the results;
+        scale words and spelled-out magnitudes are refused; and advice-like
+        phrasing is refused by code rather than only by prompt instruction.
+        All five adversarial probes now fail closed.
+
+## Known limitations recorded rather than hidden
+
+- **Lighthouse still not run.** Neither binary is installed and the permission
+  deny-list blocks installing one, so §8's ">=90 performance / >=95
+  accessibility" remains UNVERIFIED and is a human step. Contrast is now
+  computed in the test suite, which closes one thing Lighthouse would catch.
+- **True PWA installability is at odds with a single self-contained file.**
+  A service worker must be separately fetchable; `blob:` and `data:` scripts
+  are rejected. The report ships a complete manifest and is genuinely offline
+  once opened (it has no network dependencies at all), but a browser install
+  prompt needs a host page that serves a worker. Recorded as a deliberate
+  trade-off, not an omission.
+
+## PHASE_REVIEW_4 SHOULD-FIX (were untracked — now listed)
+
+Not yet done: float-rounding sweep (S1-S3); `fx.ts` hard-codes the USD pivot
+(S4); the cost stack reconciles against hand-typed constants rather than
+ingested figures (S6); three engine entry points do not take a ledger (S7);
+`latestHoldings` has no disposal semantics, so a sold holding never disappears
+(S8); the two currency columns are two different measurements and this is not
+stated (S9); concentration is measured against total rather than investable
+wealth (S10). Plus PHASE_REVIEW_5's 14 SHOULD-FIX, including table semantics
+(`scope`, `caption`) and non-text contrast below 3:1.
 
 ## Phase 5 findings
 
