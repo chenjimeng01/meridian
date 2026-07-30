@@ -35,6 +35,13 @@ export function renderReviewHtml(run: ParseRun, ledger: Ledger): string {
           } else if (m?.status === "candidates") {
             status = "confirm match";
           }
+          // An instrument whose classifying metadata the operator has not
+          // confirmed cannot be assessed for PFIC status (SPEC §7.1) — the
+          // review file is where that confirmation is asked for.
+          const existing = m?.instrumentId
+            ? ledger.instruments.find((i) => i.id === m.instrumentId)
+            : undefined;
+          const needsMetadata = !existing || existing.metadata_confirmed !== true;
           const low = h.confidence < LOW_CONFIDENCE;
           return `<li class="line${low ? " low" : ""}">
   <div class="name">${esc(h.name)}</div>
@@ -42,6 +49,7 @@ export function renderReviewHtml(run: ParseRun, ledger: Ledger): string {
   ${diff}
   <div class="meta"><span class="chip ${status === "new" ? "chip-new" : "chip-ok"}">${status}</span>
   <span class="conf">confidence ${h.confidence.toFixed(2)}</span>
+  ${needsMetadata ? '<span class="chip chip-new">confirm type &amp; domicile</span>' : ""}
   ${low ? '<span class="lownote">low confidence — page image unavailable (text ingest v0); check source document</span>' : ""}</div>
 </li>`;
         })

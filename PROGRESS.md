@@ -80,12 +80,16 @@ Cleared already: S5 (both new ledgers now inside the schema gate), S11 (the
 params sourcing rule now walks EVERY params file, not a hand-listed subset),
 S12 (the PHASE_REVIEW_2 carry-overs).
 
-- [ ] **S13 — highest priority.** Nothing in the pipeline can set
-      `metadata_confirmed`, so a *real* ingested ledger produces zero PFIC
-      flags: every instrument routes to `needs_classification`. §7 only works
-      on the hand-authored acceptance fixture. Confirming instrument metadata
-      must become an operator action in the Phase 4 CLI (`meridian review`),
-      recorded in the acceptance log like any other decision.
+- [x] **S13 FIXED.** Metadata confirmation is now a first-class operator
+      decision (`LineDecision.confirmMetadata` → `applyMetadataConfirmation`),
+      written to the acceptance log and surfaced in the review file as a
+      "confirm type & domicile" chip. `test/ingest-to-usconnect.test.ts` drives
+      the genuine ingest path end to end and proves both halves: unconfirmed,
+      every holding is `needs_classification` and nothing is declared safe;
+      confirmed, the real ledger flags the UK OEIC and the UCITS ETF as PFIC,
+      clears the direct securities, and clears the two '40 Act funds ONLY
+      because the operator confirmed their registration — withhold that one
+      field and Pioneer falls back to `needs_classification`.
 - [ ] S1/S2/S3 float hygiene: unrounded values leak into the `usconnect`
       result object; `Math.round` is used where the fx-policy mandates
       half-even; `convert()` rounds inside the engine, contradicting the policy

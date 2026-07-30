@@ -78,6 +78,21 @@ export interface ParseRun {
   matches: MatchResult[];
 }
 
+/**
+ * Operator confirmation of an instrument's classifying metadata (SPEC §7.1).
+ * The PFIC cascade refuses to run on ingest-inferred metadata, so without this
+ * every instrument routes to `needs_classification` and a real ledger produces
+ * no PFIC flags at all. Confirming is therefore an operator action, logged
+ * like any other decision — never something the parser may assert for itself.
+ */
+export interface MetadataConfirmation {
+  type?: string;
+  domicile?: string;
+  /** '40 Act registered — not knowable from a statement, so it must be confirmed. */
+  us_registered?: boolean;
+  hmrc_reporting_fund?: boolean;
+}
+
 /** One operator decision on one extracted line (SPEC §5.6). */
 export interface LineDecision {
   action: "accept" | "reject";
@@ -85,6 +100,8 @@ export interface LineDecision {
   edits?: { units?: number; value?: Money; book_cost?: Money; amount?: Money; date?: string };
   /** Confirms one of the fuzzy candidates proposed for this holding (SPEC §5.4). */
   instrumentId?: string;
+  /** Confirms the instrument's classifying metadata, unlocking the §7.1 cascade. */
+  confirmMetadata?: MetadataConfirmation;
   note?: string;
 }
 

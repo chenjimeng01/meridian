@@ -15,6 +15,7 @@ import type {
   ParseRun,
   TaxProfile,
   Instrument,
+  MetadataConfirmation,
 } from "./types.ts";
 
 export interface HouseholdConfig {
@@ -151,6 +152,30 @@ function cashInstrument(ledger: Ledger, currency: string, ids: IdFactory): strin
   return created.id;
 }
 
+/**
+ * Records the operator's confirmation of an instrument's classifying metadata
+ * (SPEC §7.1). Only after this may the PFIC cascade classify the instrument;
+ * before it, Module 3 returns `needs_classification` rather than risk a silent
+ * downgrade from a wrong inferred type or domicile.
+ */
+export function applyMetadataConfirmation(
+  ledger: Ledger,
+  instrumentId: string,
+  confirmation: MetadataConfirmation
+): void {
+  const instrument = ledger.instruments.find((i) => i.id === instrumentId);
+  if (!instrument) {
+    throw new Error(`applyMetadataConfirmation: instrument ${instrumentId} is not in the ledger`);
+  }
+  if (confirmation.type !== undefined) instrument.type = confirmation.type;
+  if (confirmation.domicile !== undefined) instrument.domicile = confirmation.domicile;
+  if (confirmation.us_registered !== undefined) instrument.us_registered = confirmation.us_registered;
+  if (confirmation.hmrc_reporting_fund !== undefined) {
+    instrument.hmrc_reporting_fund = confirmation.hmrc_reporting_fund;
+  }
+  instrument.metadata_confirmed = true;
+}
+
 const outcome = (decision: LineDecision): AcceptanceLine["action"] =>
   decision.action === "reject" ? "rejected" : decision.edits ? "edited" : "accepted";
 
@@ -226,6 +251,9 @@ export function acceptRun(
         return;
       }
       const instrumentId = resolveInstrument(ledger, holding, decision, match, ids);
+      if (decision.confirmMetadata) {
+        applyMetadataConfirmation(ledger, instrumentId, decision.confirmMetadata);
+      }
       const units = decision.edits?.units ?? holding.units;
       const value = decision.edits?.value ?? holding.value;
       ledger.holdings.push({
@@ -247,7 +275,11 @@ export function acceptRun(
         ref: holding.name,
         action,
         instrument_id: instrumentId,
-        ...(decision.note ? { note: decision.note } : {}),
+        ...(decision.note
+          ? { note: decision.note }
+          : decision.confirmMetadata
+            ? { note: "operator confirmed instrument metadata" }
+            : {}),
       });
     });
 
