@@ -29,10 +29,49 @@ review) and are not met.
   `params/{jurisdiction}/{tax_year}.json` with sources; no constants in engine code.
 - **Golden tests everywhere** — `npm test` gates every phase.
 
-## Running
+## See it working
 
 ```sh
-npm install     # also installs the §9 pre-commit rail via the prepare script
+npm install          # also installs the §9 pre-commit rail via the prepare script
+./scripts/demo.sh    # builds two households from synthetic statements, opens the report
+```
+
+That ingests 15 synthetic statements from 5 fictional institutions, accepts
+each parse, confirms instrument metadata, and produces:
+
+| | |
+|---|---|
+| the client report | mobile-first, ~40KB, self-contained, printable |
+| a screen-share deck | `--deck`, one idea per slide |
+| a UK-only household | to show the US-connected section vanish entirely |
+| a review screen | the redacted diff an operator accepts from |
+
+Add `--serve` to host them over http (`./scripts/demo.sh --serve`), which is
+how to look at the report on a phone — it is designed at 390px first.
+
+## Using it on your own documents
+
+```sh
+meridian() { node --import tsx src/cli/main.ts "$@"; }
+
+meridian households create --config my-household.json     # names/addresses -> the vault only
+meridian ingest statement.pdf --household <id>            # PDFs need pdftotext on PATH
+meridian review <run-id> --household <id> --accept-all \
+        --confirm-metadata instruments.json               # or --decisions for line-by-line
+meridian report --household <id> --asof 2026-06-30 --html
+```
+
+Copy `test/fixtures/household-config.json` as a starting point. Confirming each
+instrument's type, domicile and '40 Act registration is what unlocks the
+US/UK tax analysis — until an operator confirms them, every holding is
+reported as "needs classification" rather than assumed safe.
+
+**Before any third-party data**, work through `PRE_LAUNCH.md`. v0 is for
+synthetic and your own data only.
+
+## Running the tests
+
+```sh
 npm test
 ```
 
