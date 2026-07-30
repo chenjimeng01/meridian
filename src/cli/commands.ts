@@ -14,7 +14,7 @@ import { renderReviewHtml } from "../ingest/review-html.ts";
 import { extractWithClaude } from "../ingest/extract-llm.ts";
 import { fileAuditAppender } from "../ingest/audit.ts";
 import { buildResults, type Results } from "./results.ts";
-import type { LineDecision, LineRef, MetadataConfirmation, ParseRun } from "../ingest/types.ts";
+import type { Ledger, LineDecision, LineRef, MetadataConfirmation, ParseRun } from "../ingest/types.ts";
 
 export interface BaseOptions {
   dataRoot: string;
@@ -62,6 +62,8 @@ export interface IngestOptions extends BaseOptions {
   offline?: boolean;
   apiKey?: string;
   auditPath?: string;
+  /** Override the PDF→text converter (tests, or a different toolchain). */
+  convertPdf?: PdfConverter;
 }
 
 export interface IngestResult {
@@ -72,20 +74,41 @@ export interface IngestResult {
   accountsFound: number;
 }
 
-/**
- * §5 step 1-5. PDFs are converted to text here, at the boundary — the pipeline
- * itself only ever sees text (recorded decision, PROGRESS.md step 2.0).
- */
-function readDocument(file: string): string {
-  if (!existsSync(file)) throw new Error(`ingest: no such file ${file}`);
-  if (!file.toLowerCase().endsWith(".pdf")) return readFileSync(file, "utf8");
+/** Converts a PDF to text. Injectable so the branch is testable without poppler. */
+export type PdfConverter = (file: string) => string;
+
+const pdftotextConverter: PdfConverter = (file) => {
   try {
-    return execFileSync("pdftotext", ["-layout", "-enc", "UTF-8", file, "-"], { encoding: "utf8" });
+    execFileSync("pdftotext", ["-v"], { stdio: "ignore" });
   } catch {
     throw new Error(
-      `ingest: ${basename(file)} is a PDF and 'pdftotext' is not available. Install poppler-utils, or convert the document to text yourself and ingest that.`
+      `ingest: ${basename(file)} is a PDF and 'pdftotext' is not installed. Install poppler-utils, or convert the document to text yourself and ingest that.`
     );
   }
+  try {
+    return execFileSync("pdftotext", ["-layout", "-enc", "UTF-8", file, "-"], { encoding: "utf8" });
+  } catch (error) {
+    // A corrupt, encrypted or password-protected PDF is a different problem
+    // from a missing converter, and must not be reported as one.
+    throw new Error(
+      `ingest: could not extract text from ${basename(file)} — it may be corrupt, encrypted, or image-only. ${(error as Error).message}`
+    );
+  }
+};
+
+/**
+ * §5 step 1: fingerprint the FILE, then read it as text.
+ *
+ * The hash must be of the bytes the operator received, not of a rendering of
+ * them: two different PDFs can render to identical text, and a poppler upgrade
+ * would otherwise change a document's identity. `documents/` likewise keeps the
+ * original bytes — §3 calls it "raw uploaded PDFs".
+ */
+function readDocument(file: string, convertPdf: PdfConverter = pdftotextConverter): { raw: Buffer; text: string } {
+  if (!existsSync(file)) throw new Error(`ingest: no such file ${file}`);
+  const raw = readFileSync(file);
+  if (!file.toLowerCase().endsWith(".pdf")) return { raw, text: raw.toString("utf8") };
+  return { raw, text: convertPdf(file) };
 }
 
 export function cmdIngest(options: IngestOptions): IngestResult {
@@ -95,11 +118,11 @@ export function cmdIngest(options: IngestOptions): IngestResult {
   const createdAt = options.now();
   // Runs already on disk are not yet in the ledger, so they must be seeded in
   // too or a second ingest can reuse the first run's id and overwrite it.
-  const ids = ledgerIds(ledger, createdAt, store.listRuns());
+  const ids = ledgerIds(ledger, createdAt, store.listAllRunIds());
 
-  const rawText = readDocument(options.file);
-  const sha256 = createHash("sha256").update(rawText).digest("hex");
-  const documentPath = store.storeDocument(basename(options.file), rawText, sha256);
+  const { raw, text: rawText } = readDocument(options.file, options.convertPdf);
+  const sha256 = createHash("sha256").update(raw).digest("hex");
+  const documentPath = store.storeDocument(basename(options.file), raw, sha256);
 
   // This command is the offline path: the deterministic extractor, no egress.
   // Live model extraction is cmdIngestLive, which is async and audited.
@@ -119,7 +142,10 @@ export function cmdIngest(options: IngestOptions): IngestResult {
     });
   } catch (error) {
     // §5.3: a document we cannot turn into schema-valid output is parked for
-    // manual entry rather than silently dropped.
+    // manual entry rather than silently dropped. Persist the vault first —
+    // redaction may have allocated account tokens, and §5.2 requires them to
+    // stay stable whether or not the parse succeeded.
+    store.saveVault(vault);
     const runId = ids();
     store.parkRun(runId, {
       "error.txt": `${(error as Error).message}\n`,
@@ -161,7 +187,7 @@ export async function cmdIngestLive(options: IngestOptions & { apiKey: string })
   const store = openStore(options.dataRoot, options.householdId);
   const vault = store.loadVault();
   const createdAt = options.now();
-  const rawText = readDocument(options.file);
+  const { raw, text: rawText } = readDocument(options.file, options.convertPdf);
   const auditPath = options.auditPath ?? join(process.cwd(), "NETWORK_AUDIT.md");
 
   const { redactStatement } = await import("../ingest/redact.ts");
@@ -178,9 +204,9 @@ export async function cmdIngestLive(options: IngestOptions & { apiKey: string })
 
   // Re-run the deterministic pipeline steps over the model's output.
   const ledger = store.loadLedger();
-  const ids = ledgerIds(ledger, createdAt, store.listRuns());
-  const sha256 = createHash("sha256").update(rawText).digest("hex");
-  const documentPath = store.storeDocument(basename(options.file), rawText, sha256);
+  const ids = ledgerIds(ledger, createdAt, store.listAllRunIds());
+  const sha256 = createHash("sha256").update(raw).digest("hex");
+  const documentPath = store.storeDocument(basename(options.file), raw, sha256);
   const run: ParseRun = {
     id: ids(),
     filename: basename(options.file),
@@ -223,6 +249,8 @@ export interface ReviewOptions extends BaseOptions {
   householdId: string;
   runId: string;
   acceptAll?: boolean;
+  /** Reverse a previous acceptance of this run and apply it again. */
+  reaccept?: boolean;
   decisionsPath?: string;
   /** Map of instrument name → confirmed metadata (SPEC §7.1 gate). */
   confirmMetadataPath?: string;
@@ -234,6 +262,29 @@ export interface ReviewResult {
   rejected: number;
   edited: number;
   metadataConfirmed: number;
+  reaccepted?: boolean;
+}
+
+/**
+ * Removes everything a previous acceptance of this run put into the ledger, so
+ * the run can be applied again cleanly. Instruments are deliberately left in
+ * place: they may be referenced by other documents, and an instrument carries
+ * operator-confirmed metadata that should survive a re-review.
+ */
+export function reverseAcceptance(ledger: Ledger, documentId: string, runId: string): void {
+  const removedFxSources = new Set(
+    ledger.documents.filter((d) => d.id === documentId).map((d) => `statement:${d.filename.replace(/\.txt$/, "")}`)
+  );
+  ledger.documents = ledger.documents.filter((d) => d.id !== documentId);
+  ledger.holdings = ledger.holdings.filter((h) => h.source_document_id !== documentId);
+  ledger.transactions = ledger.transactions.filter((t) => t.source_document_id !== documentId);
+  ledger.acceptances = ledger.acceptances.filter((a) => a.document_id !== documentId && a.parse_run_id !== runId);
+  ledger.fx_rates = ledger.fx_rates.filter((r) => !removedFxSources.has(r.source));
+  // An account's freshness must fall back to whatever evidence still stands.
+  for (const account of ledger.accounts) {
+    const remaining = ledger.holdings.filter((h) => h.account_id === account.id).map((h) => h.asof).sort();
+    if (remaining.length) account.data_asof = remaining[remaining.length - 1]!;
+  }
 }
 
 export function cmdReview(options: ReviewOptions): ReviewResult {
@@ -241,7 +292,21 @@ export function cmdReview(options: ReviewOptions): ReviewResult {
   const ledger = store.loadLedger();
   const { output, meta } = store.loadRun(options.runId);
   const acceptedAt = options.now();
-  const ids = ledgerIds(ledger, acceptedAt);
+
+  // §5.6 models one acceptance per run. Applying a run twice adds a second
+  // document, duplicate fee transactions and a duplicate appendix entry — the
+  // cost-stack headline moves by the full duplicated amount, with no error.
+  const priorDocument = ledger.documents.find((d) => d.parse_run_ids.includes(options.runId));
+  if (priorDocument) {
+    if (!options.reaccept) {
+      throw new Error(
+        `review: run ${options.runId} was already accepted at ${priorDocument.accepted_at ?? "an earlier time"} (document ${priorDocument.id}). Re-run with --reaccept to reverse that acceptance and apply it again.`
+      );
+    }
+    reverseAcceptance(ledger, priorDocument.id, options.runId);
+  }
+
+  const ids = ledgerIds(ledger, acceptedAt, store.listAllRunIds());
 
   const decisions: DecisionsFile = options.decisionsPath
     ? (JSON.parse(readFileSync(options.decisionsPath, "utf8")) as DecisionsFile)
@@ -296,9 +361,9 @@ export function cmdReview(options: ReviewOptions): ReviewResult {
   });
   store.saveLedger(ledger);
   store.saveRun(options.runId, {
-    "accepted.json": JSON.stringify({ acceptedAt, ...tally }, null, 2) + "\n",
+    "accepted.json": JSON.stringify({ acceptedAt, accepted: true, tally }, null, 2) + "\n",
   });
-  return tally;
+  return options.reaccept ? { ...tally, reaccepted: true } : tally;
 }
 
 // --- report -----------------------------------------------------------------

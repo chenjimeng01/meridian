@@ -206,6 +206,10 @@ export interface Transaction {
   date: string;
   type: string;
   instrument_id: string | null;
+  /** As disclosed on the source document. */
+  label?: string;
+  /** SPEC §6.3 cost category, carried through from the parse output. */
+  category?: string;
   units?: number;
   gross?: Money;
   fees?: Money;

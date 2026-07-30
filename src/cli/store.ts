@@ -24,11 +24,12 @@ export interface HouseholdStore {
   saveLedger(ledger: Ledger): void;
   loadVault(): Vault;
   saveVault(vault: Vault): void;
-  storeDocument(filename: string, contents: string, sha256: string): string;
+  storeDocument(filename: string, contents: Buffer, sha256: string): string;
   runDir(runId: string): string;
   saveRun(runId: string, files: Record<string, string>): string;
   parkRun(runId: string, files: Record<string, string>): string;
   listRuns(): string[];
+  listAllRunIds(): string[];
   loadRun(runId: string): { output: ParseOutput; meta: RunMeta };
   saveReport(name: string, contents: string): string;
 }
@@ -43,6 +44,20 @@ export interface RunMeta {
 }
 
 const SUBDIRS = ["documents", "parse-runs", "reports"];
+
+/**
+ * The household config with direct identifiers removed. Tokens, tax profiles
+ * and account ownership are needed to run the pipeline; real names and
+ * addresses are not, and belong only in the vault (SPEC §5.2, §9).
+ */
+export function stripIdentifiers(config: HouseholdConfig & { addresses?: string[] }): HouseholdConfig {
+  const { addresses: _addresses, ...rest } = config as HouseholdConfig & { addresses?: string[] };
+  void _addresses;
+  return {
+    ...rest,
+    persons: config.persons.map((person) => ({ ...person, names: [] })),
+  };
+}
 
 export function householdDir(dataRoot: string, householdId: string): string {
   return join(dataRoot, householdId);
@@ -72,7 +87,11 @@ export function createHousehold(
   }
   mkdirSync(dir, { recursive: true });
   for (const sub of SUBDIRS) mkdirSync(join(dir, sub), { recursive: true });
-  writeFileSync(join(dir, "household.json"), JSON.stringify(config, null, 2) + "\n");
+  // SPEC §5.2: names and addresses live in the vault and NOWHERE else. Writing
+  // the operator's config verbatim would leave a second, world-readable copy of
+  // exactly what the vault's mode-600 rail exists to protect.
+  writeFileSync(join(dir, "household.json"), JSON.stringify(stripIdentifiers(config), null, 2) + "\n");
+  chmodSync(join(dir, "household.json"), 0o600);
   writeFileSync(join(dir, "ledger.json"), serializeLedger(ledger));
   saveVault(join(dir, "vault.local.json"), createVault(config, salt));
   return openStore(dataRoot, householdId);
@@ -123,7 +142,13 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
       for (const [name, contents] of Object.entries(files)) writeFileSync(join(target, name), contents);
       return target;
     },
-    parkRun: (runId, files) => write("failed", runId, files),
+    parkRun: (runId, files) => {
+      const target = write("failed", runId, files);
+      // The parked source is the RAW, unredacted document — same sensitivity as
+      // documents/, so the same mode.
+      for (const name of Object.keys(files)) chmodSync(join(target, name), 0o600);
+      return target;
+    },
     listRuns: () => {
       const runsDir = join(dir, "parse-runs");
       if (!existsSync(runsDir)) return [];
@@ -131,6 +156,24 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
         .filter((e) => e.isDirectory() && e.name !== "failed")
         .map((e) => e.name)
         .sort();
+    },
+    // Every run id ever minted, parked ones included. Ids must be seeded from
+    // this, not listRuns(): a parked run is persisted state, and a factory that
+    // cannot see it will reissue its id and overwrite the parked document —
+    // silent loss on the one path §5.3 exists to prevent.
+    listAllRunIds: () => {
+      const runsDir = join(dir, "parse-runs");
+      if (!existsSync(runsDir)) return [];
+      const ids = readdirSync(runsDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && e.name !== "failed")
+        .map((e) => e.name);
+      const failedDir = join(runsDir, "failed");
+      if (existsSync(failedDir)) {
+        for (const entry of readdirSync(failedDir, { withFileTypes: true })) {
+          if (entry.isDirectory()) ids.push(entry.name);
+        }
+      }
+      return ids.sort();
     },
     loadRun: (runId) => {
       const target = join(dir, "parse-runs", runId);

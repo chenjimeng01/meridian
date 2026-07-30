@@ -1140,6 +1140,8 @@
       "date": "2024-04-05",
       "type": "fee",
       "instrument_id": null,
+      "label": "Annual scheme administration fee",
+      "category": "platform",
       "gross": {
         "amount": 250,
         "currency": "GBP"
@@ -1185,6 +1187,8 @@
       "date": "2025-04-05",
       "type": "fee",
       "instrument_id": null,
+      "label": "Annual scheme administration fee",
+      "category": "platform",
       "gross": {
         "amount": 255,
         "currency": "GBP"
@@ -1230,6 +1234,8 @@
       "date": "2026-04-05",
       "type": "fee",
       "instrument_id": null,
+      "label": "Annual scheme administration fee",
+      "category": "platform",
       "gross": {
         "amount": 260,
         "currency": "GBP"
@@ -1320,6 +1326,8 @@
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Discretionary management fee",
+      "category": "platform",
       "gross": {
         "amount": 750,
         "currency": "GBP"
@@ -1335,6 +1343,8 @@
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Underlying fund ongoing charges",
+      "category": "fund_ocf",
       "gross": {
         "amount": 180,
         "currency": "GBP"
@@ -1350,6 +1360,8 @@
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Transaction costs",
+      "category": "transaction",
       "gross": {
         "amount": 95,
         "currency": "GBP"
@@ -1365,6 +1377,8 @@
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Foreign exchange spreads",
+      "category": "fx_spread",
       "gross": {
         "amount": 40,
         "currency": "GBP"
@@ -1380,6 +1394,8 @@
       "date": "2023-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Incidental costs",
+      "category": "incidental",
       "gross": {
         "amount": 15,
         "currency": "GBP"
@@ -1395,6 +1411,8 @@
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Discretionary management fee",
+      "category": "platform",
       "gross": {
         "amount": 785,
         "currency": "GBP"
@@ -1410,6 +1428,8 @@
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Underlying fund ongoing charges",
+      "category": "fund_ocf",
       "gross": {
         "amount": 190,
         "currency": "GBP"
@@ -1425,6 +1445,8 @@
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Transaction costs",
+      "category": "transaction",
       "gross": {
         "amount": 110,
         "currency": "GBP"
@@ -1440,6 +1462,8 @@
       "date": "2024-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Foreign exchange spreads",
+      "category": "fx_spread",
       "gross": {
         "amount": 45,
         "currency": "GBP"
@@ -1455,6 +1479,8 @@
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Discretionary management fee",
+      "category": "platform",
       "gross": {
         "amount": 820,
         "currency": "GBP"
@@ -1470,6 +1496,8 @@
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Underlying fund ongoing charges",
+      "category": "fund_ocf",
       "gross": {
         "amount": 198,
         "currency": "GBP"
@@ -1485,6 +1513,8 @@
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Transaction costs",
+      "category": "transaction",
       "gross": {
         "amount": 88,
         "currency": "GBP"
@@ -1500,6 +1530,8 @@
       "date": "2025-12-31",
       "type": "fee",
       "instrument_id": null,
+      "label": "Foreign exchange spreads",
+      "category": "fx_spread",
       "gross": {
         "amount": 52,
         "currency": "GBP"

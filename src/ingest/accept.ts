@@ -321,6 +321,10 @@ export function acceptRun(
           date: decision.edits?.date ?? fee.period?.to ?? src.period.to,
           type: "fee",
           instrument_id: null,
+          // §6.3 needs the disclosed label and category; fabricating them
+          // downstream would make the breakdown untraceable to any document.
+          label: fee.label,
+          category: fee.category,
           gross: amount,
           net: amount,
           source_document_id: docId,

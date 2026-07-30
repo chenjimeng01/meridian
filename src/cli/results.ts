@@ -10,6 +10,8 @@ import { assessRisk, type RiskResult } from "../engine/risk.ts";
 import { costStack, compoundingDrag, type CostStackResult, type CompoundingDragResult } from "../engine/cost.ts";
 import { convert, type FxContext } from "../engine/fx.ts";
 import { analyseUsConnect } from "../usconnect/index.ts";
+import { buildPerformance, type BenchmarkAssignment, type PerformanceSection } from "./performance-adapter.ts";
+import type { IndexSeries } from "../engine/benchmark.ts";
 import type { Ledger } from "../ingest/types.ts";
 
 const DEFAULT_PARAMS_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../params");
@@ -17,6 +19,12 @@ const DEFAULT_PARAMS_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..
 /** Growth assumption for the §6.3 twenty-year drag projection. Operator-set. */
 const DEFAULT_GROWTH_ASSUMPTION = 0.05;
 const DRAG_YEARS = 20;
+
+/** The same calendar day one year earlier — the cost window's exclusive start. */
+function isoYearBefore(isoDate: string): string {
+  const [y, m, d] = isoDate.split("-");
+  return `${Number(y) - 1}-${m}-${d}`;
+}
 
 export interface Results {
   meta: {
@@ -28,8 +36,9 @@ export interface Results {
     secondary_currency?: string;
   };
   consolidation: ConsolidationResult;
+  performance: PerformanceSection;
   risk: RiskResult;
-  costStack: CostStackResult;
+  costStack: CostStackResult & { period: { from: string; to: string }; accountsWithoutDisclosure: string[] };
   compoundingDrag: CompoundingDragResult;
   usConnect: unknown | null;
   appendix: {
@@ -57,6 +66,8 @@ export interface BuildResultsInput {
   generatedAt: string;
   paramsRoot?: string;
   growthAssumption?: number;
+  /** SPEC §6.2 user-assigned composite, e.g. { "global_equity_gbp": 0.6, ... }. */
+  benchmark?: BenchmarkAssignment;
 }
 
 export function buildResults(input: BuildResultsInput): Results {
@@ -101,22 +112,37 @@ export function buildResults(input: BuildResultsInput): Results {
       );
     }
   }
+  // §6.3 asks for "total ANNUAL £ and bps". Summing every fee ever ingested
+  // would present four years of charges as one year's cost and then compound
+  // that inflated rate for twenty years.
+  const costPeriod = { from: isoYearBefore(asof), to: asof };
   const documentById = new Map(ledger.documents.map((d) => [d.id, d]));
-  const costAccounts = ledger.accounts
-    .map((account) => {
-      const totals = accountTotals.get(account.id) ?? [];
-      const averageValue = totals.length ? totals.reduce((t, v) => t + v, 0) / totals.length : 0;
-      const fees = ledger.transactions
-        .filter((t) => t.account_id === account.id && t.type === "fee" && t.date <= asof)
-        .map((t) => ({
-          label: `Charges ${t.date}`,
-          category: "platform",
-          amount: t.gross ?? { amount: 0, currency: base },
-          sourceDocument: documentById.get(t.source_document_id ?? "")?.filename ?? "manual entry",
-        }));
-      return { accountToken: account.account_token, averageValue: { amount: averageValue, currency: base }, fees };
-    })
-    .filter((entry) => entry.fees.length > 0);
+  const accountsWithFees = new Set<string>();
+  const costAccounts = ledger.accounts.map((account) => {
+    const totals = accountTotals.get(account.id) ?? [];
+    const averageValue = totals.length ? totals.reduce((t, v) => t + v, 0) / totals.length : 0;
+    const fees = ledger.transactions
+      .filter(
+        (t) =>
+          t.account_id === account.id &&
+          t.type === "fee" &&
+          t.date > costPeriod.from &&
+          t.date <= costPeriod.to
+      )
+      .map((t) => ({
+        // The disclosed label and category, not fabricated ones — §6.3's
+        // standard is that every number is traceable to a document.
+        label: t.label ?? `Charges ${t.date}`,
+        category: t.category ?? "other",
+        amount: t.gross ?? { amount: 0, currency: base },
+        sourceDocument: documentById.get(t.source_document_id ?? "")?.filename ?? "manual entry",
+      }));
+    if (fees.length) accountsWithFees.add(account.account_token);
+    // Every account contributes its value to the denominator, whether or not it
+    // disclosed a fee. Measuring the rate on only the accounts that happened to
+    // disclose one, then applying it to the whole portfolio, overstates it.
+    return { accountToken: account.account_token, averageValue: { amount: averageValue, currency: base }, fees };
+  });
 
   const stack = costStack({ accounts: costAccounts, baseCurrency: base });
   const growth = input.growthAssumption ?? DEFAULT_GROWTH_ASSUMPTION;
@@ -125,6 +151,36 @@ export function buildResults(input: BuildResultsInput): Results {
     grossGrowthRate: growth,
     annualFeeRate: stack.total.bps / 10_000,
     years: DRAG_YEARS,
+  });
+  const undisclosed = ledger.accounts
+    .filter((a) => !accountsWithFees.has(a.account_token))
+    .map((a) => a.account_token);
+
+  // §6.2 performance and benchmark. The series are the bundled monthly indices;
+  // the composite is whatever the operator assigned for this household.
+  const benchmarkSeries = ["global_equity_gbp", "global_bonds_gbp", "us_equity_usd", "gbp_cash"];
+  const seriesByName: Record<string, IndexSeries> = {};
+  for (const name of benchmarkSeries) {
+    try {
+      seriesByName[name] = readParams(`shared/benchmarks/${name}.json`) as IndexSeries;
+    } catch {
+      // A missing bundled series is not fatal; the comparison simply says so.
+    }
+  }
+  let cpi: IndexSeries | undefined;
+  try {
+    cpi = readParams(base === "USD" ? "shared/benchmarks/cpi_us.json" : "shared/benchmarks/cpi_uk.json") as IndexSeries;
+  } catch {
+    cpi = undefined;
+  }
+  const performance = buildPerformance({
+    ledger,
+    base,
+    fx,
+    asof,
+    seriesByName,
+    ...(cpi ? { cpi } : {}),
+    ...(input.benchmark ? { benchmark: input.benchmark } : {}),
   });
 
   const usConnect = analyseUsConnect({
@@ -143,14 +199,18 @@ export function buildResults(input: BuildResultsInput): Results {
     .map((i) => i.name)
     .sort();
 
-  const warnings = [...consolidation.warnings, ...risk.warnings, ...costWarnings];
+  const warnings = [...consolidation.warnings, ...risk.warnings, ...costWarnings, ...performance.warnings];
   if (instrumentsNeedingConfirmation.length) {
     warnings.push(
       `${instrumentsNeedingConfirmation.length} held instrument(s) have unconfirmed metadata, so they cannot be assessed for PFIC status and appear as "needs classification"`
     );
   }
-  if (!costAccounts.length) {
-    warnings.push("no cost disclosures have been ingested, so the cost stack is empty rather than zero");
+  if (!accountsWithFees.size) {
+    warnings.push("no cost disclosures have been ingested for this period, so the cost stack is empty rather than zero");
+  } else if (undisclosed.length) {
+    warnings.push(
+      `costs cover the year to ${asof}; ${undisclosed.length} account(s) (${undisclosed.join(", ")}) disclosed no charges in that period, so the true total is at least this figure`
+    );
   }
 
   return {
@@ -163,8 +223,9 @@ export function buildResults(input: BuildResultsInput): Results {
       ...(ledger.household.secondary_currency ? { secondary_currency: ledger.household.secondary_currency } : {}),
     },
     consolidation,
+    performance,
     risk,
-    costStack: stack,
+    costStack: { ...stack, period: costPeriod, accountsWithoutDisclosure: undisclosed },
     compoundingDrag: drag,
     usConnect,
     appendix: {

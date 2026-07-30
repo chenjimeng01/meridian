@@ -25,6 +25,10 @@ function collectIds(ledger: Ledger): Set<string> {
   for (const instrument of ledger.instruments) ids.add(instrument.id);
   for (const document of ledger.documents) ids.add(document.id);
   for (const acceptance of ledger.acceptances) ids.add(acceptance.id);
+  // Run ids share the id namespace, and a document remembers the run that
+  // produced it. Without these a review can reissue a run's id as a ledger id,
+  // so an id no longer names exactly one thing (SPEC §4).
+  for (const document of ledger.documents) for (const runId of document.parse_run_ids) ids.add(runId);
   return ids;
 }
 

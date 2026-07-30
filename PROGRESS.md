@@ -1,9 +1,9 @@
 # PROGRESS
 
-**Current phase:** 4 — CLI wiring (SPEC §10 Phase 4)
-**Status:** acceptance gate met (140/140 green, lint + typecheck clean) —
-awaiting phase-gate structural review
-**Last completed step:** 4.6 end-to-end verified from a real shell
+**Current phase:** 4 complete — Phase 5 (mobile-first report) may open
+**Status:** `npm test` green (148/148), lint + typecheck clean;
+PHASE_REVIEW_4 MUST-FIX items all resolved, 0 open
+**Last completed step:** 4.8 MUST-FIX resolution
 
 ## Phase 4 step plan
 
@@ -26,7 +26,38 @@ on the fixture household.
       cascade; refuses to guess if given neither
 - [x] 4.6 `meridian report`: runs the whole engine + Module 3 into a results
       JSON with the §8 data appendix (source document AND parse date per figure)
-- [ ] 4.7 Phase gate: structural review → PHASE_REVIEW_4.md
+- [x] 4.7 Phase gate: PHASE_REVIEW_4.md (Opus reviewer) — 7 MUST-FIX,
+      20 SHOULD-FIX, 16 NOTE
+- [x] 4.8 MUST-FIX resolution (148/148 green):
+      - M1 PDF path: the fingerprint is now of the FILE, not of its text
+        rendering (two PDFs can render identically; a poppler upgrade would
+        otherwise change a document's identity), and `documents/` keeps the
+        original bytes rather than text under a .pdf name. The converter is
+        injectable, so the branch is now genuinely exercised, and a missing
+        converter is reported differently from a corrupt or encrypted PDF.
+      - M2 id collisions: `collectIds` now includes `documents[].parse_run_ids`,
+        every mint site seeds from `listAllRunIds()` (which descends into
+        failed/), and the CLI clock keeps millisecond precision. Two
+        unparseable documents ingested in the same second previously
+        overwrote each other in parse-runs/failed/ — silent loss on the one
+        path §5.3 exists to prevent.
+      - M3 `review` is idempotent: re-accepting a run is refused by default
+        (it silently duplicated documents, holdings and fee transactions,
+        moving the cost headline by the full duplicated amount), with
+        `--reaccept` reversing the prior acceptance first.
+      - M4 the cost stack is windowed to a stated year and its bps denominator
+        is the whole portfolio — the same base the 20-year drag is applied to.
+        The headline fell from £4,133/226.92bps (four years presented as one)
+        to £1,418/33.62bps, and the drag from £415,690 to £72,952.
+      - M5 fee `label` and `category` now survive the ledger round-trip, so
+        the breakdown is the document's own (platform 1,080 / fund OCF 198 /
+        transaction 88 / FX 52) rather than 100% "platform".
+      - M6 §6.2 performance is in the results JSON via a new ledger→
+        Valuation[]/Flow[] adapter, with the method label and an optional
+        benchmark comparison. This also closes PHASE_REVIEW_3 S7.
+      - M7 §9: `household.json` no longer duplicates the vault's names and
+        addresses and is mode 600; a parked raw document is mode 600; the
+        vault is persisted before the park path re-throws.
 
 ## Phase 3 step plan
 
@@ -98,6 +129,14 @@ produces no US-module output at all.
       which immediately caught a `"non_ltr"`/`"not_ltr"` typo in a test.
 
 ## Phase 4 findings
+
+- **A fabricated +180% return.** Building the portfolio valuation series by
+  summing whatever snapshots shared a date meant accounts arriving mid-period
+  read as growth: the fixture reported +180% where the truth is +1.27% over the
+  window in which every account is actually represented. Portfolio values are
+  now carried forward per account and the series starts only once every account
+  has a valuation, with the truncation stated. Found by reading the CLI output,
+  not by any test.
 
 - **Run-id collision (found by the end-to-end test).** Parse runs live on disk
   before anything they contain reaches the ledger, so with a fixed clock and an

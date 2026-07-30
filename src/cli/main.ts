@@ -45,6 +45,7 @@ Common flags:
   --data-root <dir>        where household data lives (default ${DEFAULT_DATA_ROOT})
   --offline                refuse all network egress (ingest)
   --accept-all             accept every line of a run (review)
+  --reaccept               reverse a prior acceptance and apply the run again
   --decisions <file>       per-line decisions JSON (review)
   --confirm-metadata <f>   instrument name -> confirmed type/domicile (review)
 
@@ -66,7 +67,9 @@ async function main(argv: string[]): Promise<number> {
 
   const dataRoot = typeof flags["data-root"] === "string" ? flags["data-root"] : DEFAULT_DATA_ROOT;
   // The single point at which wall-clock time enters the system.
-  const now = () => new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+  // Full millisecond precision: truncating to whole seconds widens every
+  // id-collision window a thousandfold for no benefit.
+  const now = () => new Date().toISOString();
 
   switch (command) {
     case "households": {
@@ -113,6 +116,7 @@ async function main(argv: string[]): Promise<number> {
         householdId: requireFlag(flags, "household"),
         runId,
         acceptAll: flags["accept-all"] === true,
+        reaccept: flags.reaccept === true,
         ...(typeof flags.decisions === "string" ? { decisionsPath: flags.decisions } : {}),
         ...(typeof flags["confirm-metadata"] === "string" ? { confirmMetadataPath: flags["confirm-metadata"] } : {}),
         ...(typeof flags.operator === "string" ? { operatorInitials: flags.operator } : {}),

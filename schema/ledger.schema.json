@@ -189,6 +189,15 @@
           "instrument_id": {
             "oneOf": [{ "$ref": "#/$defs/ulid" }, { "type": "null" }]
           },
+          "label": {
+            "type": "string",
+            "description": "The description as disclosed on the source document, kept verbatim."
+          },
+          "category": {
+            "type": "string",
+            "enum": ["platform", "fund_ocf", "advice", "transaction", "fx_spread", "incidental", "other"],
+            "description": "Cost category for SPEC §6.3. Extracted from the document; without it the cost stack cannot report the breakdown §6.3 names."
+          },
           "units": { "type": "number" },
           "gross": { "$ref": "#/$defs/money" },
           "fees": { "$ref": "#/$defs/money" },
