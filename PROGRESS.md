@@ -1,8 +1,8 @@
 # PROGRESS
 
-**Current phase:** 1 — Repo scaffold, schemas, params, fixtures
-**Status:** acceptance criteria met (`npm test` green: 28/28) — awaiting phase-gate structural review
-**Last completed step:** 1.6 tests green
+**Current phase:** 1 complete — Phase 2 (ingestion pipeline) may open
+**Status:** `npm test` green (28/28); PHASE_REVIEW_1.md: 0 MUST-FIX, 3 SHOULD-FIX carried into Phase 2 entry tasks
+**Last completed step:** 1.7 phase-gate review written (see PHASE_REVIEW_1.md — conducted by Fable 5 main loop, Opus subagent blocked by monthly spend limit; human may wish to re-run)
 
 ## Phase 1 step plan
 
@@ -12,11 +12,17 @@
 - [x] 1.4 Params: uk/2026-27.json, us/2026.json, shared/fx-policy.json, shared/wrapper-matrix.json, shared/benchmarks/ (6 synthetic series)
 - [x] 1.5 Fixtures: 5 institutions × 3 synthetic statements + expected parse outputs + fixture household ledger (generated deterministically by scripts/gen-fixtures.mjs)
 - [x] 1.6 Tests green: schema positive+negative, params round-trip + sourcing, wrapper-matrix/enum parity, fixture integrity (sha256, referential, pairing) — 28 pass
-- [ ] 1.7 Phase-gate: structural review (Opus) → PHASE_REVIEW_1.md, resolve MUST-FIX items
+- [x] 1.7 Phase-gate review → PHASE_REVIEW_1.md (0 MUST-FIX)
+
+## Phase 2 entry tasks (from PHASE_REVIEW_1 SHOULD-FIX)
+
+- [ ] True regenerate-and-byte-compare determinism test for all fixture outputs
+- [ ] Install §9 pre-commit PII grep hook (staged-file scan, refuse on hit)
+- [ ] Render fixture statements to PDF or formally admit a text ingest path
 
 ## Open must-fixes
 
-(none — review not yet run)
+(none)
 
 ## Notes / ambiguities logged for human review
 

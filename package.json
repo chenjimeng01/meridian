@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node --import tsx --test test/schema.test.ts test/params.test.ts test/fixtures.test.ts",
-    "lint": "eslint src test",
+    "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"schema/**/*.json\" \"params/**/*.json\"",
     "typecheck": "tsc --noEmit"
   },

@@ -21,8 +21,6 @@ let ulidCounter = 0;
 const nextUlid = () => ulid(++ulidCounter);
 
 const r2 = (x) => Math.round(x * 100) / 100;
-const gbp = (amount) => ({ amount: r2(amount), currency: "GBP" });
-const usd = (amount) => ({ amount: r2(amount), currency: "USD" });
 const fmt = (n) =>
   n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
