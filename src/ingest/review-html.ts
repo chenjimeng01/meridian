@@ -48,7 +48,7 @@ export function renderReviewHtml(run: ParseRun, ledger: Ledger): string {
         .join("\n");
 
       const cash = acct.cash_balance
-        ? `<li class="line"><div class="name">Cash balance</div><div class="figures"><strong>${esc(money(acct.cash_balance))}</strong></div><div class="meta"><span class="chip chip-ok">update</span></div></li>`
+        ? `<li class="line"><div class="name">Cash balance</div><div class="figures"><strong>${esc(money(acct.cash_balance))}</strong></div><div class="meta"><span class="chip chip-ok">update</span><span class="conf">confidence ${acct.cash_balance.confidence.toFixed(2)}</span></div></li>`
         : "";
       const fees = (acct.fees ?? [])
         .map((f) => `<li class="line"><div class="name">${esc(f.label)}</div><div class="figures">${esc(f.category)} · <strong>${esc(money(f.amount))}</strong>${f.rate_bps ? ` · ${esc(f.rate_bps)} bps` : ""}</div><div class="meta"><span class="chip chip-new">new</span><span class="conf">confidence ${f.confidence.toFixed(2)}</span></div></li>`)

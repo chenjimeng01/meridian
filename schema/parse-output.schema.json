@@ -38,7 +38,8 @@
             "properties": {
               "pair": { "type": "string", "pattern": "^[A-Z]{6}$" },
               "rate": { "type": "number", "exclusiveMinimum": 0 },
-              "date": { "$ref": "#/$defs/isoDate" }
+              "date": { "$ref": "#/$defs/isoDate" },
+              "confidence": { "$ref": "#/$defs/confidence" }
             }
           }
         }
@@ -89,7 +90,7 @@
               }
             }
           },
-          "cash_balance": { "$ref": "#/$defs/money" },
+          "cash_balance": { "$ref": "#/$defs/scoredMoney" },
           "fees": {
             "type": "array",
             "items": {
@@ -172,6 +173,17 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1
+    },
+    "scoredMoney": {
+      "description": "Money carrying its own extraction confidence. SPEC \u00a75.5 requires EVERY extracted figure to be scored; cash is often the largest single line on a private-bank statement.",
+      "type": "object",
+      "required": ["amount", "currency", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "amount": { "type": "number" },
+        "currency": { "$ref": "#/$defs/currency" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
     }
   }
 }

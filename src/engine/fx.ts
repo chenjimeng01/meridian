@@ -22,6 +22,13 @@ export interface FxRate {
 export interface FxResult extends Money {
   rate: number;
   rateDate: string;
+  /**
+   * The unrounded converted amount. `amount` is rounded for presentation; the
+   * policy is that the engine keeps full precision internally, so anything
+   * that aggregates before displaying must use this (SPEC fx-policy rounding:
+   * "banker's rounding on presentation only").
+   */
+  exact: number;
   /** Set when the rate was derived by triangulation rather than quoted directly. */
   via?: string;
   warnings: string[];
@@ -108,7 +115,7 @@ export function convert(money: Money, target: string, asof: string, ctx: FxConte
   const dp = policy.rounding.value.amount_decimal_places;
 
   if (money.currency === target) {
-    return { amount: money.amount, currency: target, rate: 1, rateDate: asof, warnings: [] };
+    return { amount: money.amount, currency: target, exact: money.amount, rate: 1, rateDate: asof, warnings: [] };
   }
 
   const direct = findRate(money.currency, target, asof, ctx.rates);
@@ -122,6 +129,7 @@ export function convert(money: Money, target: string, asof: string, ctx: FxConte
     return {
       amount: roundHalfEven(money.amount * direct.rate, dp),
       currency: target,
+      exact: money.amount * direct.rate,
       rate: direct.rate,
       rateDate: direct.date,
       warnings: stalenessWarning(asof, direct.date, maxClean),
@@ -145,6 +153,7 @@ export function convert(money: Money, target: string, asof: string, ctx: FxConte
       return {
         amount: roundHalfEven(money.amount * rate, dp),
         currency: target,
+        exact: money.amount * rate,
         rate,
         rateDate: oldest,
         via: pivot,

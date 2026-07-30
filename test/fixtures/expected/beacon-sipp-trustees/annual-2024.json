@@ -51,7 +51,8 @@
       ],
       "cash_balance": {
         "amount": 2150,
-        "currency": "GBP"
+        "currency": "GBP",
+        "confidence": 0.98
       },
       "fees": [
         {

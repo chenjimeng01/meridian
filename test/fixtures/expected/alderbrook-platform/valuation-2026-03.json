@@ -67,7 +67,8 @@
       ],
       "cash_balance": {
         "amount": 1210.11,
-        "currency": "GBP"
+        "currency": "GBP",
+        "confidence": 0.98
       }
     },
     {
@@ -111,7 +112,8 @@
       ],
       "cash_balance": {
         "amount": 95.4,
-        "currency": "GBP"
+        "currency": "GBP",
+        "confidence": 0.98
       }
     }
   ],

@@ -34,25 +34,102 @@ export function daysBetween(from: string, to: string): number {
 }
 
 /**
- * True time-weighted return: each sub-period return is computed on the value
- * before any flow at its end, then the sub-periods are geometrically linked.
- * Flows therefore have no effect on the result, which is the point — TWR
- * measures the manager, not the timing of the client's contributions.
+ * One observation point: the portfolio value on that date measured BEFORE any
+ * flow settling the same day, plus that flow. Making "before the flow" part of
+ * the type is deliberate — it is the single place TWR is usually got wrong.
  */
-export function timeWeightedReturn(
-  periods: { start: Valuation; end: Valuation; flowAtEnd?: number }[]
-): ReturnResult {
-  if (!periods.length) throw new Error("timeWeightedReturn: no periods supplied");
+export interface Observation {
+  date: string;
+  /** Value before `flow` settles. */
+  value: number;
+  /** Net external flow settling on this date; positive is money in. */
+  flow?: number;
+}
+
+/**
+ * True time-weighted return: each sub-period return is measured on the value
+ * before any flow at its end, and the next sub-period opens on that value plus
+ * the flow. The flows therefore cancel out of the result, which is the point —
+ * TWR measures the manager, not the timing of the client's contributions.
+ *
+ * The opening value of each sub-period is DERIVED from the previous
+ * observation, never supplied separately: an API that let the caller state an
+ * opening value inconsistent with the flow it just declared would silently
+ * return a wrong number.
+ */
+export function timeWeightedReturn(observations: Observation[]): ReturnResult {
+  if (observations.length < 2) {
+    throw new Error("timeWeightedReturn: at least two observations required");
+  }
   let factor = 1;
-  for (const p of periods) {
-    if (p.start.value === 0) throw new Error(`timeWeightedReturn: zero opening value at ${p.start.date}`);
-    factor *= p.end.value / p.start.value;
+  for (let i = 1; i < observations.length; i++) {
+    const previous = observations[i - 1]!;
+    const current = observations[i]!;
+    if (current.date <= previous.date) {
+      throw new Error(`timeWeightedReturn: observations must be in date order (${previous.date} then ${current.date})`);
+    }
+    const opening = previous.value + (previous.flow ?? 0);
+    if (opening === 0) {
+      throw new Error(`timeWeightedReturn: zero opening value for the sub-period starting ${previous.date}`);
+    }
+    factor *= current.value / opening;
   }
   return {
     return: factor - 1,
     method: "twr",
     isEstimate: false,
-    assumption: "sub-period returns measured on values before each flow, then geometrically linked",
+    assumption:
+      "each sub-period measured on the value before that date's flow, with the next sub-period opening on value plus flow, then geometrically linked",
+  };
+}
+
+/**
+ * True TWR over a valuation series and a dated flow series (SPEC §6.2's
+ * "daily linking"): the series is broken at every observation date, so with
+ * daily valuations the linking is daily.
+ *
+ * True TWR requires a valuation on every date a flow settles — without one the
+ * flow cannot be separated from performance. Rather than quietly approximating,
+ * this refuses and tells the caller to use Modified Dietz, which is labelled an
+ * estimate.
+ */
+export function trueTimeWeightedReturn(input: {
+  valuations: Valuation[];
+  flows: Flow[];
+}): ReturnResult {
+  if (input.valuations.length < 2) {
+    throw new Error("trueTimeWeightedReturn: at least two valuations required");
+  }
+  const valuations = [...input.valuations].sort((a, b) => a.date.localeCompare(b.date));
+  const flowByDate = new Map<string, number>();
+  for (const flow of input.flows) {
+    flowByDate.set(flow.date, (flowByDate.get(flow.date) ?? 0) + flow.amount);
+  }
+
+  const first = valuations[0]!.date;
+  const last = valuations[valuations.length - 1]!.date;
+  const valuedDates = new Set(valuations.map((v) => v.date));
+  for (const date of flowByDate.keys()) {
+    if (date < first || date > last) {
+      throw new Error(`trueTimeWeightedReturn: flow on ${date} lies outside the valuation series`);
+    }
+    if (!valuedDates.has(date)) {
+      throw new Error(
+        `trueTimeWeightedReturn: no valuation on ${date}, where a flow settles — true TWR needs one; use modifiedDietz and label the result an estimate`
+      );
+    }
+  }
+
+  const observations: Observation[] = valuations.map((v) => {
+    const flow = flowByDate.get(v.date);
+    return flow === undefined ? { date: v.date, value: v.value } : { date: v.date, value: v.value, flow };
+  });
+  // A flow on the final date is a withdrawal after the last measurement; it
+  // cannot affect the return and must not be linked into it.
+  const linked = timeWeightedReturn(observations);
+  return {
+    ...linked,
+    assumption: `${linked.assumption}; linked across ${observations.length - 1} sub-periods between ${first} and ${last}`,
   };
 }
 

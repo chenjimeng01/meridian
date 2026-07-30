@@ -13,12 +13,14 @@ import type {
   Money,
   ParseHolding,
   ParseRun,
+  TaxProfile,
+  Instrument,
 } from "./types.ts";
 
 export interface HouseholdConfig {
   base_currency: string;
   secondary_currency?: string;
-  persons: { token: string; names: string[]; tax_profile: Record<string, unknown> }[];
+  persons: { token: string; names: string[]; tax_profile: TaxProfile }[];
   addresses?: string[];
   account_owners?: Record<string, string[]>;
 }
@@ -85,13 +87,13 @@ function findByIdentifier(ledger: Ledger, holding: ParseHolding): string | undef
 
 function createDraft(ledger: Ledger, holding: ParseHolding, ids: IdFactory): string {
   const idn = holding.identifiers ?? {};
-  const draft = {
+  const draft: Instrument = {
     id: ids(),
     identifiers: idn,
     name: holding.name,
     type: inferType(holding),
     ...(idn.isin ? { domicile: idn.isin.slice(0, 2) } : {}),
-    pfic_status: "not_assessed",
+    pfic_status: "not_assessed" as const,
     // SPEC §5.4 reserves needs_review for instruments that could not be
     // resolved by identifier — a clean ISIN match is not "unknown".
     ...(hasIdentifier(holding) ? {} : { needs_review: true }),
@@ -119,7 +121,9 @@ function resolveInstrument(
       );
     }
     // A confirmed fuzzy match may carry identifiers the ledger lacked.
-    for (const [key, value] of Object.entries(holding.identifiers ?? {})) {
+    const identifierKeys = ["isin", "sedol", "ticker", "cusip"] as const;
+    for (const key of identifierKeys) {
+      const value = holding.identifiers?.[key];
       if (value && !confirmed.identifiers[key]) confirmed.identifiers[key] = value;
     }
     if (confirmed.needs_review && hasIdentifier(holding)) delete confirmed.needs_review;
@@ -135,7 +139,7 @@ function cashInstrument(ledger: Ledger, currency: string, ids: IdFactory): strin
   const name = `Cash (${currency})`;
   const existing = ledger.instruments.find((i) => i.type === "cash" && i.name === name);
   if (existing) return existing.id;
-  const created = {
+  const created: Instrument = {
     id: ids(),
     identifiers: {},
     name,
@@ -257,7 +261,11 @@ export function acceptRun(
       });
       const action = outcome(decision);
       if (decision.action !== "reject") {
-        const amount: Money = decision.edits?.value ?? decision.edits?.amount ?? acct.cash_balance;
+        const source = decision.edits?.value ?? decision.edits?.amount ?? acct.cash_balance;
+        // The parse output carries a confidence score on cash; the ledger's
+        // money type does not. Strip it at the boundary rather than letting
+        // an extraction artefact into the canonical record.
+        const amount: Money = { amount: source.amount, currency: source.currency };
         ledger.holdings.push({
           account_id: account.id,
           instrument_id: cashInstrument(ledger, amount.currency, ids),

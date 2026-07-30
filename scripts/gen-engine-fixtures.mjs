@@ -209,9 +209,80 @@ const ukOnly = makeLedger({
   ],
 });
 
+// ---------------------------------------------------------------------------
+// FX date-mismatch household (SPEC §6 acceptance criterion c, PHASE_REVIEW_3 M1)
+// Deliberately awkward: NO rate is dated on any valuation date, one leg is
+// stale enough to warn, one currency has no direct pair and must triangulate,
+// and holdings are valued on two different dates.
+// ---------------------------------------------------------------------------
+const fxMismatch = (() => {
+  const prefix = "01MERFXMM0";
+  let n = 0;
+  const id = () => prefix + String(++n).padStart(26 - prefix.length, "0");
+  const personId = id();
+  const docId = id();
+  const accountId = id();
+  const instruments = [
+    { key: "gbpFund", name: "Northgate UK Smaller Companies OEIC", type: "oeic", domicile: "GB", currency: "GBP", units: 10000, price: 1, asof: "2026-06-30" },
+    { key: "usdFund", name: "Pioneer S&P Index Fund", type: "mutual_fund_us", domicile: "US", currency: "USD", units: 12800, price: 1, asof: "2026-06-30" },
+    { key: "eurFund", name: "Continental Europe Equity SICAV", type: "other_pooled", domicile: "LU", currency: "EUR", units: 5400, price: 1, asof: "2026-06-30" },
+    { key: "oldUsd", name: "Keystone Treasury Money Market Fund", type: "mmf", domicile: "US", currency: "USD", units: 2500, price: 1, asof: "2026-02-15" },
+  ].map((i) => ({ ...i, id: id() }));
+
+  return {
+    schema_version: "0.1",
+    household: {
+      id: id(),
+      base_currency: "GBP",
+      secondary_currency: "USD",
+      persons: [{ id: personId, display_token: "P1", tax_profile: { uk_resident: true, us_person: false } }],
+    },
+    accounts: [
+      {
+        id: accountId, person_ids: [personId], institution: "Alderbrook Platform",
+        account_token: "A1", wrapper: "gia", wrapper_jurisdiction: "UK",
+        custody_currency: "GBP", opened: null, data_asof: "2026-06-30",
+      },
+    ],
+    instruments: instruments.map((i) => ({
+      id: i.id, identifiers: {}, name: i.name, type: i.type, domicile: i.domicile,
+      pfic_status: "not_assessed", metadata_confirmed: true,
+      prices: [{ date: i.asof, price: { amount: i.price, currency: i.currency }, source: "statement" }],
+    })),
+    holdings: instruments.map((i) => ({
+      account_id: accountId, instrument_id: i.id, asof: i.asof, units: i.units,
+      value: { amount: r2(i.units * i.price), currency: i.currency },
+      source_document_id: docId,
+    })),
+    transactions: [],
+    documents: [
+      {
+        id: docId, filename: "synthetic/fx-mismatch.txt", sha256: "1".repeat(64),
+        institution: "Synthetic Fixture", doc_type: "valuation",
+        period: { from: "2026-01-01", to: "2026-06-30" },
+        parsed_at: PARSED_AT, accepted_at: ACCEPTED_AT, parse_run_ids: ["RUN-FX-01"],
+      },
+    ],
+    acceptances: [
+      {
+        id: id(), document_id: docId, parse_run_id: "RUN-FX-01",
+        accepted_at: ACCEPTED_AT, operator_initials: "JC",
+        lines: instruments.map((i) => ({ kind: "holding", account_token: "A1", ref: i.name, action: "accepted", instrument_id: i.id })),
+      },
+    ],
+    // No rate lands on 2026-06-30 or 2026-02-15, and GBPEUR is never quoted.
+    fx_rates: [
+      { date: "2026-01-31", pair: "GBPUSD", rate: 1.25, source: "statement:synthetic/fx-mismatch" },
+      { date: "2026-06-10", pair: "GBPUSD", rate: 1.28, source: "statement:synthetic/fx-mismatch" },
+      { date: "2026-06-10", pair: "EURUSD", rate: 1.08, source: "statement:synthetic/fx-mismatch" },
+    ],
+  };
+})();
+
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, "household-usuk-acceptance.json"), JSON.stringify(acceptance, null, 2) + "\n");
 writeFileSync(join(OUT, "household-uk-only.json"), JSON.stringify(ukOnly, null, 2) + "\n");
+writeFileSync(join(OUT, "household-fx-mismatch.json"), JSON.stringify(fxMismatch, null, 2) + "\n");
 console.log(
   `Wrote acceptance household (${acceptance.accounts.length} accounts, ${acceptance.holdings.length} holdings) ` +
     `and UK-only household (${ukOnly.accounts.length} accounts, ${ukOnly.holdings.length} holdings) to ${OUT}`

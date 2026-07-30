@@ -277,6 +277,45 @@ test("an unconfirmed identifier-less holding creates a draft flagged needs_revie
   assert.equal(draft.needs_review, true, "an unresolvable instrument must be flagged for operator review");
 });
 
+// PHASE_REVIEW_2 S4: the <0.9 treatment §5.5 requires was implemented but
+// never exercised — the fixture extractor only ever emits 0.97/0.98.
+test("a low-confidence figure gets the §5.5 review treatment", () => {
+  const ids = sequentialIds();
+  const ledger = initHousehold(config, ids);
+  const run = {
+    id: "RUN-LOWCONF",
+    filename: "probe.txt",
+    sha256: "0".repeat(64),
+    created_at: PARSED_AT,
+    redactedText: "",
+    output: {
+      schema_version: "0.1",
+      source: { institution: "Alderbrook Platform", doc_type: "valuation", period: { from: "2026-04-01", to: "2026-06-30" }, statement_currency: "GBP" },
+      accounts: [{
+        account_token: "A1", wrapper_hint: "gia", currency: "GBP", confidence: 0.62,
+        holdings: [
+          { name: "Smudged Row Global Fund", identifiers: {}, units: 100, value: { amount: 5000, currency: "GBP" }, confidence: 0.55 },
+          { name: "Clean Row PLC", identifiers: { isin: "GB00SYNTH052" }, units: 10, value: { amount: 63.1, currency: "GBP" }, confidence: 0.98 },
+        ],
+        cash_balance: { amount: 250.4, currency: "GBP", confidence: 0.71 },
+      }],
+      overall_confidence: 0.6,
+    },
+    matches: [
+      { accountIndex: 0, holdingIndex: 0, status: "new" as const },
+      { accountIndex: 0, holdingIndex: 1, status: "new" as const },
+    ],
+  };
+  const html = renderReviewHtml(run as any, ledger);
+
+  assert.ok(html.includes('class="line low"'), "the low-confidence row is visually distinguished");
+  assert.equal((html.match(/class="line low"/g) ?? []).length, 1, "only the low row, not the clean one");
+  assert.ok(html.includes("confidence 0.55"));
+  assert.ok(html.includes("check source document"), "the operator is told to go back to the source");
+  // S5: cash now carries a score of its own and renders it.
+  assert.ok(html.includes("confidence 0.71"), "cash balance shows its confidence");
+});
+
 test("fixture ingest path makes no network calls and leaves NETWORK_AUDIT untouched", () => {
   const before = readFileSync(join(ROOT, "NETWORK_AUDIT.md"), "utf8");
   runFullPipeline();

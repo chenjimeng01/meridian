@@ -352,9 +352,9 @@ test("§7.3 a non-US joint owner gets the NRA column treatment and an equal spli
   ledger.household.persons.push({
     id: "01MERACPT00000000000000099",
     display_token: "P2",
-    tax_profile: { uk_resident: true, uk_domicile_status: "non_ltr", us_person: false },
+    tax_profile: { uk_resident: true, uk_domicile_status: "not_ltr", us_person: false },
   });
-  const gia = ledger.accounts.find((a: { account_token: string }) => a.account_token === "A1");
+  const gia = ledger.accounts.find((a) => a.account_token === "A1")!;
   gia.person_ids = [p1.id, "01MERACPT00000000000000099"];
 
   const r = analyse(ledger);

@@ -67,7 +67,8 @@
       ],
       "cash_balance": {
         "amount": 152.4,
-        "currency": "USD"
+        "currency": "USD",
+        "confidence": 0.98
       },
       "movements": [
         {

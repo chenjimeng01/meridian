@@ -159,7 +159,7 @@ export function parseFixtureStatement(redactedText: string): ParseOutput {
       confidence: CONF.account,
     };
     if (s.holdings.length) acct.holdings = s.holdings;
-    if (s.cash !== undefined) acct.cash_balance = { amount: s.cash, currency: symCurrency(s.cashSym!) };
+    if (s.cash !== undefined) acct.cash_balance = { amount: s.cash, currency: symCurrency(s.cashSym!), confidence: CONF.holding };
     if (s.fees.length) acct.fees = s.fees;
     if (s.movements.length) acct.movements = s.movements;
     return acct;
@@ -172,7 +172,7 @@ export function parseFixtureStatement(redactedText: string): ParseOutput {
       doc_type: docType,
       period,
       statement_currency: currency,
-      ...(fxRate !== undefined ? { fx_rates: [{ pair: "GBPUSD", rate: fxRate }] } : {}),
+      ...(fxRate !== undefined ? { fx_rates: [{ pair: "GBPUSD", rate: fxRate, confidence: CONF.holding }] } : {}),
     },
     accounts,
     overall_confidence: CONF.overall,

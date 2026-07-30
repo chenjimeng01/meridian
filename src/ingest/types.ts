@@ -40,7 +40,7 @@ export interface ParseAccount {
   currency?: string;
   confidence: number;
   holdings?: ParseHolding[];
-  cash_balance?: Money;
+  cash_balance?: Money & { confidence: number };
   fees?: ParseFee[];
   movements?: ParseMovement[];
 }
@@ -52,7 +52,7 @@ export interface ParseOutput {
     doc_type: string;
     period: { from: string; to: string };
     statement_currency: string;
-    fx_rates?: { pair: string; rate: number; date?: string }[];
+    fx_rates?: { pair: string; rate: number; date?: string; confidence?: number }[];
   };
   accounts: ParseAccount[];
   overall_confidence: number;
@@ -120,19 +120,125 @@ export interface AcceptanceLine {
 
 export type IdFactory = () => string;
 
+// The canonical ledger, mirroring schema/ledger.schema.json (SPEC §4). The
+// schema remains the source of truth and is what ajv enforces; these types
+// exist so the engine gets compile-time protection over the same shape.
+
+export interface TaxProfile {
+  uk_resident: boolean;
+  uk_domicile_status?: "ltr_flag" | "not_ltr" | "unknown";
+  us_person: boolean;
+  us_person_basis?: "citizen" | "green_card" | "substantial_presence";
+  state_exposure?: string;
+  treaty_positions?: string[];
+}
+
+export interface Person {
+  id: string;
+  display_token: string;
+  tax_profile: TaxProfile;
+}
+
+export interface Account {
+  id: string;
+  person_ids: string[];
+  institution: string;
+  account_token: string;
+  wrapper: string;
+  wrapper_jurisdiction: "UK" | "US" | "OTHER";
+  custody_currency: string;
+  opened: string | null;
+  data_asof: string;
+}
+
+export interface InstrumentPrice {
+  date: string;
+  price: Money;
+  source: "statement" | "feed" | "manual";
+}
+
+export interface Instrument {
+  id: string;
+  identifiers: { isin?: string; sedol?: string; ticker?: string; cusip?: string };
+  name: string;
+  type: string;
+  domicile?: string;
+  hmrc_reporting_fund?: boolean;
+  us_registered?: boolean;
+  pfic_status?: "not_assessed" | "not_pfic" | "pfic" | "needs_classification";
+  /** Only true once an operator has confirmed type/domicile/registration (SPEC §7.1). */
+  metadata_confirmed?: boolean;
+  needs_review?: boolean;
+  prices: InstrumentPrice[];
+}
+
+export interface Holding {
+  account_id: string;
+  instrument_id: string;
+  asof: string;
+  units: number;
+  book_cost?: Money;
+  value: Money;
+  source_document_id?: string;
+  source?: "manual";
+  operator_initials?: string;
+}
+
+export interface Transaction {
+  account_id: string;
+  date: string;
+  type: string;
+  instrument_id: string | null;
+  units?: number;
+  gross?: Money;
+  fees?: Money;
+  net?: Money;
+  source_document_id?: string;
+  source?: "manual";
+  operator_initials?: string;
+}
+
+export interface LedgerDocument {
+  id: string;
+  filename: string;
+  sha256: string;
+  institution: string;
+  doc_type: string;
+  period: { from: string; to: string };
+  parsed_at?: string;
+  accepted_at?: string;
+  parse_run_ids: string[];
+}
+
+export interface Acceptance {
+  id: string;
+  document_id: string;
+  parse_run_id: string;
+  accepted_at: string;
+  operator_initials: string;
+  lines: AcceptanceLine[];
+}
+
+export interface LedgerFxRate {
+  date: string;
+  pair: string;
+  rate: number;
+  source: string;
+}
+
 export interface Ledger {
   schema_version: "0.1";
   household: {
     id: string;
     base_currency: string;
     secondary_currency?: string;
-    persons: { id: string; display_token: string; tax_profile: Record<string, unknown> }[];
+    persons: Person[];
   };
-  accounts: any[];
-  instruments: any[];
-  holdings: any[];
-  transactions: any[];
-  documents: any[];
-  acceptances: any[];
-  fx_rates: any[];
+  accounts: Account[];
+  instruments: Instrument[];
+  holdings: Holding[];
+  transactions: Transaction[];
+  documents: LedgerDocument[];
+  acceptances: Acceptance[];
+  fx_rates: LedgerFxRate[];
 }

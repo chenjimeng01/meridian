@@ -1,7 +1,7 @@
 // Consolidation (SPEC §6.1): total wealth sliced every way the report needs,
 // always renderable in base AND secondary currency. Pure: the ledger, the
 // params and the valuation date are all passed in.
-import { convert, type FxContext, type Money } from "./fx.ts";
+import { convert, roundHalfEven, type FxContext, type Money } from "./fx.ts";
 import type { Ledger } from "../ingest/types.ts";
 
 export interface DualMoney {
@@ -103,7 +103,8 @@ export function consolidate(input: ConsolidateInput): ConsolidationResult {
     }
     const converted = convert(holding.value as Money, base, holding.asof, input.fx);
     warnings.push(...converted.warnings);
-    const value = converted.amount;
+    // Full precision into the buckets; rounding happens once, at the boundary.
+    const value = converted.exact;
     total += value;
 
     // Ownership: split evenly between joint owners. Recorded as an explicit
@@ -142,33 +143,78 @@ export function consolidate(input: ConsolidateInput): ConsolidationResult {
     warnings.push("jointly held accounts are split evenly between their owners");
   }
 
-  const dual = (amount: number, at: string): DualMoney => {
-    const baseMoney: Money = { amount: Math.round(amount * 100) / 100, currency: base };
-    if (!secondary || secondary === base) return { base: baseMoney };
+  // Secondary figures are derived from the UNROUNDED base, then rounded once.
+  // Rounding a rounded figure was how the two columns came to disagree with
+  // their own headline by a penny (PHASE_REVIEW_3 M2).
+  const secondaryExact = (exactBase: number, at: string): number | null => {
+    if (!secondary || secondary === base) return null;
     try {
-      const other = convert(baseMoney, secondary, at, input.fx);
-      return { base: baseMoney, secondary: { amount: other.amount, currency: secondary } };
+      return convert({ amount: exactBase, currency: base }, secondary, at, input.fx).exact;
     } catch {
       // A missing secondary rate must not sink the whole consolidation; the
       // base figure still stands and the omission is visible.
       warnings.push(`secondary-currency figure unavailable for ${at}`);
-      return { base: baseMoney };
+      return null;
     }
   };
 
-  const toSlices = (bucket: Map<string, { label: string; total: number }>): Slice[] =>
-    [...bucket.entries()]
-      .map(([key, { label, total: value }]) => ({
+  const round2 = (x: number) => roundHalfEven(x, 2);
+
+  const totalSecondaryExact = secondaryExact(total, asof);
+  const totalDual: DualMoney = {
+    base: { amount: round2(total), currency: base },
+    ...(totalSecondaryExact === null
+      ? {}
+      : { secondary: { amount: round2(totalSecondaryExact), currency: secondary! } }),
+  };
+
+  /**
+   * Rounds each slice once and gives the rounding residual to the largest
+   * slice, so a column always adds up to the headline above it. Without this
+   * an instrument table in USD does not sum to the USD total (SPEC §8 calls
+   * the dual-currency pair the signature of the product; a column that does
+   * not add up is not renderable).
+   */
+  const toSlices = (bucket: Map<string, { label: string; total: number }>): Slice[] => {
+    const entries = [...bucket.entries()]
+      .map(([key, { label, total: exactBase }]) => ({
         key,
         label,
-        value: dual(value, asof),
-        shareOfTotal: total === 0 ? 0 : value / total,
+        exactBase,
+        exactSecondary: secondaryExact(exactBase, asof),
+        baseAmount: round2(exactBase),
+        secondaryAmount: 0,
       }))
-      .sort((a, b) => b.value.base.amount - a.value.base.amount || a.key.localeCompare(b.key));
+      .sort((a, b) => b.exactBase - a.exactBase || a.key.localeCompare(b.key));
+    if (!entries.length) return [];
+
+    const baseResidual = round2(totalDual.base.amount - entries.reduce((t, e) => round2(t + e.baseAmount), 0));
+    entries[0]!.baseAmount = round2(entries[0]!.baseAmount + baseResidual);
+
+    if (totalDual.secondary) {
+      for (const entry of entries) entry.secondaryAmount = round2(entry.exactSecondary ?? 0);
+      const secondaryResidual = round2(
+        totalDual.secondary.amount - entries.reduce((t, e) => round2(t + e.secondaryAmount), 0)
+      );
+      entries[0]!.secondaryAmount = round2(entries[0]!.secondaryAmount + secondaryResidual);
+    }
+
+    return entries.map((entry) => ({
+      key: entry.key,
+      label: entry.label,
+      value: {
+        base: { amount: entry.baseAmount, currency: base },
+        ...(totalDual.secondary
+          ? { secondary: { amount: entry.secondaryAmount, currency: secondary! } }
+          : {}),
+      },
+      shareOfTotal: total === 0 ? 0 : entry.exactBase / total,
+    }));
+  };
 
   return {
     asof,
-    total: dual(total, asof),
+    total: totalDual,
     byPerson: toSlices(buckets.person),
     byAccount: toSlices(buckets.account),
     byWrapper: toSlices(buckets.wrapper),

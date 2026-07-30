@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { timeWeightedReturn, xirr, modifiedDietz, chainLink } from "../src/engine/performance.ts";
+import { timeWeightedReturn, trueTimeWeightedReturn, xirr, modifiedDietz, chainLink } from "../src/engine/performance.ts";
 
 // SPEC §6 Phase 3 acceptance: "TWR vs XIRR divergence case" and "Modified
 // Dietz vs known TWR tolerance case". Both cases below are constructed so the
@@ -28,9 +28,12 @@ const CASE_A = {
 const CASE_A_XIRR = 10 / (8 + Math.sqrt(84)) - 1;
 
 test("TWR is flat while XIRR is deeply negative — the divergence case (§6.2)", () => {
+  // Values are stated BEFORE the flow on that date; the opening value of the
+  // next sub-period is derived, never restated by the caller.
   const twr = timeWeightedReturn([
-    { start: { date: "2025-01-01", value: 100 }, end: { date: "2026-01-01", value: 200 }, flowAtEnd: 800 },
-    { start: { date: "2026-01-01", value: 1000 }, end: { date: "2027-01-01", value: 500 }, flowAtEnd: 0 },
+    { date: "2025-01-01", value: 100 },
+    { date: "2026-01-01", value: 200, flow: 800 },
+    { date: "2027-01-01", value: 500 },
   ]);
   assert.equal(twr.return, 0, "TWR must be exactly zero: +100% then -50%");
   assert.equal(twr.method, "twr");
@@ -82,8 +85,9 @@ test("Modified Dietz approximates a known TWR within a stated tolerance (§6.2)"
   assert.match(dietz.assumption, /weight|flow/i, "the assumption must be stated in words");
 
   const trueTwr = timeWeightedReturn([
-    { start: { date: "2025-01-01", value: 1000 }, end: { date: "2025-07-02", value: 1100 }, flowAtEnd: 500 },
-    { start: { date: "2025-07-02", value: 1600 }, end: { date: "2025-12-31", value: 1760 }, flowAtEnd: 0 },
+    { date: "2025-01-01", value: 1000 },
+    { date: "2025-07-02", value: 1100, flow: 500 },
+    { date: "2025-12-31", value: 1760 },
   ]);
   assert.ok(Math.abs(trueTwr.return - 0.21) < 1e-12, "control: true TWR is 21%");
 
@@ -104,6 +108,77 @@ test("Modified Dietz weights a late flow less than an early one", () => {
     flows: [{ date: "2025-12-01", amount: 500 }],
   });
   assert.ok(late.return > early.return, "money present for less of the period earns a higher implied return");
+});
+
+// PHASE_REVIEW_3 M3: the old signature let a caller declare a flow AND restate
+// the next opening value, and silently ignored the flow — supplying the
+// pre-flow opening value returned +400% where the answer is 0%. The opening
+// value is now derived, so that mistake is unrepresentable.
+test("a declared flow is honoured, not ignored (§6.2 regression)", () => {
+  const withFlow = timeWeightedReturn([
+    { date: "2025-01-01", value: 100 },
+    { date: "2026-01-01", value: 200, flow: 800 },
+    { date: "2027-01-01", value: 500 },
+  ]);
+  assert.equal(withFlow.return, 0, "+100% then -50% on the post-flow base");
+
+  const withoutFlow = timeWeightedReturn([
+    { date: "2025-01-01", value: 100 },
+    { date: "2026-01-01", value: 200 },
+    { date: "2027-01-01", value: 500 },
+  ]);
+  assert.ok(Math.abs(withoutFlow.return - 4) < 1e-12, "omitting the flow is a different, visibly different, answer");
+  assert.notEqual(withFlow.return, withoutFlow.return, "the flow must change the result");
+});
+
+test("observations must be ordered and cannot open on nothing", () => {
+  assert.throws(
+    () => timeWeightedReturn([
+      { date: "2026-01-01", value: 200 },
+      { date: "2025-01-01", value: 100 },
+    ]),
+    /date order/
+  );
+  assert.throws(
+    () => timeWeightedReturn([
+      { date: "2025-01-01", value: 0 },
+      { date: "2026-01-01", value: 100 },
+    ]),
+    /zero opening value/
+  );
+});
+
+test("daily linking breaks the series at every observation (§6.2)", () => {
+  // Five daily valuations, one flow mid-series on a date that is valued.
+  const result = trueTimeWeightedReturn({
+    valuations: [
+      { date: "2026-01-01", value: 1000 },
+      { date: "2026-01-02", value: 1010 },
+      { date: "2026-01-03", value: 1020 }, // flow settles here
+      { date: "2026-01-04", value: 1530 },
+      { date: "2026-01-05", value: 1560 },
+    ],
+    flows: [{ date: "2026-01-03", amount: 500 }],
+  });
+  // (1010/1000)(1020/1010)(1530/1520)(1560/1530) - 1
+  const expected = (1010 / 1000) * (1020 / 1010) * (1530 / 1520) * (1560 / 1530) - 1;
+  assert.ok(Math.abs(result.return - expected) < 1e-12);
+  assert.equal(result.isEstimate, false);
+  assert.match(result.assumption, /4 sub-periods/, "the linking granularity must be stated");
+});
+
+test("true TWR refuses rather than approximating when a flow date has no valuation", () => {
+  assert.throws(
+    () => trueTimeWeightedReturn({
+      valuations: [
+        { date: "2026-01-01", value: 1000 },
+        { date: "2026-01-31", value: 1600 },
+      ],
+      flows: [{ date: "2026-01-15", amount: 500 }],
+    }),
+    /modifiedDietz/,
+    "it must point the caller at the estimate rather than silently produce a wrong TWR"
+  );
 });
 
 test("chain-linking compounds sub-period returns and carries the weakest method label", () => {

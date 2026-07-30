@@ -277,7 +277,7 @@ function renderExpected(doc) {
       doc_type: doc.doc_type,
       period: doc.period,
       statement_currency: doc.statement_currency,
-      ...(doc.fxRate ? { fx_rates: [{ pair: "GBPUSD", rate: doc.fxRate }] } : {}),
+      ...(doc.fxRate ? { fx_rates: [{ pair: "GBPUSD", rate: doc.fxRate, confidence: 0.98 }] } : {}),
     },
     accounts: doc.accounts.map((acct) => {
       const a = ACCOUNTS[acct.key];
@@ -301,7 +301,7 @@ function renderExpected(doc) {
           };
         });
       }
-      if (acct.cash != null) out.cash_balance = { amount: acct.cash, currency: doc.statement_currency };
+      if (acct.cash != null) out.cash_balance = { amount: acct.cash, currency: doc.statement_currency, confidence: 0.98 };
       if (acct.fees?.length) {
         out.fees = acct.fees.map((f) => ({
           label: f.label,

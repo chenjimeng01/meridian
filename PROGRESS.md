@@ -1,9 +1,9 @@
 # PROGRESS
 
-**Current phase:** 3 — Engine (§6) + US-connected intelligence (§7)
-**Status:** in progress. Module 2 complete (90/90 green across all suites);
-Module 3 delegated to the deep-technical agent per §12.
-**Last completed step:** 3.5 Module 2 risk & exposure
+**Current phase:** 3 complete — Phase 4 (CLI wiring) may open
+**Status:** `npm test` green (125/125), lint + typecheck clean;
+PHASE_REVIEW_3 MUST-FIX items all resolved, 0 open
+**Last completed step:** 3.9 carried-forward SHOULD-FIX cleared
 
 ## Phase 3 step plan
 
@@ -40,7 +40,39 @@ produces no US-module output at all.
       Harbour Point fund routes to needs_classification (S7 honoured);
       ISA WARN / SIPP OK; situs puts the 401(k) *and* the US-incorporated
       share held in a UK GIA on the US side; UK-only household returns null.
-- [ ] 3.7 Phase gate: structural review → PHASE_REVIEW_3.md
+- [x] 3.7 Phase gate: PHASE_REVIEW_3.md (Opus reviewer) — 4 MUST-FIX,
+      13 SHOULD-FIX, 14 NOTE
+- [x] 3.8 MUST-FIX resolution (125/125 green):
+      - M1 the §6 FX date-mismatch criterion is now exercised through
+        consolidation, not only at the `convert()` unit: new
+        `household-fx-mismatch.json` where no rate lands on any valuation date,
+        one leg is stale enough to warn, EUR triangulates via USD, and two
+        holdings are valued on different dates. Plus tests for refusal when a
+        holding cannot be valued in base, and graceful degradation when the
+        secondary rate is missing — both previously dead code paths.
+      - M2 the dual-currency column reconciles: secondary figures now derive
+        from the UNROUNDED base and are rounded once, with the rounding
+        residual allocated to the largest slice, so every column adds up to
+        its own headline exactly. The sum-to-total test now asserts BOTH
+        currencies to the penny instead of only `.base` with a 0.05 tolerance.
+        NOTE: the correct full-precision USD headline is 317,854.69 (was
+        317,854.68 when double-rounded) and 566,476.21 on the golden ledger.
+      - M3 `timeWeightedReturn` declared a `flowAtEnd` it never read, so using
+        the documented API as documented returned +400% instead of 0%. The API
+        now takes observations whose opening value is DERIVED from the previous
+        value plus its flow, making the mistake unrepresentable, and
+        `trueTimeWeightedReturn` implements §6.2's daily linking — refusing
+        rather than approximating when a flow date has no valuation.
+      - M4 §6.2 benchmarks and real returns built (`src/engine/benchmark.ts`):
+        weighted composites from the bundled monthly series, index levels read
+        on-or-before the date (mirroring the FX rule), nominal AND real via the
+        CPI series, and the portfolio's method label travelling with the
+        comparison so an estimate is never presented as exact.
+- [x] 3.9 Carried-forward SHOULD-FIX cleared: S4 low-confidence review branch
+      now exercised; S5 cash balances and statement FX observations carry
+      confidence scores (`scoredMoney`), stripped at the ledger boundary;
+      S9 the `Ledger` type mirrors §4 instead of seven `any[]` collections —
+      which immediately caught a `"non_ltr"`/`"not_ltr"` typo in a test.
 
 ## Phase 2 step plan
 
@@ -127,6 +159,28 @@ test proves the redaction assertion blocks an unredacted network call;
   single capitalised tokens are pervasive in statement layouts, so flagging
   them would make the gate unusable. Pinned by a test so it cannot be assumed
   away. Revisit if a real statement layout puts surnames on their own line.
+- **Module 3 ambiguities, encoded conservatively** (logged at the
+  deep-technical agent's request, for human review):
+  - *US retirement plan situs.* A 401(k)/IRA interest is treated as a single
+    US-situs asset with no look-through to its underlying holdings. The
+    contrary look-through reading exists; the higher-exposure one is encoded.
+  - *US-obligor debt.* `us_situs_debt_non_portfolio` is applied to US-domiciled
+    bonds even though the portfolio-interest exclusion may remove them —
+    qualification is not establishable from a statement. Unexercised by either
+    fixture (no bonds), so this path has no test coverage.
+  - *UK IHT scope* is read off the stored `uk_domicile_status`, not recomputed:
+    the ledger holds no residence history, so the 10-of-20 test cannot be
+    evaluated. Post-departure tail provisions remain unmodelled.
+  - *De-minimis PFIC reporting exception* is reported as "available but
+    unverified" below the threshold, because "no excess distributions and no
+    elections" is invisible to this system.
+  - *Currency exposure has no look-through*, so the currency-of-life mismatch
+    score understates true exposure. Surfaced on the result, not just in docs.
+- **Params file naming wart:** the §7.3 situs cascade and §7.4 currency-of-life
+  config live in `params/shared/pfic-rules.json` purely because the Module 3
+  agent was scoped to one writable params file. Split into
+  `situs-rules.json` / `usconnect-rules.json`; only `readSharedRules()` in
+  `src/usconnect/params.ts` changes.
 - **Model tiering changed:** Fable 5 usage was exhausted mid-build, so
   `.claude/agents/deep-technical.md` now specifies `model: opus`, exactly as
   SPEC §12.1's availability note directs. PHASE_REVIEW_1 was written by the

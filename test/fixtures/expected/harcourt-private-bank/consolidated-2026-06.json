@@ -11,7 +11,8 @@
     "fx_rates": [
       {
         "pair": "GBPUSD",
-        "rate": 1.28
+        "rate": 1.28,
+        "confidence": 0.98
       }
     ]
   },
@@ -79,7 +80,8 @@
       "confidence": 0.98,
       "cash_balance": {
         "amount": 85300,
-        "currency": "GBP"
+        "currency": "GBP",
+        "confidence": 0.98
       }
     }
   ],

@@ -26,6 +26,7 @@ export {
 
 export {
   timeWeightedReturn,
+  trueTimeWeightedReturn,
   modifiedDietz,
   chainLink,
   xirr,
@@ -35,7 +36,19 @@ export {
   type ReturnMethod,
   type Valuation,
   type Flow,
+  type Observation,
 } from "./performance.ts";
+
+export {
+  levelAt,
+  seriesReturn,
+  compositeReturn,
+  compareToBenchmark,
+  type IndexSeries,
+  type CompositeComponent,
+  type BenchmarkResult,
+  type BenchmarkComparison,
+} from "./benchmark.ts";
 
 export {
   costStack,

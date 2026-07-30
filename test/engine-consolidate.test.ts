@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readJson } from "./helpers.ts";
 import { consolidate } from "../src/engine/consolidate.ts";
 import { assessRisk } from "../src/engine/risk.ts";
+import { FxUnavailableError } from "../src/engine/fx.ts";
 import type { Ledger } from "../src/ingest/types.ts";
 
 const assetClasses = readJson("params/shared/asset-classes.json");
@@ -36,13 +37,18 @@ test("total wealth consolidates across currencies to the expected figure (§6.1)
   assert.equal(result.total.base.amount, TOTAL_GBP);
   assert.equal(result.total.base.currency, "GBP");
   assert.equal(result.total.secondary!.currency, "USD", "dual currency is the signature of the product");
-  assert.equal(result.total.secondary!.amount, 317854.68); // 248,323.97 x 1.28
+  // Converted from the UNROUNDED base total 248,323.9746875 x 1.28 =
+  // 317,854.6876125. Converting the rounded base instead would give
+  // 317,854.68 — a penny out, and the source of the M2 reconciliation break.
+  assert.equal(result.total.secondary!.amount, 317854.69);
 });
 
-test("every slice sums back to the total — no wealth created or lost (§6.1)", () => {
+// PHASE_REVIEW_3 M2: this previously summed only `.base` with a 0.05 tolerance,
+// which could not see the penny break in the USD column. Both columns are now
+// asserted to the exact penny.
+test("every slice sums back to the total in BOTH currencies, exactly (§6.1, §8)", () => {
   const { result } = load("household-usuk-acceptance");
-  const sums = (slices: { value: { base: { amount: number } } }[]) =>
-    Math.round(slices.reduce((t, s) => t + s.value.base.amount, 0) * 100) / 100;
+  const sum = (values: number[]) => Math.round(values.reduce((t, v) => t + v, 0) * 100) / 100;
 
   for (const [name, slices] of [
     ["byAccount", result.byAccount],
@@ -54,7 +60,12 @@ test("every slice sums back to the total — no wealth created or lost (§6.1)",
     ["byInstrument", result.byInstrument],
     ["byPerson", result.byPerson],
   ] as const) {
-    assert.ok(Math.abs(sums(slices) - TOTAL_GBP) < 0.05, `${name} sums to ${sums(slices)}, expected ${TOTAL_GBP}`);
+    assert.equal(sum(slices.map((s) => s.value.base.amount)), result.total.base.amount, `${name} base column must add up to the headline`);
+    assert.equal(
+      sum(slices.map((s) => s.value.secondary!.amount)),
+      result.total.secondary!.amount,
+      `${name} secondary column must add up to the headline — a column that does not add up is not renderable`
+    );
   }
 });
 
@@ -142,6 +153,79 @@ test("geographic split follows instrument domicile and does not guess for cash",
   assert.equal(share("JE"), 10700, "the Jersey pooled fund");
   assert.ok(share("unallocated")! > 0, "cash is not attributed to a country");
   assert.ok(risk.warnings.some((w) => /domicile is not confirmed/.test(w)));
+});
+
+// --- §6 acceptance criterion (c), through consolidation (PHASE_REVIEW_3 M1) --
+// The awkwardness was previously only exercised at the convert() unit, leaving
+// consolidation's staleness and missing-rate paths dead in the suite.
+
+test("dual-currency consolidation survives a deliberately awkward FX date mismatch (§6.1)", () => {
+  const ledger = readJson("test/fixtures/ledger/household-fx-mismatch.json") as Ledger;
+  const result = consolidate({
+    ledger,
+    assetClasses,
+    fx: { rates: ledger.fx_rates, policy: fxPolicy },
+    asof: ASOF,
+  });
+
+  // No rate is dated on ANY valuation date in this ledger:
+  //   GBP 10,000            no conversion needed
+  //   USD 12,800 @ 2026-06-30 -> 2026-06-10 rate 1.28        = 10,000.00
+  //   EUR  5,400 @ 2026-06-30 -> no GBPEUR; via USD 1.08/1.28 =  4,556.25
+  //   USD  2,500 @ 2026-02-15 -> 2026-01-31 rate 1.25         =  2,000.00
+  assert.equal(result.total.base.amount, 26556.25);
+  assert.equal(result.total.secondary!.amount, 33992);
+
+  const byCurrency = Object.fromEntries(result.byCurrency.map((s) => [s.key, s.value.base.amount]));
+  assert.equal(byCurrency.GBP, 10000);
+  assert.equal(byCurrency.USD, 12000, "both USD holdings, each at its own date's rate");
+  assert.equal(byCurrency.EUR, 4556.25, "triangulated via USD");
+
+  // Staleness must reach the consolidation warnings, not just the FX unit.
+  const stale = result.warnings.filter((w) => /stale/.test(w));
+  assert.equal(stale.length, 2, "one warning per stale conversion date");
+  assert.ok(stale.some((w) => /20 days stale \(dated 2026-06-10/.test(w)));
+  assert.ok(stale.some((w) => /15 days stale \(dated 2026-01-31/.test(w)));
+
+  // And the columns still reconcile under all that.
+  const sum = (v: number[]) => Math.round(v.reduce((t, x) => t + x, 0) * 100) / 100;
+  assert.equal(sum(result.byInstrument.map((s) => s.value.base.amount)), result.total.base.amount);
+  assert.equal(sum(result.byInstrument.map((s) => s.value.secondary!.amount)), result.total.secondary!.amount);
+});
+
+test("consolidation refuses rather than guessing when a holding cannot be valued in base", () => {
+  const ledger = readJson("test/fixtures/ledger/household-fx-mismatch.json") as Ledger;
+  // Only the January rate survives, so a June USD holding is 150 days stale —
+  // past the policy's refusal limit.
+  const staleOnly = ledger.fx_rates.filter((r: any) => r.date === "2026-01-31");
+  assert.throws(
+    () => consolidate({ ledger, assetClasses, fx: { rates: staleOnly, policy: fxPolicy }, asof: ASOF }),
+    (err: unknown) => {
+      assert.ok(err instanceof FxUnavailableError);
+      assert.match((err as Error).message, /beyond the 31-day policy limit/);
+      return true;
+    }
+  );
+});
+
+test("a missing secondary rate degrades the second column without sinking the report", () => {
+  const ledger = readJson("test/fixtures/ledger/household-fx-mismatch.json") as Ledger;
+  const result = consolidate({
+    ledger,
+    assetClasses,
+    fx: { rates: ledger.fx_rates, policy: fxPolicy },
+    asof: ASOF,
+    secondaryCurrency: "JPY", // never quoted anywhere in this ledger
+  });
+  assert.equal(result.total.base.amount, 26556.25, "the base column still stands");
+  assert.equal(result.total.secondary, undefined, "and the missing column is absent, not zero");
+  assert.ok(
+    result.warnings.some((w) => /secondary-currency figure unavailable/.test(w)),
+    "the omission must be visible"
+  );
+  for (const slice of result.byInstrument) {
+    assert.equal(slice.value.secondary, undefined);
+  }
 });
 
 test("the UK-only household consolidates without a secondary currency", () => {

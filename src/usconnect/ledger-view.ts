@@ -80,9 +80,9 @@ export function readWrappers(ledger: Ledger): Wrapper[] {
 
 export function buildPositions(ledger: Ledger, toBase: ToBase, asof: string): Position[] {
   const accounts = new Map<string, Record<string, unknown>>();
-  for (const a of ledger.accounts) accounts.set(String(a.id), a as Record<string, unknown>);
+  for (const a of ledger.accounts) accounts.set(String(a.id), a as unknown as Record<string, unknown>);
   const instruments = new Map<string, Record<string, unknown>>();
-  for (const i of ledger.instruments) instruments.set(String(i.id), i as Record<string, unknown>);
+  for (const i of ledger.instruments) instruments.set(String(i.id), i as unknown as Record<string, unknown>);
   const personTokens = new Map<string, string>();
   for (const p of ledger.household.persons) personTokens.set(p.id, p.display_token);
 
