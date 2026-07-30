@@ -18,7 +18,9 @@ function firstMatchingRule(rules: CascadeRule[], position: Position): CascadeRul
 function assess(position: Position, rules: SharedRules): PficHoldingDetail {
   const rule = firstMatchingRule(rules.cascade, position);
   const mitigation =
-    rule.outcome === "pfic" ? rules.mitigation.find((m) => m.wrappers.includes(position.wrapper)) : undefined;
+    rule.outcome === "pfic"
+      ? rules.mitigation.find((m) => m.wrappers.includes(position.wrapper))
+      : undefined;
 
   const severity: Severity = mitigation ? mitigation.severity : rule.severity;
   return {
@@ -61,6 +63,11 @@ export interface PficInput {
 
 export function assessPfic(input: PficInput): PficSection {
   const { rules, us } = input;
+  // A position enters the population if *any* owner is a US person, and it is
+  // counted gross — not reduced to that person's share of a joint account. The
+  // conservative reading for a flag: the whole holding is PFIC-exposed, and
+  // `personTokens` on each row shows who owns it. (Situs, where the split
+  // changes the exposure itself, does attribute by share.)
   const assessed = input.positions
     .filter((p) => heldForAnyOf(p, input.usPersonIds))
     .map((p) => assess(p, rules));
@@ -87,7 +94,9 @@ export function assessPfic(input: PficInput): PficSection {
   }
   const unitBase = input.toBase({ amount: 1, currency: us.currency }, input.asof);
   if (!Number.isFinite(unitBase)) {
-    throw new Error(`usconnect: injected FX returned a non-finite rate for ${us.currency} at ${input.asof}`);
+    throw new Error(
+      `usconnect: injected FX returned a non-finite rate for ${us.currency} at ${input.asof}`
+    );
   }
   const thresholdBase = thresholdAmount * unitBase;
   const belowThreshold = totalValueBase < thresholdBase;
@@ -102,7 +111,8 @@ export function assessPfic(input: PficInput): PficSection {
       instrumentCount: new Set(flagged.map((h) => h.instrumentId)).size,
       totalValueBase,
       investableWealthBase,
-      shareOfInvestableWealth: investableWealthBase === 0 ? 0 : totalValueBase / investableWealthBase,
+      shareOfInvestableWealth:
+        investableWealthBase === 0 ? 0 : totalValueBase / investableWealthBase,
       needsClassificationCount: needsClassification.length,
       needsClassificationValueBase: sum(needsClassification),
       bySeverity,

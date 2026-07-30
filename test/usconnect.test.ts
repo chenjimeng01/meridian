@@ -110,7 +110,10 @@ test("§7.1 every OEIC and the UCITS ETF are flagged PFIC", () => {
 
 test("§7.1 direct shares are not PFIC — UK or US incorporated", () => {
   const pos = pficByPosition(acceptance());
-  for (const key of ["A1|Thames Utilities PLC Ordinary 25p", "A1|Amalgamated Tech Inc Common Stock"]) {
+  for (const key of [
+    "A1|Thames Utilities PLC Ordinary 25p",
+    "A1|Amalgamated Tech Inc Common Stock",
+  ]) {
     const h = pos.get(key);
     assert.ok(h, `missing ${key}`);
     assert.equal(h.outcome, "not_pfic", `${key} is a direct equity, not a pooled vehicle`);
@@ -161,7 +164,11 @@ test("§7.1 wrapper mitigation: the same ETF is CRITICAL in the GIA and WARN in 
   assert.ok(gia && sipp);
   assert.equal(gia.severity, "CRITICAL");
   assert.equal(gia.wrapperMitigation, null);
-  assert.equal(sipp.outcome, "pfic", "the PFIC determination itself does not change inside a pension");
+  assert.equal(
+    sipp.outcome,
+    "pfic",
+    "the PFIC determination itself does not change inside a pension"
+  );
   assert.equal(sipp.severity, "WARN");
   assert.ok(sipp.wrapperMitigation, "SIPP holding must carry wrapper context");
   assert.ok(sipp.wrapperMitigation.sources.length > 0);
@@ -173,14 +180,21 @@ test("§7.1 exposure summary: count, total value, % of investable wealth, all pa
   assert.equal(s.positionCount, 5);
   assert.equal(s.instrumentCount, 3);
   near(s.totalValueBase, 161934.5, "PFIC total");
-  near(s.investableWealthBase, 109111.3 + 17869.12 + 75790 + 58308.55 / GBPUSD, "investable wealth");
+  near(
+    s.investableWealthBase,
+    109111.3 + 17869.12 + 75790 + 58308.55 / GBPUSD,
+    "investable wealth"
+  );
   near(s.shareOfInvestableWealth, s.totalValueBase / s.investableWealthBase, "share");
   assert.equal(s.needsClassificationCount, 1);
   near(s.needsClassificationValueBase, 10700, "unclassified value");
 
   const us = usParams as { params: { pfic: Record<string, { value: unknown } | undefined> } };
   assert.equal(r.pfic.reporting.form, us.params.pfic["form"]?.value);
-  const deMinimis = us.params.pfic["de_minimis_reporting_exception"]?.value as Record<string, number>;
+  const deMinimis = us.params.pfic["de_minimis_reporting_exception"]?.value as Record<
+    string,
+    number
+  >;
   assert.equal(r.pfic.reporting.deMinimis.thresholdAmount, deMinimis.aggregate_value_single);
   assert.equal(r.pfic.reporting.deMinimis.thresholdCurrency, "USD");
   assert.equal(r.pfic.reporting.deMinimis.belowThreshold, false);
@@ -202,9 +216,16 @@ test("§7.2 wrapper map: ISA WARN, SIPP OK, one entry per distinct wrapper held"
     assert.ok(w.accountTokens.length > 0);
     assert.ok(w.ukResident, `${w.wrapper}: UK-resident perspective cell required`);
   }
-  const matrix = (wrapperMatrix as { matrix: Record<string, { us_person: { severity: string; explanation: string } }> })
-    .matrix;
-  assert.equal(byWrapper.get("isa")?.explanation, matrix.isa?.us_person.explanation, "text must come from params");
+  const matrix = (
+    wrapperMatrix as {
+      matrix: Record<string, { us_person: { severity: string; explanation: string } }>;
+    }
+  ).matrix;
+  assert.equal(
+    byWrapper.get("isa")?.explanation,
+    matrix.isa?.us_person.explanation,
+    "text must come from params"
+  );
 });
 
 test("§8 the section opens with a count of critical flags", () => {
@@ -223,7 +244,8 @@ test("§7.3 situs splits US and non-US correctly, and follows incorporation not 
   assert.equal(r.situs.persons.length, 1);
   const p = r.situs.persons[0];
   assert.ok(p);
-  const key = (i: { accountToken: string; instrumentName: string }) => `${i.accountToken}|${i.instrumentName}`;
+  const key = (i: { accountToken: string; instrumentName: string }) =>
+    `${i.accountToken}|${i.instrumentName}`;
   const usSitus = new Set(p.usSitus.items.map(key));
   const nonUs = new Set(p.nonUsSitus.items.map(key));
 
@@ -238,7 +260,9 @@ test("§7.3 situs splits US and non-US correctly, and follows incorporation not 
     assert.ok(!nonUs.has(k), `${k} must not also be non-US-situs`);
   }
   // Situs follows incorporation, not custody: the US share sits in a UK GIA.
-  const amalgamated = p.usSitus.items.find((i) => i.instrumentName === "Amalgamated Tech Inc Common Stock");
+  const amalgamated = p.usSitus.items.find(
+    (i) => i.instrumentName === "Amalgamated Tech Inc Common Stock"
+  );
   assert.ok(amalgamated);
   assert.equal(amalgamated.wrapper, "gia", "held in a UK general investment account");
   assert.equal(amalgamated.wrapperJurisdiction, "UK");
@@ -267,10 +291,14 @@ test("§7.3 estate scope, treaty credit and the not-advice label are explicit", 
   const p = r.situs.persons[0];
   assert.ok(p);
   assert.equal(p.usEstate.basis, "worldwide", "P1 is a US citizen");
-  const estate = (usParams as { params: { estate_gift: Record<string, { value: number } | undefined> } }).params
-    .estate_gift;
+  const estate = (
+    usParams as { params: { estate_gift: Record<string, { value: number } | undefined> } }
+  ).params.estate_gift;
   assert.equal(p.usEstate.exemptionUsd, estate["estate_exemption"]?.value);
-  assert.equal(p.usEstate.nonresidentExemptionUsd, estate["nonresident_alien_exemption_equivalent"]?.value);
+  assert.equal(
+    p.usEstate.nonresidentExemptionUsd,
+    estate["nonresident_alien_exemption_equivalent"]?.value
+  );
   assert.equal(p.ukIht.scope, "worldwide", "ltr_flag: UK long-term resident");
   assert.ok(p.ukIht.sources.length > 0);
 
@@ -295,7 +323,11 @@ test("§7.4 currency-of-life compares portfolio exposure with the spending mix",
   near(p.portfolioMix.USD ?? 0, usdShare, "USD portfolio share");
   near(p.portfolioMix.GBP ?? 0, 1 - usdShare, "GBP portfolio share");
   assert.ok(p.spendingMix);
-  near(p.mismatchScore ?? -1, Math.abs(1 - usdShare - 0.8), "mismatch score (total variation distance)");
+  near(
+    p.mismatchScore ?? -1,
+    Math.abs(1 - usdShare - 0.8),
+    "mismatch score (total variation distance)"
+  );
   assert.ok(p.mismatchScore !== null && p.mismatchScore >= 0 && p.mismatchScore <= 1);
   assert.equal(p.band, "aligned");
   assert.ok(r.currencyOfLife.method.length > 20, "the score must be documented");
@@ -338,7 +370,9 @@ test("§7.3 a non-US joint owner gets the NRA column treatment and an equal spli
   assert.equal(p2.ukIht.scope, "uk_situs_only", "not flagged as a UK long-term resident");
   // Half of the US share in the joint GIA, and none of the solely-owned accounts.
   near(p2.usSitus.totalBase, 15156 / 2, "NRA US-situs exposure");
-  const amalgamated = p2.usSitus.items.find((i) => i.instrumentName === "Amalgamated Tech Inc Common Stock");
+  const amalgamated = p2.usSitus.items.find(
+    (i) => i.instrumentName === "Amalgamated Tech Inc Common Stock"
+  );
   assert.equal(amalgamated?.attributedShare, 0.5);
   assert.equal(p2.unclassified.totalBase, 10700 / 2);
   // The PFIC population still keys on the US person, so the joint GIA stays in it.

@@ -9,11 +9,16 @@ import type { CurrencyOfLifePerson, CurrencyOfLifeSection, CurrencyRow } from ".
 function normalise(mix: Record<string, number>, personToken: string): Record<string, number> {
   const total = Object.values(mix).reduce((acc, v) => acc + v, 0);
   if (!Number.isFinite(total) || total <= 0) {
-    throw new Error(`usconnect: currency-of-life mix for ${personToken} must contain positive weights`);
+    throw new Error(
+      `usconnect: currency-of-life mix for ${personToken} must contain positive weights`
+    );
   }
   const out: Record<string, number> = {};
   for (const [currency, weight] of Object.entries(mix)) {
-    if (weight < 0) throw new Error(`usconnect: currency-of-life weight for ${personToken}/${currency} is negative`);
+    if (weight < 0)
+      throw new Error(
+        `usconnect: currency-of-life weight for ${personToken}/${currency} is negative`
+      );
     out[currency] = weight / total;
   }
   return out;
@@ -23,7 +28,9 @@ function bandFor(score: number, rules: SharedRules): string {
   for (const band of rules.currencyOfLife.bands) {
     if (band.upTo === null || score <= band.upTo) return band.band;
   }
-  throw new Error("usconnect params: currency_of_life.bands must end with an open band (up_to: null)");
+  throw new Error(
+    "usconnect params: currency_of_life.bands must end with an open band (up_to: null)"
+  );
 }
 
 function forPerson(
@@ -43,10 +50,13 @@ function forPerson(
   }
 
   const portfolioMix: Record<string, number> = {};
-  for (const [currency, value] of byCurrency) portfolioMix[currency] = totalBase === 0 ? 0 : value / totalBase;
+  for (const [currency, value] of byCurrency)
+    portfolioMix[currency] = totalBase === 0 ? 0 : value / totalBase;
 
   const spendingMix = spending ? normalise(spending, person.token) : null;
-  const currencies = [...new Set([...Object.keys(portfolioMix), ...Object.keys(spendingMix ?? {})])].sort();
+  const currencies = [
+    ...new Set([...Object.keys(portfolioMix), ...Object.keys(spendingMix ?? {})]),
+  ].sort();
 
   const rows: CurrencyRow[] = currencies.map((currency) => {
     const portfolioShare = portfolioMix[currency] ?? 0;

@@ -88,9 +88,15 @@ export function buildPositions(ledger: Ledger, toBase: ToBase, asof: string): Po
 
   return ledger.holdings.map((holding, index) => {
     const account = accounts.get(String(holding.account_id));
-    if (!account) throw new Error(`usconnect: holding[${index}] references unknown account ${holding.account_id}`);
+    if (!account)
+      throw new Error(
+        `usconnect: holding[${index}] references unknown account ${holding.account_id}`
+      );
     const instrument = instruments.get(String(holding.instrument_id));
-    if (!instrument) throw new Error(`usconnect: holding[${index}] references unknown instrument ${holding.instrument_id}`);
+    if (!instrument)
+      throw new Error(
+        `usconnect: holding[${index}] references unknown instrument ${holding.instrument_id}`
+      );
 
     const rawValue = holding.value as { amount?: unknown; currency?: unknown } | undefined;
     if (typeof rawValue?.amount !== "number" || typeof rawValue.currency !== "string") {
@@ -99,7 +105,9 @@ export function buildPositions(ledger: Ledger, toBase: ToBase, asof: string): Po
     const value: Money = { amount: rawValue.amount, currency: rawValue.currency };
     const valueBase = toBase(value, asof);
     if (!Number.isFinite(valueBase)) {
-      throw new Error(`usconnect: injected FX returned a non-finite base value for ${value.currency} at ${asof}`);
+      throw new Error(
+        `usconnect: injected FX returned a non-finite base value for ${value.currency} at ${asof}`
+      );
     }
 
     const personIds = ((account["person_ids"] as unknown[] | undefined) ?? []).map(String);

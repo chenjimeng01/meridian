@@ -1,7 +1,13 @@
 // SPEC §7.3 — situs & estate exposure sketch. Two columns per person, plus a
 // third for anything whose metadata is unconfirmed: an unverified instrument is
 // never dropped into a column (PHASE_REVIEW_2 S7). Not advice.
-import { matchWhen, type SharedRules, type SitusRule, type UkParams, type UsParams } from "./params.ts";
+import {
+  matchWhen,
+  type SharedRules,
+  type SitusRule,
+  type UkParams,
+  type UsParams,
+} from "./params.ts";
 import { attributedShare, subjectOf, type Person, type Position } from "./ledger-view.ts";
 import type { SitusColumn, SitusItem, SitusPerson, SitusSection } from "./types.ts";
 
@@ -19,7 +25,13 @@ function column(items: SitusItem[]): SitusColumn {
   return { items, totalBase: items.reduce((acc, i) => acc + i.valueBase, 0) };
 }
 
-function forPerson(person: Person, positions: Position[], rules: SharedRules, us: UsParams, uk: UkParams): SitusPerson {
+function forPerson(
+  person: Person,
+  positions: Position[],
+  rules: SharedRules,
+  us: UsParams,
+  uk: UkParams
+): SitusPerson {
   const usSitus: SitusItem[] = [];
   const nonUsSitus: SitusItem[] = [];
   const unclassified: SitusItem[] = [];
@@ -30,7 +42,9 @@ function forPerson(person: Person, positions: Position[], rules: SharedRules, us
     const rule = firstMatchingRule(rules.situs.rules, position);
     const assetClass = rule.assetClass === null ? null : rules.situs.assetClasses[rule.assetClass];
     if (rule.assetClass !== null && assetClass === undefined) {
-      throw new Error(`usconnect params: situs rule ${rule.id} names undeclared asset class ${rule.assetClass}`);
+      throw new Error(
+        `usconnect params: situs rule ${rule.id} names undeclared asset class ${rule.assetClass}`
+      );
     }
     const item: SitusItem = {
       instrumentId: position.instrumentId,
@@ -52,7 +66,8 @@ function forPerson(person: Person, positions: Position[], rules: SharedRules, us
 
   const usWorldwide = person.usPerson;
   const ukWorldwide =
-    person.ukDomicileStatus !== null && rules.situs.longTermResidentFlags.includes(person.ukDomicileStatus);
+    person.ukDomicileStatus !== null &&
+    rules.situs.longTermResidentFlags.includes(person.ukDomicileStatus);
 
   return {
     personToken: person.token,
@@ -92,7 +107,10 @@ export function buildSitus(
   return {
     label: rules.situs.label,
     attribution: rules.situs.attribution,
-    treatyCredit: { note: rules.situs.treatyCredit.note, sources: [rules.situs.treatyCredit.source] },
+    treatyCredit: {
+      note: rules.situs.treatyCredit.note,
+      sources: [rules.situs.treatyCredit.source],
+    },
     persons: persons.map((p) => forPerson(p, positions, rules, us, uk)),
   };
 }

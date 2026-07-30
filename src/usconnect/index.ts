@@ -68,13 +68,21 @@ export function analyseUsConnect(input: UsConnectInput): UsConnectResult | null 
     wrapperConflicts.filter((w) => w.severity === "CRITICAL").length;
 
   const assumptions: Assumption[] = [
-    { id: "situs_treaty_credit", assumption: situs.treatyCredit.note, sources: situs.treatyCredit.sources },
+    {
+      id: "situs_treaty_credit",
+      assumption: situs.treatyCredit.note,
+      sources: situs.treatyCredit.sources,
+    },
     {
       id: "situs_attribution",
       assumption: rules.situs.attributionNote,
       sources: ["params/shared/pfic-rules.json situs.attribution"],
     },
-    { id: "pfic_filing_status", assumption: pfic.reporting.position, sources: pfic.reporting.sources },
+    {
+      id: "pfic_filing_status",
+      assumption: pfic.reporting.position,
+      sources: pfic.reporting.sources,
+    },
     {
       id: "currency_look_through",
       assumption: currencyOfLife.lookThroughNote,
@@ -87,8 +95,14 @@ export function analyseUsConnect(input: UsConnectInput): UsConnectResult | null 
     },
   ];
   for (const rule of rules.mitigation) {
-    if (pfic.holdings.some((h) => h.wrapperMitigation !== null && rule.wrappers.includes(h.wrapper))) {
-      assumptions.push({ id: "pfic_wrapper_mitigation", assumption: rule.explanation, sources: rule.sources });
+    if (
+      pfic.holdings.some((h) => h.wrapperMitigation !== null && rule.wrappers.includes(h.wrapper))
+    ) {
+      assumptions.push({
+        id: "pfic_wrapper_mitigation",
+        assumption: rule.explanation,
+        sources: rule.sources,
+      });
       break;
     }
   }
