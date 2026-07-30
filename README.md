@@ -71,8 +71,9 @@ unless you press Download. That is the only way a hosted interface is
 compatible with the local-first rule in `SPEC.md` §2.2.
 
 The desktop CLI remains the tool for real work — it keeps a durable ledger, an
-encrypted-at-rest vault, an acceptance audit trail and the parked-document
-workflow. The browser build is for showing someone what this does.
+owner-only (mode 600, **not encrypted**) vault, an acceptance audit trail and
+the parked-document workflow. Encryption at rest is a `PRE_LAUNCH.md`
+prerequisite and is NOT implemented; rely on FileVault or equivalent. The browser build is for showing someone what this does.
 
 ## Using it on your own documents
 

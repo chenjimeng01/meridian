@@ -11,6 +11,11 @@ node_modules/
 run.log
 *.log
 
+# The egress log records real processing activity once real documents are
+# ingested. It ships as an empty template; a working copy must never be
+# committed, least of all to a public repo.
+NETWORK_AUDIT.md
+
 # OS
 .DS_Store
 demo-data/
