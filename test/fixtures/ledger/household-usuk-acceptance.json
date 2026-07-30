@@ -1,0 +1,617 @@
+{
+  "schema_version": "0.1",
+  "household": {
+    "id": "01MERACPT00000000000000017",
+    "base_currency": "GBP",
+    "secondary_currency": "USD",
+    "persons": [
+      {
+        "id": "01MERACPT00000000000000001",
+        "display_token": "P1",
+        "tax_profile": {
+          "uk_resident": true,
+          "uk_domicile_status": "ltr_flag",
+          "us_person": true,
+          "us_person_basis": "citizen",
+          "state_exposure": "NY",
+          "treaty_positions": [
+            "uk_us_dta_pension_art17_18"
+          ]
+        }
+      }
+    ]
+  },
+  "accounts": [
+    {
+      "id": "01MERACPT00000000000000013",
+      "person_ids": [
+        "01MERACPT00000000000000001"
+      ],
+      "institution": "Alderbrook Platform",
+      "account_token": "A1",
+      "wrapper": "gia",
+      "wrapper_jurisdiction": "UK",
+      "custody_currency": "GBP",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    },
+    {
+      "id": "01MERACPT00000000000000014",
+      "person_ids": [
+        "01MERACPT00000000000000001"
+      ],
+      "institution": "Alderbrook Platform",
+      "account_token": "A2",
+      "wrapper": "isa",
+      "wrapper_jurisdiction": "UK",
+      "custody_currency": "GBP",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    },
+    {
+      "id": "01MERACPT00000000000000015",
+      "person_ids": [
+        "01MERACPT00000000000000001"
+      ],
+      "institution": "Beacon SIPP Trustees",
+      "account_token": "A3",
+      "wrapper": "sipp",
+      "wrapper_jurisdiction": "UK",
+      "custody_currency": "GBP",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    },
+    {
+      "id": "01MERACPT00000000000000016",
+      "person_ids": [
+        "01MERACPT00000000000000001"
+      ],
+      "institution": "Liberty Street Retirement",
+      "account_token": "A4",
+      "wrapper": "401k",
+      "wrapper_jurisdiction": "US",
+      "custody_currency": "USD",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    }
+  ],
+  "instruments": [
+    {
+      "id": "01MERACPT00000000000000002",
+      "identifiers": {
+        "isin": "GB00SYNTH014"
+      },
+      "name": "Sterling Park UK Equity Income OEIC Acc",
+      "type": "oeic",
+      "domicile": "GB",
+      "hmrc_reporting_fund": true,
+      "us_registered": false,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 2.221,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        },
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 2.221,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000003",
+      "identifiers": {
+        "isin": "GB00SYNTH089"
+      },
+      "name": "Northgate UK Smaller Companies OEIC",
+      "type": "oeic",
+      "domicile": "GB",
+      "hmrc_reporting_fund": true,
+      "us_registered": false,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 3.415,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000004",
+      "identifiers": {
+        "isin": "IE00SYNTH021"
+      },
+      "name": "Atlas Global Equity UCITS ETF",
+      "type": "ucits_etf",
+      "domicile": "IE",
+      "hmrc_reporting_fund": true,
+      "us_registered": false,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 65.02,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        },
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 63.9,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000005",
+      "identifiers": {
+        "isin": "GB00SYNTH052"
+      },
+      "name": "Thames Utilities PLC Ordinary 25p",
+      "type": "equity",
+      "domicile": "GB",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 6.31,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000006",
+      "identifiers": {
+        "isin": "US0000SYN047",
+        "cusip": "SYN000104"
+      },
+      "name": "Amalgamated Tech Inc Common Stock",
+      "type": "equity",
+      "domicile": "US",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 168.4,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000007",
+      "identifiers": {
+        "isin": "US0000SYN039"
+      },
+      "name": "Pioneer S&P Index Fund",
+      "type": "mutual_fund_us",
+      "domicile": "US",
+      "hmrc_reporting_fund": false,
+      "us_registered": true,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 152.35,
+            "currency": "USD"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000008",
+      "identifiers": {
+        "isin": "US0000SYN070"
+      },
+      "name": "Keystone Treasury Money Market Fund",
+      "type": "mmf",
+      "domicile": "US",
+      "hmrc_reporting_fund": false,
+      "us_registered": true,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "USD"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000009",
+      "identifiers": {},
+      "name": "Harbour Point Diversified Fund",
+      "type": "other_pooled",
+      "domicile": "JE",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": false,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 42.8,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000010",
+      "identifiers": {},
+      "name": "Cash (GBP)",
+      "type": "cash",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        },
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        },
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERACPT00000000000000011",
+      "identifiers": {},
+      "name": "Cash (USD)",
+      "type": "cash",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "USD"
+          },
+          "source": "statement"
+        }
+      ]
+    }
+  ],
+  "holdings": [
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000002",
+      "asof": "2026-06-30",
+      "units": 12500,
+      "value": {
+        "amount": 27762.5,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000003",
+      "asof": "2026-06-30",
+      "units": 4000,
+      "value": {
+        "amount": 13660,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000004",
+      "asof": "2026-06-30",
+      "units": 450,
+      "value": {
+        "amount": 29259,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000005",
+      "asof": "2026-06-30",
+      "units": 1800,
+      "value": {
+        "amount": 11358,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000006",
+      "asof": "2026-06-30",
+      "units": 90,
+      "value": {
+        "amount": 15156,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000009",
+      "asof": "2026-06-30",
+      "units": 250,
+      "value": {
+        "amount": 10700,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000013",
+      "instrument_id": "01MERACPT00000000000000010",
+      "asof": "2026-06-30",
+      "units": 1215.8,
+      "value": {
+        "amount": 1215.8,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000014",
+      "instrument_id": "01MERACPT00000000000000002",
+      "asof": "2026-06-30",
+      "units": 8000,
+      "value": {
+        "amount": 17768,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000014",
+      "instrument_id": "01MERACPT00000000000000010",
+      "asof": "2026-06-30",
+      "units": 101.12,
+      "value": {
+        "amount": 101.12,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000015",
+      "instrument_id": "01MERACPT00000000000000004",
+      "asof": "2026-06-30",
+      "units": 1150,
+      "value": {
+        "amount": 73485,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000015",
+      "instrument_id": "01MERACPT00000000000000010",
+      "asof": "2026-06-30",
+      "units": 2305,
+      "value": {
+        "amount": 2305,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000016",
+      "instrument_id": "01MERACPT00000000000000007",
+      "asof": "2026-06-30",
+      "units": 300,
+      "value": {
+        "amount": 45705,
+        "currency": "USD"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000016",
+      "instrument_id": "01MERACPT00000000000000008",
+      "asof": "2026-06-30",
+      "units": 12451.15,
+      "value": {
+        "amount": 12451.15,
+        "currency": "USD"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    },
+    {
+      "account_id": "01MERACPT00000000000000016",
+      "instrument_id": "01MERACPT00000000000000011",
+      "asof": "2026-06-30",
+      "units": 152.4,
+      "value": {
+        "amount": 152.4,
+        "currency": "USD"
+      },
+      "source_document_id": "01MERACPT00000000000000012"
+    }
+  ],
+  "transactions": [],
+  "documents": [
+    {
+      "id": "01MERACPT00000000000000012",
+      "filename": "synthetic/engine-fixture.txt",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "institution": "Synthetic Fixture",
+      "doc_type": "valuation",
+      "period": {
+        "from": "2026-04-01",
+        "to": "2026-06-30"
+      },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "parse_run_ids": [
+        "RUN-ENGINE-01"
+      ]
+    }
+  ],
+  "acceptances": [
+    {
+      "id": "01MERACPT00000000000000018",
+      "document_id": "01MERACPT00000000000000012",
+      "parse_run_id": "RUN-ENGINE-01",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000002"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Northgate UK Smaller Companies OEIC",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000003"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000004"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Thames Utilities PLC Ordinary 25p",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000005"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Amalgamated Tech Inc Common Stock",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000006"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Harbour Point Diversified Fund",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000009"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Cash (GBP)",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000010"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000002"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Cash (GBP)",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000010"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Atlas Global Equity UCITS ETF",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000004"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A3",
+          "ref": "Cash (GBP)",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000010"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Pioneer S&P Index Fund",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000007"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Keystone Treasury Money Market Fund",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000008"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A4",
+          "ref": "Cash (USD)",
+          "action": "accepted",
+          "instrument_id": "01MERACPT00000000000000011"
+        }
+      ]
+    }
+  ],
+  "fx_rates": [
+    {
+      "date": "2026-06-30",
+      "pair": "GBPUSD",
+      "rate": 1.28,
+      "source": "statement:synthetic/engine-fixture"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "jurisdiction": "SHARED",
+  "name": "asset-classes",
+  "effective": { "from": "2026-01-01", "to": "2099-12-31" },
+  "comment": "Classification maps for SPEC §6.1 consolidation and §6.4 exposure. Instrument types map to a broad asset class and a liquidity tier; keys match the ledger schema's instrumentType enum exactly.",
+  "asset_class_by_type": {
+    "equity": "equity",
+    "oeic": "equity",
+    "ucits_etf": "equity",
+    "us_etf": "equity",
+    "investment_trust": "equity",
+    "mutual_fund_us": "equity",
+    "other_pooled": "alternative",
+    "private_equity": "alternative",
+    "bond": "bond",
+    "mmf": "cash",
+    "cash": "cash",
+    "property": "property"
+  },
+  "liquidity_tier_by_type": {
+    "comment": "t0 = same day, t1 = next day, t2_5 = 2-5 days, illiquid = no reliable market",
+    "cash": "t0",
+    "mmf": "t0",
+    "equity": "t1",
+    "bond": "t1",
+    "us_etf": "t1",
+    "ucits_etf": "t1",
+    "investment_trust": "t1",
+    "oeic": "t2_5",
+    "mutual_fund_us": "t2_5",
+    "other_pooled": "t2_5",
+    "property": "illiquid",
+    "private_equity": "illiquid"
+  },
+  "wrapped_by_wrapper": {
+    "comment": "SPEC §6.4 unwrapped-vs-wrapped ratio, per jurisdiction. 'wrapped' means the wrapper confers a tax shelter in its own jurisdiction.",
+    "isa": true,
+    "sipp": true,
+    "ira_trad": true,
+    "ira_roth": true,
+    "401k": true,
+    "529": true,
+    "uk_bond_onshore": true,
+    "uk_bond_offshore": true,
+    "gia": false,
+    "us_brokerage": false,
+    "bank_current": false,
+    "bank_savings": false,
+    "property": false,
+    "private_holding": false
+  },
+  "concentration": {
+    "single_issuer_flag_threshold": {
+      "value": 0.05,
+      "source": "SPEC §6.4: single-issuer positions above 5% of investable wealth are flagged",
+      "status": "published"
+    },
+    "top_positions_count": {
+      "value": 10,
+      "source": "SPEC §6.4: top-10 positions reported",
+      "status": "published"
+    }
+  }
+}

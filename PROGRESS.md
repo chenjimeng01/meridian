@@ -1,9 +1,39 @@
 # PROGRESS
 
-**Current phase:** 2 complete — Phase 3 (engine + US-connected) may open
-**Status:** `npm test` green (54/54), lint + typecheck clean; PHASE_REVIEW_2
-MUST-FIX items all resolved
-**Last completed step:** 2.10 MUST-FIX resolution
+**Current phase:** 3 — Engine (§6) + US-connected intelligence (§7)
+**Status:** in progress. Module 2 complete (90/90 green across all suites);
+Module 3 delegated to the deep-technical agent per §12.
+**Last completed step:** 3.5 Module 2 risk & exposure
+
+## Phase 3 step plan
+
+Acceptance criteria — §6: golden suites for (a) TWR vs XIRR divergence,
+(b) Modified Dietz vs known TWR tolerance, (c) dual-currency consolidation with
+an awkward FX date-mismatch, (d) cost-stack reconciliation to a synthetic MiFID
+disclosure to the penny. §7: the acceptance household produces the correct PFIC
+list, ISA WARN / SIPP OK, and a correct situs split; a UK-only household
+produces no US-module output at all.
+
+- [x] 3.0 Foundations: `metadata_confirmed` on instruments (PHASE_REVIEW_2 S7),
+      `params/shared/pfic-rules.json`, `params/shared/asset-classes.json`,
+      and the two Phase 3 test households (§7 acceptance + UK-only), both
+      schema-valid and deterministically generated
+- [x] 3.1 §6 acceptance criteria written as tests first
+- [x] 3.2 FX (`src/engine/fx.ts`): fx-policy source order, never a rate later
+      than the valuation date, staleness warning, refusal beyond the limit,
+      USD triangulation, half-even rounding — 11 tests
+- [x] 3.3 Performance (`performance.ts`): TWR daily-linked, XIRR
+      (Newton + bisection), Modified Dietz always labelled an estimate with its
+      assumption stated, chain-linking, real returns — 9 tests, both §6.2
+      acceptance cases verified against closed-form answers
+- [x] 3.4 Cost stack (`cost.ts`): reconciles to the MiFID fixture to the penny
+      (£1,158.00 / 141.22 bps), refuses any unattributed line, 20-year
+      compounding drag — 6 tests
+- [x] 3.5 Consolidation + risk (`consolidate.ts`, `risk.ts`): eight slices that
+      all sum back to the total, dual currency, concentration flags, wrapped vs
+      unwrapped per jurisdiction, geographic split — 10 tests
+- [ ] 3.6 Module 3 — US-connected intelligence (delegated to deep-technical)
+- [ ] 3.7 Phase gate: structural review → PHASE_REVIEW_3.md
 
 ## Phase 2 step plan
 

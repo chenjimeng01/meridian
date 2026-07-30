@@ -1,0 +1,230 @@
+{
+  "schema_version": "0.1",
+  "household": {
+    "id": "01MERDMST00000000000000008",
+    "base_currency": "GBP",
+    "persons": [
+      {
+        "id": "01MERDMST00000000000000001",
+        "display_token": "P1",
+        "tax_profile": {
+          "uk_resident": true,
+          "uk_domicile_status": "ltr_flag",
+          "us_person": false
+        }
+      }
+    ]
+  },
+  "accounts": [
+    {
+      "id": "01MERDMST00000000000000006",
+      "person_ids": [
+        "01MERDMST00000000000000001"
+      ],
+      "institution": "Alderbrook Platform",
+      "account_token": "A1",
+      "wrapper": "gia",
+      "wrapper_jurisdiction": "UK",
+      "custody_currency": "GBP",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    },
+    {
+      "id": "01MERDMST00000000000000007",
+      "person_ids": [
+        "01MERDMST00000000000000001"
+      ],
+      "institution": "Alderbrook Platform",
+      "account_token": "A2",
+      "wrapper": "isa",
+      "wrapper_jurisdiction": "UK",
+      "custody_currency": "GBP",
+      "opened": null,
+      "data_asof": "2026-06-30"
+    }
+  ],
+  "instruments": [
+    {
+      "id": "01MERDMST00000000000000002",
+      "identifiers": {
+        "isin": "GB00SYNTH014"
+      },
+      "name": "Sterling Park UK Equity Income OEIC Acc",
+      "type": "oeic",
+      "domicile": "GB",
+      "hmrc_reporting_fund": true,
+      "us_registered": false,
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 2.221,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        },
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 2.221,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERDMST00000000000000003",
+      "identifiers": {
+        "isin": "GB00SYNTH052"
+      },
+      "name": "Thames Utilities PLC Ordinary 25p",
+      "type": "equity",
+      "domicile": "GB",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 6.31,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    },
+    {
+      "id": "01MERDMST00000000000000004",
+      "identifiers": {},
+      "name": "Cash (GBP)",
+      "type": "cash",
+      "pfic_status": "not_assessed",
+      "metadata_confirmed": true,
+      "prices": [
+        {
+          "date": "2026-06-30",
+          "price": {
+            "amount": 1,
+            "currency": "GBP"
+          },
+          "source": "statement"
+        }
+      ]
+    }
+  ],
+  "holdings": [
+    {
+      "account_id": "01MERDMST00000000000000006",
+      "instrument_id": "01MERDMST00000000000000002",
+      "asof": "2026-06-30",
+      "units": 10000,
+      "value": {
+        "amount": 22210,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERDMST00000000000000005"
+    },
+    {
+      "account_id": "01MERDMST00000000000000006",
+      "instrument_id": "01MERDMST00000000000000003",
+      "asof": "2026-06-30",
+      "units": 1200,
+      "value": {
+        "amount": 7572,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERDMST00000000000000005"
+    },
+    {
+      "account_id": "01MERDMST00000000000000007",
+      "instrument_id": "01MERDMST00000000000000002",
+      "asof": "2026-06-30",
+      "units": 5000,
+      "value": {
+        "amount": 11105,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERDMST00000000000000005"
+    },
+    {
+      "account_id": "01MERDMST00000000000000007",
+      "instrument_id": "01MERDMST00000000000000004",
+      "asof": "2026-06-30",
+      "units": 480.5,
+      "value": {
+        "amount": 480.5,
+        "currency": "GBP"
+      },
+      "source_document_id": "01MERDMST00000000000000005"
+    }
+  ],
+  "transactions": [],
+  "documents": [
+    {
+      "id": "01MERDMST00000000000000005",
+      "filename": "synthetic/engine-fixture.txt",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "institution": "Synthetic Fixture",
+      "doc_type": "valuation",
+      "period": {
+        "from": "2026-04-01",
+        "to": "2026-06-30"
+      },
+      "parsed_at": "2026-07-30T11:00:00Z",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "parse_run_ids": [
+        "RUN-ENGINE-01"
+      ]
+    }
+  ],
+  "acceptances": [
+    {
+      "id": "01MERDMST00000000000000009",
+      "document_id": "01MERDMST00000000000000005",
+      "parse_run_id": "RUN-ENGINE-01",
+      "accepted_at": "2026-07-30T12:00:00Z",
+      "operator_initials": "JC",
+      "lines": [
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MERDMST00000000000000002"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A1",
+          "ref": "Thames Utilities PLC Ordinary 25p",
+          "action": "accepted",
+          "instrument_id": "01MERDMST00000000000000003"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Sterling Park UK Equity Income OEIC Acc",
+          "action": "accepted",
+          "instrument_id": "01MERDMST00000000000000002"
+        },
+        {
+          "kind": "holding",
+          "account_token": "A2",
+          "ref": "Cash (GBP)",
+          "action": "accepted",
+          "instrument_id": "01MERDMST00000000000000004"
+        }
+      ]
+    }
+  ],
+  "fx_rates": [
+    {
+      "date": "2026-06-30",
+      "pair": "GBPUSD",
+      "rate": 1.28,
+      "source": "statement:synthetic/engine-fixture"
+    }
+  ]
+}
