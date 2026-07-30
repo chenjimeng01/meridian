@@ -33,6 +33,13 @@ export interface AuditEntry {
   endpoint: string;
   purpose: string;
   redaction_check: "pass";
+  /**
+   * Which household and document. Without these the log cannot answer "whose
+   * data went to the API on 3 March", which is the question it exists for and
+   * which Art. 33 gives 72 hours to answer.
+   */
+  household_id?: string;
+  document_ref?: string;
 }
 
 export interface ExtractDeps {

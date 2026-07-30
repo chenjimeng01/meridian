@@ -10,8 +10,9 @@
 //
 // This module owns all disk I/O for the CLI so the engine and ingest modules
 // stay pure.
-import { chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { dirname, join } from "node:path";
 import { createVault, loadVault, saveVault, type Vault } from "../ingest/redact.ts";
 import { serializeLedger, type HouseholdConfig } from "../ingest/accept.ts";
 import type { Ledger, ParseOutput } from "../ingest/types.ts";
@@ -34,6 +35,23 @@ export interface HouseholdStore {
   loadParkedRun(runId: string): { source: string; error: string };
   loadRun(runId: string): { output: ParseOutput; meta: RunMeta };
   saveReport(name: string, contents: string): string;
+  issueReport(kind: string, asof: string, contents: string): IssuedReport;
+  listIssuedReports(): IssuedReport[];
+  purge(): string[];
+}
+
+/**
+ * A report as actually issued. Content-addressed and never overwritten: the
+ * record that matters for COBS 9A.5 is the document the client received, and
+ * regenerating with different assumptions used to destroy it silently.
+ */
+export interface IssuedReport {
+  /** sha256 of the rendered document — its identity. */
+  sha256: string;
+  kind: string;
+  asof: string;
+  issuedAt: string;
+  path: string;
 }
 
 export interface RunMeta {
@@ -109,8 +127,19 @@ export function createHousehold(
   writeFileSync(join(dir, "household.json"), JSON.stringify(stripIdentifiers(config), null, 2) + "\n");
   chmodSync(join(dir, "household.json"), 0o600);
   writeFileSync(join(dir, "ledger.json"), serializeLedger(ledger));
+  chmodSync(join(dir, "ledger.json"), 0o600);
   saveVault(join(dir, "vault.local.json"), createVault(config, salt));
   return openStore(dataRoot, householdId);
+}
+
+/** The issue timestamp, read once per store so src/ still never polls a clock. */
+let issuedAtOverride: string | null = null;
+export function setIssuedAt(timestamp: string | null): void {
+  issuedAtOverride = timestamp;
+}
+function issuedAtStamp(_dir: string): string {
+  void _dir;
+  return issuedAtOverride ?? new Date().toISOString();
 }
 
 export function openStore(dataRoot: string, householdId: string): HouseholdStore {
@@ -134,7 +163,13 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
     dir,
     config,
     loadLedger: () => JSON.parse(readFileSync(join(dir, "ledger.json"), "utf8")) as Ledger,
-    saveLedger: (ledger) => writeFileSync(join(dir, "ledger.json"), serializeLedger(ledger)),
+    saveLedger: (ledger) => {
+      const path = join(dir, "ledger.json");
+      writeFileSync(path, serializeLedger(ledger));
+      // The ledger is the entire financial picture and sits beside the file
+      // that re-identifies it; 644 made the vault's 600 pointless.
+      chmodSync(path, 0o600);
+    },
     loadVault: () => {
       const vault = loadVault(join(dir, "vault.local.json"));
       if (!vault) throw new Error(`household ${householdId} has no vault — refusing to redact without one`);
@@ -155,7 +190,10 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
     saveRun: (runId, files) => {
       const target = join(dir, "parse-runs", runId);
       mkdirSync(target, { recursive: true });
-      for (const [name, contents] of Object.entries(files)) writeFileSync(join(target, name), contents);
+      for (const [name, contents] of Object.entries(files)) {
+        writeFileSync(join(target, name), contents);
+        chmodSync(join(target, name), 0o600);
+      }
       return target;
     },
     parkRun: (runId, files) => {
@@ -222,7 +260,52 @@ export function openStore(dataRoot: string, householdId: string): HouseholdStore
     saveReport: (name, contents) => {
       const path = join(dir, "reports", name);
       writeFileSync(path, contents);
+      chmodSync(path, 0o600);
       return path;
+    },
+
+    issueReport: (kind, asof, contents) => {
+      const sha256 = createHash("sha256").update(contents).digest("hex");
+      const filename = `${kind}-${asof}-${sha256.slice(0, 12)}.html`;
+      const path = join(dir, "reports", "issued", filename);
+      mkdirSync(dirname(path), { recursive: true });
+      // Content-addressed, so re-issuing an identical document is a no-op and
+      // a changed one can never overwrite its predecessor.
+      if (!existsSync(path)) {
+        writeFileSync(path, contents);
+        chmodSync(path, 0o600);
+      }
+      const record: IssuedReport = { sha256, kind, asof, issuedAt: issuedAtStamp(dir), path };
+      appendFileSync(join(dir, "reports", "issued.log.jsonl"), JSON.stringify(record) + "\n");
+      chmodSync(join(dir, "reports", "issued.log.jsonl"), 0o600);
+      return record;
+    },
+
+    listIssuedReports: () => {
+      const logPath = join(dir, "reports", "issued.log.jsonl");
+      if (!existsSync(logPath)) return [];
+      return readFileSync(logPath, "utf8")
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as IssuedReport);
+    },
+
+    /**
+     * UK GDPR Art. 17. Removes EVERYTHING for this household — including the
+     * places a naive `rm` would miss: content-addressed originals in
+     * documents/, and parse-runs/failed/, which holds RAW unredacted documents.
+     */
+    purge: () => {
+      const removed: string[] = [];
+      for (const entry of ["ledger.json", "household.json", "vault.local.json", "documents", "parse-runs", "reports"]) {
+        const target = join(dir, entry);
+        if (existsSync(target)) {
+          rmSync(target, { recursive: true, force: true });
+          removed.push(entry);
+        }
+      }
+      rmSync(dir, { recursive: true, force: true });
+      return removed;
     },
   };
 }

@@ -181,7 +181,11 @@ export function assertNarrationSafe(payload: Results, forbidden: Iterable<string
     const token = match[1]!;
     if (!TOKEN_SHAPES.some((shape) => shape.test(token))) hits.push(token);
   }
-  if (/[\/\\][A-Za-z0-9_.-]+\.(?:pdf|txt|csv|xlsx?)/i.test(serialised)) {
+  // Real filenames contain spaces — "Eleanor Vance Q2 statement.pdf" is the
+  // normal case, and a character class of [A-Za-z0-9_.-] missed every one of
+  // them. The client's name is frequently IN the filename, so this is the
+  // detector that matters most.
+  if (/[/\\][^"\\/]{0,120}\.(?:pdf|txt|csv|xlsx?|docx?)/i.test(serialised)) {
     hits.push("a file path");
   }
   if (hits.length) {

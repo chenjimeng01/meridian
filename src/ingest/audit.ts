@@ -8,7 +8,8 @@ export function fileAuditAppender(auditPath: string): (entry: AuditEntry) => voi
   return (entry) => {
     appendFileSync(
       auditPath,
-      `| ${entry.timestamp} | ${entry.endpoint} | ${entry.purpose} | ${entry.redaction_check} |\n`
+      `| ${entry.timestamp} | ${entry.household_id ?? "-"} | ${entry.document_ref ?? "-"} | ` +
+        `${entry.endpoint} | ${entry.purpose} | ${entry.redaction_check} |\n`
     );
   };
 }

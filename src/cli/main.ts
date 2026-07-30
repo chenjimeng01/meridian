@@ -11,6 +11,7 @@
 // This file is the only place the real clock is read.
 import { cmdHouseholds, cmdIngest, cmdIngestLive, cmdReport, cmdReview, generateNarrative } from "./commands.ts";
 import { cmdManual } from "./manual.ts";
+import { cmdDelete } from "./commands.ts";
 
 const DEFAULT_DATA_ROOT = "./data";
 
@@ -42,6 +43,7 @@ const USAGE = `meridian — cross-border wealth intelligence (v0, local-first)
   review <run-id> --household <id>       accept/reject a parse run's lines
   manual <run-id> --household <id>       enter a parked document by hand
   report --household <id> --asof <date>  compute results, and --html the report
+  delete --household <id> --confirm      erase a household completely (GDPR Art. 17)
 
 Common flags:
   --data-root <dir>        where household data lives (default ${DEFAULT_DATA_ROOT})
@@ -116,6 +118,18 @@ async function main(argv: string[]): Promise<number> {
       console.log(`Parsed ${file} as run ${result.runId} (${result.extractor}, ${result.accountsFound} account(s)).`);
       console.log(`Review it: ${result.reviewPath}`);
       console.log(`Then: meridian review ${result.runId} --household ${householdId} --accept-all`);
+      return 0;
+    }
+
+    case "delete": {
+      const result = cmdDelete({
+        dataRoot,
+        householdId: requireFlag(flags, "household"),
+        confirm: flags.confirm === true,
+        now,
+      });
+      console.log(`Erased household ${result.householdId}: ${result.removed.join(", ")}.`);
+      console.log("Ledger, vault, original documents, parse runs and reports are gone. This cannot be undone.");
       return 0;
     }
 

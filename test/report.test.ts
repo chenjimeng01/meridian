@@ -291,6 +291,21 @@ test("--deck is a genuine paged summary, not the report with a class (§8)", () 
   // A screen-share artifact that cannot show the second currency defeats the
   // point of a dual-currency product.
   assert.match(deck, /id="currency-toggle"/);
+
+  // Consumer Duty: the deck is the document actually used in the meeting.
+  // Dropping the limitations while keeping "4 critical flags" is a
+  // fair-clear-and-not-misleading failure in the highest-traffic artefact.
+  // Compare against the escaped form the renderer emits.
+  const escaped = (text: string) =>
+    text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  for (const warning of usukResults.warnings) {
+    assert.ok(
+      deck.includes(escaped(warning)),
+      `the deck drops a caveat the report carries: "${warning.slice(0, 60)}…"`
+    );
+  }
+  assert.ok(deck.includes(escaped(usukResults.disclaimer)), "the deck must carry the disclaimer");
+  assert.match(deck, /contested readings of the UK\/US treaty/, "and the treaty caveat");
 });
 
 // --- narrative (§8): the model may never introduce a number ------------------

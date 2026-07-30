@@ -514,17 +514,31 @@ function deckSlides(results: Results): string {
       ? slide(
           SECTIONS.usConnect,
           `<h2>US-connected exposure</h2><p class="flag-count num">${esc(usConnect.criticalCount)}</p>` +
-            `<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to address.</p>` +
+            `<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to look into.</p>` +
+            `<p class="small muted">Several of these rest on contested readings of the UK/US treaty. ` +
+            `Take advice from a tax lawyer or dual-qualified adviser before acting.</p>` +
             (criticalRows
               ? `<div class="scroll" role="region" aria-label="Critical holdings" tabindex="0">` +
                 `<table><thead><tr><th scope="col">Holding</th><th scope="col" class="r">Value</th></tr></thead><tbody>${criticalRows}</tbody></table></div>`
               : "")
         )
       : "",
+    // The deck is the artefact actually used in the meeting. Dropping the
+    // limitations while keeping the alarming conclusions is a fair-clear-and-
+    // not-misleading failure in the highest-traffic document, so the caveats
+    // travel with it.
+    results.warnings.length
+      ? slide(
+          "What to read carefully",
+          `<h2>What to read carefully</h2>` +
+            `<ul class="warnings">${results.warnings.map((warning) => `<li>${esc(warning)}</li>`).join("")}</ul>`
+        )
+      : "",
     slide(
       SECTIONS.appendix,
       `<h2>Where every figure came from</h2><p>${esc(results.appendix.documents.length)} source documents, ` +
-        `each fingerprinted and dated. The full appendix is in the written report.</p>`
+        `each fingerprinted and dated. The full appendix is in the written report.</p>` +
+        `<p class="small muted">${esc(results.disclaimer)}</p>`
     ),
   ].join("\n");
 }

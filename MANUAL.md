@@ -313,6 +313,30 @@ starts later than you'd expect, and when instruments are unclassified.
 | `is a PDF and 'pdftotext' is not installed` | `brew install poppler`, or convert the file yourself. |
 | `N held instruments have unconfirmed metadata` | Not an error. Confirm them (§4) to get the tax analysis. |
 
+## 8b. Records and erasure
+
+**Every report you generate is also issued immutably.** Alongside the
+convenience copy at `reports/report-<date>.html`, a content-addressed copy is
+written to `reports/issued/` and logged in `reports/issued.log.jsonl` with its
+sha256 and issue time. Regenerating with different assumptions creates a new
+issued document; it never overwrites the one a client already received.
+
+**Erasing a household:**
+
+```sh
+meridian delete --household <id> --confirm
+```
+
+This removes the ledger, the vault, every original document, every parse run
+*including parked originals in `parse-runs/failed/`*, and every report. It is
+irreversible and refuses to run without `--confirm`.
+
+It removes what Meridian stored. It cannot reach your own copy of the original
+statement wherever you keep it — that belongs in your retention policy.
+
+**Permissions.** Everything holding client data is written mode 600. The vault
+is not encrypted; rely on FileVault or equivalent (see `PRE_LAUNCH.md`).
+
 ## 9. About the tax content
 
 Several positions this tool reports depend on how the UK/US double tax treaty

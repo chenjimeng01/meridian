@@ -369,6 +369,30 @@ export function cmdReview(options: ReviewOptions): ReviewResult {
   return options.reaccept ? { ...tally, reaccepted: true } : tally;
 }
 
+// --- delete -----------------------------------------------------------------
+
+export interface DeleteOptions extends BaseOptions {
+  householdId: string;
+  /** Must be true. Erasure is irreversible and is never inferred. */
+  confirm: boolean;
+}
+
+/**
+ * UK GDPR Art. 17 erasure and Art. 5(1)(e) storage limitation. Without this
+ * there is no mechanism behind a deletion request at all, and an operator
+ * doing it by hand would have to know that `documents/` holds content-addressed
+ * originals and `parse-runs/failed/` holds RAW, unredacted documents.
+ */
+export function cmdDelete(options: DeleteOptions): { householdId: string; removed: string[] } {
+  if (!options.confirm) {
+    throw new Error(
+      `delete: refusing to erase household ${options.householdId} without --confirm. This removes the ledger, the vault, every original document, every parse run including parked originals, and every report. It cannot be undone.`
+    );
+  }
+  const store = openStore(options.dataRoot, options.householdId);
+  return { householdId: options.householdId, removed: store.purge() };
+}
+
 // --- report -----------------------------------------------------------------
 
 export interface ReportOptions extends BaseOptions {
@@ -404,16 +428,17 @@ export function cmdReport(options: ReportOptions): {
   let reportPath: string | undefined;
   let deckPath: string | undefined;
   if (options.html) {
-    reportPath = store.saveReport(
-      `report-${options.asof}.html`,
-      renderReport(results, options.narrative ? { narrative: options.narrative } : {})
-    );
+    const html = renderReport(results, options.narrative ? { narrative: options.narrative } : {});
+    // Convenience copy at a stable name, PLUS an immutable issued copy. The
+    // convenience copy is overwritten freely; the issued one never is, because
+    // the record that matters is the document the client actually received.
+    reportPath = store.saveReport(`report-${options.asof}.html`, html);
+    store.issueReport("report", options.asof, html);
   }
   if (options.deck) {
-    deckPath = store.saveReport(
-      `deck-${options.asof}.html`,
-      renderReport(results, { mode: "deck", ...(options.narrative ? { narrative: options.narrative } : {}) })
-    );
+    const deck = renderReport(results, { mode: "deck", ...(options.narrative ? { narrative: options.narrative } : {}) });
+    deckPath = store.saveReport(`deck-${options.asof}.html`, deck);
+    store.issueReport("deck", options.asof, deck);
   }
   return {
     resultsPath,
