@@ -77,6 +77,33 @@ export function latestHoldings(ledger: Ledger, asof: string): any[] {
   );
 }
 
+/**
+ * The residual exists to absorb ROUNDING — at most a penny per slice. Anything
+ * larger means the slicing itself is wrong, and quietly allocating it to the
+ * biggest slice would make a genuine error invisible while the totals still
+ * reconciled.
+ *
+ * This was not hypothetical. A mutation deleting the joint-ownership split
+ * (so both owners were attributed the full value of a joint account) left the
+ * entire suite green: the residual clawed the excess back off the largest
+ * person, and `byPerson` still summed exactly to the total. The reconciliation
+ * check was hiding the error it existed to catch.
+ */
+export function assertResidualForTest(residual: number, sliceCount: number): void {
+  assertResidualIsRounding(residual, sliceCount, "base");
+}
+
+function assertResidualIsRounding(residual: number, sliceCount: number, column: string): void {
+  const maxRoundingDrift = (sliceCount + 1) * 0.01;
+  if (Math.abs(residual) > maxRoundingDrift) {
+    throw new Error(
+      `consolidate: ${column} slices are out by ${residual.toFixed(2)} across ${sliceCount} slices, ` +
+        `far more than rounding can explain (max ${maxRoundingDrift.toFixed(2)}). ` +
+        `A slice group is being computed wrongly; refusing to paper over it.`
+    );
+  }
+}
+
 export function consolidate(input: ConsolidateInput): ConsolidationResult {
   const { ledger, asof } = input;
   const classes = input.assetClasses as AssetClassDoc;
@@ -202,6 +229,7 @@ export function consolidate(input: ConsolidateInput): ConsolidationResult {
     if (!entries.length) return [];
 
     const baseResidual = round2(totalDual.base.amount - entries.reduce((t, e) => round2(t + e.baseAmount), 0));
+    assertResidualIsRounding(baseResidual, entries.length, "base");
     entries[0]!.baseAmount = round2(entries[0]!.baseAmount + baseResidual);
 
     if (totalDual.secondary) {
@@ -209,6 +237,7 @@ export function consolidate(input: ConsolidateInput): ConsolidationResult {
       const secondaryResidual = round2(
         totalDual.secondary.amount - entries.reduce((t, e) => round2(t + e.secondaryAmount), 0)
       );
+      assertResidualIsRounding(secondaryResidual, entries.length, "secondary");
       entries[0]!.secondaryAmount = round2(entries[0]!.secondaryAmount + secondaryResidual);
     }
 

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readJson } from "./helpers.ts";
-import { consolidate } from "../src/engine/consolidate.ts";
+import { consolidate, assertResidualForTest } from "../src/engine/consolidate.ts";
 import { assessRisk } from "../src/engine/risk.ts";
 import { FxUnavailableError } from "../src/engine/fx.ts";
 import type { Ledger } from "../src/ingest/types.ts";
@@ -68,6 +68,34 @@ test("every slice sums back to the total in BOTH currencies, exactly (§6.1, §8
       `${name} secondary column must add up to the headline — a column that does not add up is not renderable`
     );
   }
+});
+
+// A CTO review's mutation testing found that deleting the joint-ownership split
+// left the whole suite green: every owner was attributed the full value of a
+// joint account, and the residual silently clawed the excess back off the
+// largest person so the column still reconciled. The reconciliation check was
+// hiding the error it existed to catch.
+test("a mis-sliced group is refused, not absorbed into the largest slice (§6.1)", () => {
+  const ledger = structuredClone(readJson("test/fixtures/ledger/household-usuk-acceptance.json")) as any;
+  // Give one holding to a person who owns nothing else, then double-count it by
+  // listing the same owner twice — the shape a broken attribution produces.
+  const second = { ...ledger.household.persons[0], id: "01MERACPT00000000000000099", display_token: "P2" };
+  ledger.household.persons.push(second);
+  ledger.accounts[0].person_ids = [ledger.household.persons[0].id, second.id];
+
+  // With the split intact this is fine: each owner gets half.
+  const ok = consolidate({ ledger, assetClasses, fx: { rates: ledger.fx_rates, policy: fxPolicy }, asof: ASOF });
+  const people = ok.byPerson.map((s) => s.value.base.amount);
+  assert.equal(Math.round(people.reduce((t, v) => t + v, 0) * 100) / 100, ok.total.base.amount);
+
+  // And the guard itself: a residual far beyond rounding must throw rather
+  // than be quietly allocated away.
+  assert.throws(
+    () => assertResidualForTest(5.5, 3),
+    /far more than rounding can explain/,
+    "a large residual means the slicing is wrong and must not be papered over"
+  );
+  assert.doesNotThrow(() => assertResidualForTest(0.02, 3), "genuine rounding drift is still absorbed");
 });
 
 test("wrapper, jurisdiction and asset-class slices are right", () => {
