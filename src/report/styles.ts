@@ -193,6 +193,20 @@ ${
     : `.flag-count { font-family: ${DISPLAY_SERIF}; font-size: 3rem; line-height: 1; color: var(--brass-text); }`
 }
 
+/* --- treaty caveat: must read as a caution, not a footnote --------------- */
+.treaty-note {
+  border: 1px solid var(--brass); background: var(--paper-sunk);
+  padding: 0.85rem 0.95rem; margin: 1rem 0 1.2rem;
+}
+.treaty-note p { margin: 0.3rem 0 0; font-size: 0.86rem; }
+.treaty-note .byline {
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--brass-text); font-weight: 600; margin: 0;
+}
+.sources { margin-top: 0.35rem; font-size: 0.78rem; color: var(--ink-soft); }
+.sources-label { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.64rem; }
+.contested { color: var(--brass-text); }
+
 /* --- commentary ---------------------------------------------------------- */
 .commentary { border-left: 2px solid var(--brass-soft); padding: 0.1rem 0 0.1rem 0.85rem; margin: 0.9rem 0; }
 .commentary .byline {

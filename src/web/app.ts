@@ -9,7 +9,6 @@
 //
 // State lives in memory for the session. Nothing is written to a server, and
 // nothing is persisted unless you press Download.
-import Ajv2020 from "ajv/dist/2020.js";
 
 import { createVault, redactStatement, primeRedactionVocabulary, type Vault } from "../ingest/redact.ts";
 import { parseFixtureStatement } from "../ingest/extract-fixture.ts";
@@ -20,7 +19,6 @@ import type { Ledger, MetadataConfirmation, ParseOutput, ParseRun } from "../ing
 import { buildResults, type Results } from "../cli/results.ts";
 import { renderReport } from "../report/render.ts";
 
-import parseOutputSchema from "../../schema/parse-output.schema.json" with { type: "json" };
 import redactionVocabulary from "../../params/shared/redaction-vocabulary.json" with { type: "json" };
 import assetClasses from "../../params/shared/asset-classes.json" with { type: "json" };
 import fxPolicy from "../../params/shared/fx-policy.json" with { type: "json" };
@@ -40,6 +38,8 @@ import gbpCash from "../../params/shared/benchmarks/gbp_cash.json" with { type: 
 import demoConfig from "../../test/fixtures/household-config.json" with { type: "json" };
 import demoMetadata from "../../test/fixtures/instrument-metadata.json" with { type: "json" };
 import { DEMO_STATEMENTS } from "./demo-statements.ts";
+// @ts-expect-error — generated at build time by scripts/build-web.mjs
+import validateParseOutputGenerated from "./validate-parse-output.generated.mjs";
 
 primeRedactionVocabulary(redactionVocabulary);
 
@@ -60,12 +60,18 @@ const PARAMS: Record<string, unknown> = {
   "shared/benchmarks/gbp_cash.json": gbpCash,
 };
 
-const ajv = new (Ajv2020 as unknown as typeof import("ajv/dist/2020.js").Ajv2020)({
-  strict: true,
-  strictRequired: false,
-  allErrors: true,
-});
-const validateParseOutput = ajv.compile(parseOutputSchema as object);
+// Precompiled at build time (see scripts/build-web.mjs): a runtime schema
+// compiler would need script-src 'unsafe-eval', and the page's privacy claim
+// depends on the CSP staying strict.
+const validateParseOutput = validateParseOutputGenerated as unknown as {
+  (data: unknown): boolean;
+  errors?: { instancePath?: string; message?: string }[] | null;
+};
+
+const describeErrors = () =>
+  (validateParseOutput.errors ?? [])
+    .map((error) => `${error.instancePath ?? ""} ${error.message ?? ""}`.trim())
+    .join("; ");
 
 // --- session state ----------------------------------------------------------
 
@@ -135,7 +141,7 @@ async function addStatement(filename: string, text: string): Promise<Loaded> {
   if (!validateParseOutput(output)) {
     throw new Error(
       `${filename} could not be read as a statement. In the desktop tool it would be parked for manual entry. ` +
-        `(${ajv.errorsText(validateParseOutput.errors).slice(0, 160)})`
+        `(${describeErrors().slice(0, 160)})`
     );
   }
   if (!output.accounts.length || output.accounts.every((a) => !a.holdings?.length && !a.cash_balance && !a.fees?.length)) {

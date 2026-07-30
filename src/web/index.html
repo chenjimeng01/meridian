@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meridian — cross-border wealth intelligence</title>
 <meta name="description" content="Consolidate statements into one wealth ledger, with US/UK cross-border intelligence. Runs entirely in your browser.">
+<!-- The page claims your statements never leave the browser. This makes the
+     browser ENFORCE it: connect-src 'none' blocks every fetch, XHR, WebSocket
+     and beacon, so the claim does not depend on trusting the code — or on
+     every future commit to app.js staying honest. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src local(*); connect-src 'none'; frame-src blob: data:; child-src blob: data:; form-action 'none'; base-uri 'none'; object-src 'none'">
 <style>
   :root {
     --paper:#FAFAF7; --paper-sunk:#F2F1EA; --ink:#101B2D; --ink-soft:#4A5568;
@@ -89,6 +94,9 @@
     static: there is no server to send anything to. Parsing, redaction, the tax
     analysis and the report all run in this tab, and nothing is stored unless you
     press Download. Reload and it is gone.</p>
+    <p class="small" style="margin:.4rem 0 0">Enforced by the browser, not just promised:
+    this page's security policy blocks every network request it could make. See the
+    <a href="#privacy">privacy notice</a> for how to verify that yourself.</p>
     <p class="small" style="margin:.4rem 0 0">Synthetic and your own data only — see
     <span class="mono">PRE_LAUNCH.md</span> before using anyone else's.</p>
   </div>
@@ -153,10 +161,81 @@
   <iframe id="viewer" title="Generated document" sandbox="allow-same-origin"></iframe>
 </div>
 
+<section id="tax-note">
+  <h2>About the tax content</h2>
+  <p class="small">Several positions this tool reports depend on how the UK/US double tax
+  treaty is read, and qualified practitioners disagree about some of them. A treaty
+  position is an argument, not settled law: HMRC or the IRS may take a different view,
+  published guidance changes, and the outcome can turn on elections and filings made
+  years ago that this tool cannot see.</p>
+  <p class="small"><strong>Nothing here has been reviewed by a US-qualified tax adviser.</strong>
+  Consulting a tax lawyer or dual-qualified adviser is <strong>strongly recommended</strong>
+  before acting on anything this tool reports — and in particular before assuming a
+  wrapper is safe because it is marked OK. This is information, not advice, and it is
+  not a substitute for advice on your own circumstances.</p>
+</section>
+
+<section id="privacy">
+  <h2>Privacy notice</h2>
+
+  <h3>The short version</h3>
+  <p class="small">This page does not collect your data, because it cannot. It is a static
+  file with no server behind it. Everything happens in your browser and stops when you
+  close the tab.</p>
+
+  <h3>What happens to a file you choose</h3>
+  <p class="small">It is read by this page using your browser's file API and held in the
+  tab's memory. It is parsed, redacted and analysed there. It is not transmitted,
+  copied, logged or stored. Nothing is written to disk unless you press a Download
+  button, and that writes only to your own machine. Reloading the page discards
+  everything.</p>
+
+  <h3>How you can verify that, rather than take our word for it</h3>
+  <p class="small">This page sets a Content-Security-Policy of
+  <span class="mono">connect-src 'none'</span>, which instructs your browser to block
+  every network request this page might attempt — fetch, XHR, WebSocket and beacon
+  alike. Even if the code tried to send your data somewhere, the browser would refuse.
+  You can confirm it yourself: open your browser's developer tools, go to the Network
+  tab, and use the tool. You will see no requests. The
+  <a href="https://github.com/chenjimeng01/meridian">source is public</a>, as is the
+  exact file this page serves.</p>
+
+  <h3>Cookies, storage and analytics</h3>
+  <p class="small">None. No cookies, no localStorage, no sessionStorage, no IndexedDB, no
+  service worker, no analytics, no tracking pixels, no third-party scripts, no fonts
+  loaded from anywhere. The page loads two files — this document and one script — both
+  from this domain.</p>
+
+  <h3>Hosting</h3>
+  <p class="small">Served by GitHub Pages. GitHub receives the ordinary request
+  information any web server does — your IP address, browser type and the page
+  requested — under
+  <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement">GitHub's own privacy statement</a>.
+  That is unavoidable for any hosted page and applies to the page request only; it never
+  includes your financial data, because your financial data never leaves the tab.</p>
+
+  <h3>Who is responsible for this page</h3>
+  <p class="small"><strong>[Controller name and contact address to be completed before this
+  page is shared with anyone.]</strong> This is a personal, non-commercial project. If it
+  is ever used with another person's data it must be brought under a named controller,
+  with an ICO registration, a DPIA covering the document-extraction step, and a
+  retention policy — none of which are in place. See
+  <span class="mono">PRE_LAUNCH.md</span> in the repository.</p>
+
+  <h3>Your rights</h3>
+  <p class="small">UK GDPR rights of access, rectification and erasure apply to personal
+  data a controller holds about you. This page holds none once you close it, so there is
+  nothing here to access or erase. Rights against the desktop version, if someone runs
+  your data through it, are a matter for whoever operates it.</p>
+</section>
+
 <footer>
   <p>Analysis and information only. Not a personal recommendation. Not tax advice.
-  US tax outcomes depend on elections and filings not visible to this system.</p>
+  US tax outcomes depend on elections and filings not visible to this system.
+  Treaty interpretations differ — consult a tax lawyer.</p>
   <p>Everything in the worked example is fictional. Runs entirely client-side; no analytics, no cookies, no network calls.</p>
+  <p><a href="#privacy">Privacy notice</a> · <a href="#tax-note">About the tax content</a> ·
+  <a href="https://github.com/chenjimeng01/meridian">Source</a></p>
 </footer>
 </main>
 <script type="module" src="./app.js"></script>

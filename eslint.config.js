@@ -20,5 +20,5 @@ export default tseslint.config(
     },
   },
   // docs/ is the generated browser bundle; demo-statements.ts is generated too.
-  { ignores: ["node_modules/**", "data/**", "demo-data/**", "docs/**", "src/web/demo-statements.ts"] }
+  { ignores: ["node_modules/**", "data/**", "demo-data/**", "docs/**", "src/web/demo-statements.ts", "src/web/validate-parse-output.generated.mjs"] }
 );

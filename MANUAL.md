@@ -313,7 +313,27 @@ starts later than you'd expect, and when instruments are unclassified.
 | `is a PDF and 'pdftotext' is not installed` | `brew install poppler`, or convert the file yourself. |
 | `N held instruments have unconfirmed metadata` | Not an error. Confirm them (§4) to get the tax analysis. |
 
+## 9. About the tax content
+
+Several positions this tool reports depend on how the UK/US double tax treaty
+is read, and qualified practitioners disagree about some of them. A treaty
+position is an argument, not settled law: HMRC or the IRS may take a different
+view, published guidance changes, and the outcome can turn on elections and
+filings made years ago that this tool cannot see.
+
+Every wrapper now shows what its position rests on, and any position sourced to
+an analogy rather than authority is marked **"a treaty position, not settled
+authority"** in the report. The SIPP treatment is the clearest example: it is a
+treaty position, not a statutory exemption, and it depends on the scheme
+qualifying.
+
+**Nothing in this tool has been reviewed by a US-qualified tax adviser.**
+Consulting a tax lawyer or dual-qualified adviser is strongly recommended
+before acting on anything it reports — and particularly before assuming a
+wrapper is safe because it is marked OK.
+
 ---
 
 Analysis and information only. Not a personal recommendation. Not tax advice.
 US tax outcomes depend on elections and filings not visible to this system.
+Treaty interpretations differ — consult a tax lawyer.

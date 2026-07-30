@@ -68,6 +68,14 @@ export interface Results {
 export const DISCLAIMER =
   "Analysis and information only. Not a personal recommendation. Not tax advice. US tax outcomes depend on elections and filings not visible to this system.";
 
+/**
+ * Cross-border positions in this report rest on treaty readings that
+ * practitioners genuinely disagree about — they are not settled law, and the
+ * report says so wherever one is relied on (SPEC §7.2, §9).
+ */
+export const TREATY_DISCLAIMER =
+  "Several positions in this section depend on how the UK/US double tax treaty is read, and qualified practitioners disagree about some of them. A treaty position is an argument, not settled law: HMRC or the IRS may take a different view, published guidance changes, and the outcome can turn on elections and filings that were made years ago and are not visible to this system. Nothing here has been reviewed by a US-qualified tax adviser. Before acting on anything in this section — and before assuming a wrapper is safe because it is marked OK — take advice from a tax lawyer or dual-qualified adviser who can see your full circumstances and filing history.";
+
 export interface BuildResultsInput {
   ledger: Ledger;
   asof: string;

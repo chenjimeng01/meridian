@@ -227,6 +227,40 @@ test("data freshness is shown per account, and the appendix carries source + par
   assert.match(usukHtml, /parsed/i);
 });
 
+test("the treaty caveat leads the US section, before any severity label (§9)", () => {
+  const sectionStart = usukHtml.indexOf("What should worry you");
+  const caveatAt = usukHtml.indexOf("treaty position is an argument", sectionStart);
+  const firstSeverityAt = usukHtml.indexOf("CRITICAL", sectionStart);
+  assert.ok(caveatAt > sectionStart, "the caveat must be in the US section");
+  assert.ok(
+    caveatAt < firstSeverityAt,
+    "a reader must meet the treaty caveat BEFORE the first severity label, not after"
+  );
+  assert.match(usukHtml, /tax lawyer or dual-qualified adviser/);
+  assert.match(usukHtml, /has been reviewed by a US-qualified tax adviser|Nothing here has been reviewed/);
+});
+
+test("a wrapper position sourced to an analogy is marked contested, not settled (§7.2)", () => {
+  // The params say the SIPP treaty position is "an analogy (position, not
+  // authority)". That uncertainty existed in the data and was discarded by the
+  // renderer, so a contested position rendered as a confident green badge.
+  assert.match(usukHtml, /class="sources"/);
+  assert.match(usukHtml, /This is a treaty position, not settled authority/);
+  const wrapperSection = usukHtml.slice(usukHtml.indexOf("How your wrappers are treated"));
+  assert.match(wrapperSection, /Basis:/, "each wrapper cell shows what its position rests on");
+});
+
+test("the report declares a CSP that forbids it phoning home (§9)", () => {
+  // The report claims to be self-contained. This makes the browser enforce it,
+  // so a future edit that tried to transmit would be blocked, not permitted.
+  assert.match(usukHtml, /http-equiv="Content-Security-Policy"/);
+  assert.match(usukHtml, /connect-src 'none'/);
+  assert.match(usukHtml, /default-src 'none'/);
+  assert.match(usukHtml, /form-action 'none'/);
+  // And no eval, which would let injected script run.
+  assert.equal(/unsafe-eval/.test(usukHtml), false);
+});
+
 test("the regulatory footer is present verbatim (§9)", () => {
   for (const html of [usukHtml, ukOnlyHtml]) {
     assert.ok(html.includes("Not a personal recommendation"));

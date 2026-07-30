@@ -7,7 +7,7 @@ import { styles } from "./styles.ts";
 import { barChart, dragChart, pairedBars, stackedBar } from "./charts.ts";
 import { bps, esc, freshness, longDate, money, moneyShort, percent, wrapperLabel } from "./format.ts";
 import type { NarrativeSections } from "./narrative.ts";
-import type { Results } from "../cli/results.ts";
+import { TREATY_DISCLAIMER, type Results } from "../cli/results.ts";
 import type { DualMoney, Slice } from "../engine/consolidate.ts";
 
 export interface RenderOptions {
@@ -297,7 +297,15 @@ function usConnectSection(results: Results, options: RenderOptions): string {
     .map(
       (conflict: any) =>
         `<tr><td>${esc(wrapperLabel(conflict.wrapper))}</td><td>${severityChip(conflict.severity)}</td>` +
-        `<td class="small">${esc(conflict.explanation)}</td></tr>`
+        `<td class="small">${esc(conflict.explanation)}` +
+        (conflict.sources?.length
+          ? `<div class="sources"><span class="sources-label">Basis:</span> ${esc(conflict.sources.join("; "))}` +
+            (conflict.sources.some((source: string) => /position|analogy|not authority/i.test(source))
+              ? ` <strong class="contested">This is a treaty position, not settled authority.</strong>`
+              : "") +
+            `</div>`
+          : "") +
+        `</td></tr>`
     )
     .join("");
 
@@ -315,7 +323,11 @@ function usConnectSection(results: Results, options: RenderOptions): string {
 <p class="eyebrow">${esc(SECTIONS.usConnect)}</p>
 <h2>US-connected exposure</h2>
 <p class="flag-count num">${esc(usConnect.criticalCount)}</p>
-<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to address.</p>
+<p>critical ${usConnect.criticalCount === 1 ? "flag" : "flags"} to look into.</p>
+<aside class="treaty-note">
+  <p class="byline">Read this before the table below</p>
+  <p>${esc(TREATY_DISCLAIMER)}</p>
+</aside>
 ${commentary(options.narrative?.usConnect)}
 ${
   pficRows
@@ -534,6 +546,10 @@ export function renderReport(results: Results, options: RenderOptions = {}): str
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The report is self-contained by design; this makes that enforceable by the
+     browser rather than merely true today. connect-src 'none' means a future
+     edit that tried to phone home would be blocked, not silently permitted. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; font-src local(*); connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#101B2D">
 <title>${esc(title)}</title>
