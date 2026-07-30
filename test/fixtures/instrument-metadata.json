@@ -1,0 +1,11 @@
+{
+  "comment": "What an operator confirms at review time for the synthetic fixture instruments (SPEC §7.1). Until an instrument appears here, the PFIC cascade refuses to classify it and reports needs_classification. '40 Act registration in particular is NOT knowable from a statement.",
+  "Sterling Park UK Equity Income OEIC Acc": { "type": "oeic", "domicile": "GB", "us_registered": false, "hmrc_reporting_fund": true },
+  "Atlas Global Equity UCITS ETF": { "type": "ucits_etf", "domicile": "IE", "us_registered": false, "hmrc_reporting_fund": true },
+  "Thames Utilities PLC Ordinary 25p": { "type": "equity", "domicile": "GB", "us_registered": false },
+  "Amalgamated Tech Inc Common Stock": { "type": "equity", "domicile": "US", "us_registered": false },
+  "Continental Rail Corp Common Stock": { "type": "equity", "domicile": "US", "us_registered": false },
+  "UK Treasury Gilt 4.25% 2032": { "type": "bond", "domicile": "GB", "us_registered": false },
+  "Pioneer S&P Index Fund": { "type": "mutual_fund_us", "domicile": "US", "us_registered": true, "hmrc_reporting_fund": false },
+  "Keystone Treasury Money Market Fund": { "type": "mmf", "domicile": "US", "us_registered": true, "hmrc_reporting_fund": false }
+}

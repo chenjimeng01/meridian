@@ -132,6 +132,44 @@ test("a US-registered fund is only cleared because the operator said so, not bec
   assert.equal(pioneer.outcome, "needs_classification");
 });
 
+// Regression: Module 3 read every holding row rather than the latest snapshot
+// per position, so a ledger with three statements per account counted each
+// holding three times — investable wealth read £1,265,902 against an actual
+// £442,559, and the critical-flag count tripled. Only a multi-snapshot ledger
+// exposes it; the single-date acceptance fixture cannot.
+test("PFIC exposure counts each position once, and reconciles with the consolidation", async () => {
+  const { consolidate } = await import("../src/engine/consolidate.ts");
+  const ledger = ingest(true);
+  const result = analyse(ledger)!;
+
+  const consolidation = consolidate({
+    ledger,
+    assetClasses: readJson("params/shared/asset-classes.json"),
+    fx: { rates: ledger.fx_rates, policy: fxPolicy },
+    asof: "2026-06-30",
+  });
+
+  assert.ok(
+    Math.abs(result.pfic.summary.investableWealthBase - consolidation.total.base.amount) < 0.05,
+    `investable wealth ${result.pfic.summary.investableWealthBase} must reconcile with the consolidated total ${consolidation.total.base.amount}`
+  );
+
+  // Each (account, instrument) pair may appear at most once.
+  const seen = new Set<string>();
+  for (const holding of result.pfic.holdings as any[]) {
+    const key = `${holding.accountToken}|${holding.instrumentName}`;
+    assert.ok(!seen.has(key), `${key} counted more than once — historic snapshots are being double-counted`);
+    seen.add(key);
+  }
+
+  // The ledger genuinely holds three snapshots per position, so this is a real
+  // test rather than a vacuous one.
+  const atlasSnapshots = ledger.holdings.filter(
+    (h) => h.instrument_id === ledger.instruments.find((i) => i.identifiers.isin === "IE00SYNTH021")!.id
+  );
+  assert.ok(atlasSnapshots.length > 6, `expected multiple snapshots per position, found ${atlasSnapshots.length}`);
+});
+
 test("every metadata confirmation is written to the acceptance log", () => {
   const ledger = ingest(true);
   const confirmations = ledger.acceptances

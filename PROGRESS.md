@@ -1,9 +1,32 @@
 # PROGRESS
 
-**Current phase:** 3 complete — Phase 4 (CLI wiring) may open
-**Status:** `npm test` green (125/125), lint + typecheck clean;
-PHASE_REVIEW_3 MUST-FIX items all resolved, 0 open
-**Last completed step:** 3.9 carried-forward SHOULD-FIX cleared
+**Current phase:** 4 — CLI wiring (SPEC §10 Phase 4)
+**Status:** acceptance gate met (140/140 green, lint + typecheck clean) —
+awaiting phase-gate structural review
+**Last completed step:** 4.6 end-to-end verified from a real shell
+
+## Phase 4 step plan
+
+Acceptance gate (§10): end-to-end — document → accepted ledger → results JSON
+on the fixture household.
+
+- [x] 4.0 Entry task S13 (see below) — metadata confirmation is an operator
+      decision, so a real ingested ledger can produce PFIC flags at all
+- [x] 4.1 Acceptance criteria written as failing tests first (`test/cli.test.ts`)
+- [x] 4.2 Local-first store (`src/cli/store.ts`): the §3 directory layout,
+      content-addressed documents, owner-only vault, parse-runs incl. failed/,
+      reports/ — closes PHASE_REVIEW_2 S8 (parked runs and review files are
+      now actually written to disk)
+- [x] 4.3 `meridian households create|list`
+- [x] 4.4 `meridian ingest <file>`: PDF→text at the boundary via pdftotext with
+      a clear message when it is absent; redact, extract, match, write the
+      review file; a document that cannot be parsed parks in parse-runs/failed/
+- [x] 4.5 `meridian review <run-id>`: --accept-all or --decisions <file> for
+      per-line accept/edit/reject, plus --confirm-metadata to unlock the §7.1
+      cascade; refuses to guess if given neither
+- [x] 4.6 `meridian report`: runs the whole engine + Module 3 into a results
+      JSON with the §8 data appendix (source document AND parse date per figure)
+- [ ] 4.7 Phase gate: structural review → PHASE_REVIEW_4.md
 
 ## Phase 3 step plan
 
@@ -74,7 +97,25 @@ produces no US-module output at all.
       S9 the `Ledger` type mirrors §4 instead of seven `any[]` collections —
       which immediately caught a `"non_ltr"`/`"not_ltr"` typo in a test.
 
-## Phase 4 entry tasks (remaining PHASE_REVIEW_3 SHOULD-FIX)
+## Phase 4 findings
+
+- **Run-id collision (found by the end-to-end test).** Parse runs live on disk
+  before anything they contain reaches the ledger, so with a fixed clock and an
+  unaccepted ledger every ingest generated the SAME run id and silently
+  overwrote the previous run's directory. `ledgerIds` now seeds from runs on
+  disk as well as from the ledger.
+- **Module 3 double-counted historic snapshots (found by running the CLI for
+  real).** `buildPositions` read every holding row instead of the latest
+  snapshot per (account, instrument), so a household with three statements per
+  account reported investable wealth of £1,265,902 against an actual £442,559
+  and tripled the critical-flag count. It also converted every snapshot at the
+  report date rather than its own valuation date. Both fixed; Module 3 now
+  shares `latestHoldings` with the consolidation so the two cannot drift, and a
+  regression test asserts the two totals reconcile on a multi-snapshot ledger.
+  The single-date acceptance fixture could never have caught this — which is
+  the argument for running the real pipeline, not just the unit fixtures.
+
+## Remaining PHASE_REVIEW_3 SHOULD-FIX
 
 Cleared already: S5 (both new ledgers now inside the schema gate), S11 (the
 params sourcing rule now walks EVERY params file, not a hand-listed subset),

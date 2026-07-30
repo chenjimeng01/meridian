@@ -2,6 +2,7 @@
 // joined to its account and instrument, valued in base currency by the injected
 // FX function. Pure; the ledger's own array order is preserved so output is
 // stable without sorting.
+import { latestHoldings } from "../engine/consolidate.ts";
 import type { Ledger } from "../ingest/types.ts";
 import type { Money } from "./types.ts";
 import type { RuleSubject } from "./params.ts";
@@ -86,7 +87,11 @@ export function buildPositions(ledger: Ledger, toBase: ToBase, asof: string): Po
   const personTokens = new Map<string, string>();
   for (const p of ledger.household.persons) personTokens.set(p.id, p.display_token);
 
-  return ledger.holdings.map((holding, index) => {
+  // Holdings are snapshots (SPEC §4): the same position appears once per
+  // statement. Taking every row would count a holding once per document —
+  // inflating PFIC exposure and investable wealth several-fold. Use exactly
+  // the same selection as the consolidation so the two always agree.
+  return latestHoldings(ledger, asof).map((holding, index) => {
     const account = accounts.get(String(holding.account_id));
     if (!account)
       throw new Error(
@@ -103,7 +108,9 @@ export function buildPositions(ledger: Ledger, toBase: ToBase, asof: string): Po
       throw new Error(`usconnect: holding[${index}] has no { amount, currency } value`);
     }
     const value: Money = { amount: rawValue.amount, currency: rawValue.currency };
-    const valueBase = toBase(value, asof);
+    // Convert at the snapshot's OWN valuation date, as consolidation does — a
+    // figure must be reproducible from the data available when it was struck.
+    const valueBase = toBase(value, String(holding.asof ?? asof));
     if (!Number.isFinite(valueBase)) {
       throw new Error(
         `usconnect: injected FX returned a non-finite base value for ${value.currency} at ${asof}`
