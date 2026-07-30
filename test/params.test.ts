@@ -8,7 +8,10 @@ const PARAM_FILES = listFiles("params", ".json");
 
 test("all expected params files are present", () => {
   const names = PARAM_FILES.map((f) => f.replace(/^params\//, ""));
-  for (const required of ["uk/2026-27.json", "us/2026.json", "shared/fx-policy.json", "shared/wrapper-matrix.json"]) {
+  for (const required of [
+    "uk/2026-27.json", "us/2026.json", "shared/fx-policy.json", "shared/wrapper-matrix.json",
+    "shared/pfic-rules.json", "shared/asset-classes.json", "shared/redaction-vocabulary.json",
+  ]) {
     assert.ok(names.includes(required), `missing params/${required}`);
   }
   assert.ok(names.filter((n) => n.startsWith("shared/benchmarks/")).length >= 5, "expected at least 5 benchmark series");
@@ -61,9 +64,21 @@ test("every parameter entry carries a source string and a valid status", () => {
       );
       return 1;
     }
-    for (const [k, v] of Object.entries(node as object)) count += walk(v, `${path}.${k}`, file);
+    for (const [k, v] of Object.entries(node as object)) {
+      // Index observations are data, not parameter entries; they have their own
+      // dedicated shape test below.
+      if (k === "series") continue;
+      count += walk(v, `${path}.${k}`, file);
+    }
     return count;
   };
+  // PHASE_REVIEW_3 S11: the sourcing rule applies to EVERY params file, not a
+  // hand-listed subset that new files silently escape.
+  for (const f of PARAM_FILES) {
+    walk(readJson(f), "$", f);
+  }
+  // The rate-bearing files must additionally be substantial, so an emptied
+  // file cannot pass by having nothing to check.
   for (const f of ["params/uk/2026-27.json", "params/us/2026.json", "params/shared/fx-policy.json"]) {
     const n = walk(readJson(f), "$", f);
     assert.ok(n >= 5, `${f}: expected at least 5 sourced parameter entries, found ${n}`);

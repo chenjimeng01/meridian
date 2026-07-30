@@ -20,9 +20,14 @@ test("both schemas compile under ajv strict mode", () => {
   assert.ok(validateParseOutput);
 });
 
-test("fixture household ledger validates against ledger schema", () => {
-  const ledger = readJson("test/fixtures/ledger/household-usuk.json");
-  assert.ok(validateLedger(ledger), errs(validateLedger));
+test("every committed ledger fixture validates against the ledger schema", () => {
+  // PHASE_REVIEW_3 S5: the Phase-3 households were outside this gate.
+  const ledgers = listFiles("test/fixtures/ledger", ".json");
+  assert.ok(ledgers.length >= 4, `expected all ledger fixtures, found ${ledgers.length}`);
+  for (const file of ledgers) {
+    assert.ok(validateLedger(readJson(file)), `${file}: ${errs(validateLedger)}`);
+  }
+  assert.ok(validateLedger(readJson("test/golden/ingested-ledger.json")), errs(validateLedger));
 });
 
 test("every expected parse output validates against parse-output schema", () => {

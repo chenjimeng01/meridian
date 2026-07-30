@@ -74,6 +74,37 @@ produces no US-module output at all.
       S9 the `Ledger` type mirrors §4 instead of seven `any[]` collections —
       which immediately caught a `"non_ltr"`/`"not_ltr"` typo in a test.
 
+## Phase 4 entry tasks (remaining PHASE_REVIEW_3 SHOULD-FIX)
+
+Cleared already: S5 (both new ledgers now inside the schema gate), S11 (the
+params sourcing rule now walks EVERY params file, not a hand-listed subset),
+S12 (the PHASE_REVIEW_2 carry-overs).
+
+- [ ] **S13 — highest priority.** Nothing in the pipeline can set
+      `metadata_confirmed`, so a *real* ingested ledger produces zero PFIC
+      flags: every instrument routes to `needs_classification`. §7 only works
+      on the hand-authored acceptance fixture. Confirming instrument metadata
+      must become an operator action in the Phase 4 CLI (`meridian review`),
+      recorded in the acceptance log like any other decision.
+- [ ] S1/S2/S3 float hygiene: unrounded values leak into the `usconnect`
+      result object; `Math.round` is used where the fx-policy mandates
+      half-even; `convert()` rounds inside the engine, contradicting the policy
+      it implements. (Partly addressed — `convert()` now also returns `exact`,
+      and consolidation uses it — but the rounding call sites need a sweep.)
+- [ ] S4 `fx.ts` hardcodes the USD pivot and ignores two policy values it reads
+- [ ] S6 the cost-stack reconciliation runs against hand-typed constants rather
+      than figures that came through the ingest pipeline
+- [ ] S7 only two of the five engine entry points take a ledger
+- [ ] S8 `latestHoldings` has no disposal semantics and no staleness signal —
+      a sold holding never disappears from the consolidation
+- [ ] S9 the two currency columns are two different measurements and this is
+      not stated to the reader
+- [ ] S10 §6.4 concentration is per-instrument and measured against total
+      rather than investable wealth
+- [ ] Split `params/shared/pfic-rules.json` into properly-named files (the
+      situs and currency-of-life config live there only because of a scoping
+      constraint on the Module 3 agent)
+
 ## Phase 2 step plan
 
 Acceptance criteria (§5): (a) 3 fixtures per priority parser parse to expected
