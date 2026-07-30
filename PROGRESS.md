@@ -32,7 +32,14 @@ produces no US-module output at all.
 - [x] 3.5 Consolidation + risk (`consolidate.ts`, `risk.ts`): eight slices that
       all sum back to the total, dual currency, concentration flags, wrapped vs
       unwrapped per jurisdiction, geographic split — 10 tests
-- [ ] 3.6 Module 3 — US-connected intelligence (delegated to deep-technical)
+- [x] 3.6 Module 3 — US-connected intelligence (deep-technical agent, 17 tests).
+      §7 acceptance verified independently by the main loop, not just by the
+      agent's own tests: both UK OEICs and the UCITS ETF flag PFIC CRITICAL;
+      the same ETF inside the SIPP flags WARN (wrapper-mitigated); direct
+      shares and both US-registered funds are not_pfic; the unconfirmed
+      Harbour Point fund routes to needs_classification (S7 honoured);
+      ISA WARN / SIPP OK; situs puts the 401(k) *and* the US-incorporated
+      share held in a UK GIA on the US side; UK-only household returns null.
 - [ ] 3.7 Phase gate: structural review → PHASE_REVIEW_3.md
 
 ## Phase 2 step plan

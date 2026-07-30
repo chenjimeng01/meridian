@@ -114,7 +114,7 @@
       "status": "published"
     },
     "treaty_credit": {
-      "value": "Modelling assumption: the UK/US estate and gift tax treaty (1979) is assumed to be available, giving primary taxing rights by situs and domicile with credit relief for the other country's tax, and extending a prorated unified credit to a non-US-domiciled decedent. No credit is computed here — the two columns are gross exposure, before any treaty relief.",
+      "value": "Modelling assumption: the UK/US estate and gift tax treaty (1979) is assumed to be available, giving primary taxing rights by situs and domicile with credit relief for the other country's tax, and extending a prorated unified credit to a non-US-domiciled decedent. No treaty credit is computed here — the two columns are gross exposure, before any treaty relief.",
       "source": "UK/US Estate, Gift and Generation-Skipping Tax Convention 1979, Arts. 5-9 and 11",
       "status": "published"
     },
