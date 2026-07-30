@@ -11,19 +11,28 @@ canonical output byte-for-byte after operator acceptance; (b) a failing-path
 test proves the redaction assertion blocks an unredacted network call;
 (c) NETWORK_AUDIT.md records every API call.
 
-- [ ] 2.0 Entry tasks from PHASE_REVIEW_1: regen-and-byte-compare determinism
-      test; §9 pre-commit PII scan hook; text-ingest-path decision recorded
-- [ ] 2.1 Failing tests written restating §5 acceptance criteria
-- [ ] 2.2 Redaction engine + vault (salted stable tokens, chmod 600, assertRedacted)
-- [ ] 2.3 Fingerprint & classify (sha256, institution/doc_type heuristics)
-- [ ] 2.4 Deterministic fixture extractor (text layout parser → parse-output JSON)
-- [ ] 2.5 LLM extractor shell (redaction-gated, ajv-validated, one retry,
-      NETWORK_AUDIT append; fake-fetch tested — no real egress in tests)
-- [ ] 2.6 Instrument matching (deterministic identifiers first, fuzzy proposes only)
-- [ ] 2.7 Accept flow: parse output → ledger application, deterministic IDs,
-      golden ingested ledger byte-for-byte
-- [ ] 2.8 Mobile review diff HTML per parse run
-- [ ] 2.9 Phase gate: tests green + structural review → PHASE_REVIEW_2.md
+- [x] 2.0 Entry tasks from PHASE_REVIEW_1: regen-and-byte-compare determinism
+      test; §9 pre-commit PII scan hook (installed + verified blocking);
+      text-ingest decision: v0 ingests .txt natively, .pdf converts at the
+      Phase 4 CLI boundary (pdftotext when available, else manual conversion)
+- [x] 2.1 Failing tests written restating §5 acceptance criteria (3 suites red)
+- [x] 2.2 Redaction engine + vault (stable tokens, honorific stripping,
+      NI/SSN/postcode/account patterns, assertRedacted hard gate, mode-600 save)
+- [x] 2.3 Fingerprint & classify (sha256 of raw bytes; institution/doc_type
+      registry in the fixture extractor; LLM classifies real-world docs)
+- [x] 2.4 Deterministic fixture extractor — all 15 statements parse to expected
+      canonical output byte-for-byte (§5 criterion a)
+- [x] 2.5 LLM extractor: redaction-gated (criterion b test proves fetch is
+      never reached unredacted), audit row per call (criterion c), ajv + one
+      retry with errors appended, then ParkedError; offline mode refuses egress
+- [x] 2.6 Matching: ISIN/SEDOL/CUSIP exact; fuzzy Jaccard proposes candidates
+      only; unknown → draft needs_review
+- [x] 2.7 Accept flow + golden: full 15-doc pipeline reproduces
+      test/golden/ingested-ledger.json byte-for-byte; semantically equivalent
+      to the Phase 1 fixture ledger (per-account totals, asof, fx)
+- [x] 2.8 Mobile review diff HTML (390-first, redacted-only, confidence chips,
+      prior-vs-proposed diff, <200KB)
+- [ ] 2.9 Phase gate: tests green (45/45) + structural review → PHASE_REVIEW_2.md
 
 ## Phase 1 step plan
 

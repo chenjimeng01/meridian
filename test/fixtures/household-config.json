@@ -1,0 +1,33 @@
+{
+  "comment": "Fixture household setup input — SYNTHETIC, fictional people (see NOTICE). In production this file's PII lives only in data/{household}/vault.local.json.",
+  "base_currency": "GBP",
+  "secondary_currency": "USD",
+  "persons": [
+    {
+      "token": "P1",
+      "names": ["Eleanor Vance"],
+      "tax_profile": {
+        "uk_resident": true,
+        "uk_domicile_status": "ltr_flag",
+        "us_person": true,
+        "us_person_basis": "citizen",
+        "state_exposure": "NY",
+        "treaty_positions": ["uk_us_dta_pension_art17_18"]
+      }
+    },
+    {
+      "token": "P2",
+      "names": ["Thomas Vance"],
+      "tax_profile": { "uk_resident": true, "uk_domicile_status": "ltr_flag", "us_person": false }
+    }
+  ],
+  "addresses": ["14 Larkspur Mews", "London W1U 0XX"],
+  "account_owners": {
+    "A1": ["P1"],
+    "A2": ["P1"],
+    "A3": ["P1"],
+    "A4": ["P1"],
+    "A5": ["P1", "P2"],
+    "A6": ["P1", "P2"]
+  }
+}

@@ -8,7 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --import tsx --test test/schema.test.ts test/params.test.ts test/fixtures.test.ts",
+    "test": "node --import tsx --test test/schema.test.ts test/params.test.ts test/fixtures.test.ts test/ingest-redact.test.ts test/ingest-parse.test.ts test/ingest-pipeline.test.ts",
+    "gen:golden": "node --import tsx scripts/gen-golden-ingest.mts",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"schema/**/*.json\" \"params/**/*.json\"",
     "typecheck": "tsc --noEmit"
